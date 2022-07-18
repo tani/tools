@@ -6,51 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
-    <script type="module">
-        import { h, text, app } from 'https://esm.run/hyperapp';
-        import { textarea, div, h1, input } from 'https://esm.run/@hyperapp/html';
-        
-        const oninput = (key) => (state, event) => ({ ... state, [key]: event.target.value })
-        app({
-            init: { value: "" },
-            view: (state) => div([
-                h1([text("Unicode to LaTeX")]),
-                textarea({ oninput: oninput("value"), rows: 10, placeholder: 'Unicode Text' }),
-                textarea({ value: state.value, rows: 10, placeholder: 'LaTeX Text', disabled: true }),
-            ]),
-            node: document.getElementById("app")
-        });
-
-        function replace({text, searchValue, replaceValue, flags}) {
-            try {
-                const regexp = new RegExp(searchValue, flags)
-                return text.replace(regexp, replaceValue)
-            } catch (err) {
-                console.error(err)
-                return text
-            }
-        }
-        app({
-            init: { searchValue: "", replaceValue: "", text: "", flags: "g" },
-            view: (state) => div([
-                h1([text("Replace Text")]),
-                text("s/"),
-                input({ oninput: oninput("searchValue"), value: state.searchValue }),
-                text("/"),
-                input({ oninput: oninput("replaceValue"), value: state.replaceValue }),
-                text("/"),
-                input({ oninput: oninput("flags"), value: state.flags }),
-                textarea({ oninput: oninput("text"), rows: 10, placeholder: 'Target Text' }),
-                textarea({ value: replace(state), rows: 10, placeholder: 'Replaced Text', disabled: true }),
-            ]),
-            node: document.getElementById("sed")
-        });
-    </script>
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./unicode-to-latex.jsx"></script>
 </head>
 
 <body>
-    <div id="app"></div>
-    <div id="sed"></div>
+    <div id="unicode-to-latex"></div>
 </body>
 
 </html>

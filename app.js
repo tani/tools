@@ -1,9 +1,7 @@
-import React from 'https://esm.sh/react@18';
-import ReactDOM from 'https://esm.sh/react-dom@18'
-import { HashRouter, Routes, Route, Link, NavLink } from 'https://esm.sh/react-router-dom@6';
-import htm from 'https://esm.sh/htm@3';
+import { ReactRouter, React, ReactDOM, htm } from './deps.js';
 import { UnicodeToLaTeX } from './unicode-to-latex.js';
 import { ReplaceText } from './replace-text.js';
+const { NavLink, Link, HashRouter, Routes, Route } = ReactRouter;
 
 const html = htm.bind(React.createElement)
 

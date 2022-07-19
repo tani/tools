@@ -1,5 +1,4 @@
-import React from 'https://esm.sh/react@18';
-import htm from 'https://esm.sh/htm@3'
+import { htm, React } from './deps.js'
 const html = htm.bind(React.createElement)
 
 var response = await fetch('./unicode_latex_unicodemath.json')

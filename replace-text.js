@@ -1,6 +1,4 @@
-import React from 'https://esm.sh/react@18';
-import htm from 'https://esm.sh/htm@3';
-import ReactDiffViewer from "https://esm.sh/react-diff-viewer";
+import { htm, React, ReactDiffViewer } from './deps.js'
 const html = htm.bind(React.createElement);
 
 export function ReplaceText() {

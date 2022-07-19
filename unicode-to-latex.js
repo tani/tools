@@ -1,6 +1,6 @@
-import { h, render } from 'https://jspm.dev/preact@10';
-import { useState } from 'http://jspm.dev/preact@10/hooks';
-import htm from 'https://jspm.dev/htm@3'
+import { h } from 'https://esm.sh/preact@10';
+import { useState } from 'http://esm.sh/preact@10/hooks';
+import htm from 'https://esm.sh/htm@3'
 const html = htm.bind(h)
 
 var response = await fetch('./unicode_latex_unicodemath.json')
@@ -15,16 +15,14 @@ function replace(str) {
     return str.replaceAll(/\$\$/g, '')
 }
 
-function UnicodeToLaTeX() {
+export function UnicodeToLaTeX() {
     const [state, setState] = useState({ value: "" })
     const handleInput = (event) => setState({ ...state, value: event.target.value })
     return html`
         <div>
             <h2>Unicode To LaTeX</h2>
-            <textarea onInput=${handleInput} rows="20"></textarea>
-            <textarea value=${replace(state.value)} readOnly rows="20"></textarea>
+            <textarea class="form-control mt-3" onInput=${handleInput} rows="20"></textarea>
+            <textarea class="form-control mt-3" value=${replace(state.value)} readOnly rows="20"></textarea>
         </div>
     `
 }
-
-render(html`<${UnicodeToLaTeX} />`, document.getElementById("unicode-to-latex"));

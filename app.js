@@ -1,36 +1,42 @@
-import { h, render } from 'https://esm.sh/preact@10';
-import { Router } from 'https://esm.sh/preact-router@3';
-import { Link } from 'https://esm.sh/preact-router@3/match';
+import React from 'https://esm.sh/react@18';
+import ReactDOM from 'https://esm.sh/react-dom@18'
+import { HashRouter, Routes, Route, Link, NavLink } from 'https://esm.sh/react-router-dom@6';
 import htm from 'https://esm.sh/htm@3';
-import { createHashHistory } from 'https://esm.sh/history';
 import { UnicodeToLaTeX } from './unicode-to-latex.js';
+import { ReplaceText } from './replace-text.js';
 
-const html = htm.bind(h)
+const html = htm.bind(React.createElement)
+
+function menuClassName({isActive}) {
+    return [isActive ? "active" : "", "list-group-item", "list-group-item-action"].join(" ")
+}
 
 function App() {
     return html`
-    <div>
-        <nav class="navbar bg-light">
-          <div class="container-fluid">
-            <${Link} class="navbar-brand" href="/">Taniguchi's Tools<//>
+    <${HashRouter}>
+        <nav className="navbar bg-light">
+          <div className="container-fluid">
+            <${Link} className="navbar-brand" to="/">Taniguchi's Tools<//>
           </div>
         </nav>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-2 pt-3">
-                    <div class="list-group">
-                        <${Link} activeClassName="active" class="list-group-item list-group-item-action" href="/unicode-to-latex">Unicode To LaTeX<//>
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-sm-2 pt-3">
+                    <div className="list-group">
+                        <${NavLink} className=${menuClassName} to="/unicode-to-latex">Unicode To LaTeX<//>
+                        <${NavLink} className=${menuClassName} to="/replace-text">Replace Text<//>
                     </div>
                 </div>
-                <div class="col-sm-10 pt-3">
-                    <${Router} history=${createHashHistory()}>
-                        <${UnicodeToLaTeX} default path="/unicode-to-latex" />
+                <div className="col-sm-10 pt-3">
+                    <${Routes}>
+                        <${Route} path="/unicode-to-latex" element=${html`<${UnicodeToLaTeX} />`} />
+                        <${Route} path="/replace-text" element=${html`<${ReplaceText} />`} />
                     <//>
                 </div>
             </div>
         </div>
-    </div>
+    <//>
     `
 }
 
-render(html`<${App} />`, document.getElementById('app'))
+ReactDOM.createRoot(document.getElementById('app')).render(html`<${App} />`)

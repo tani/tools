@@ -1,9 +1,8 @@
 import { ReactRouter, React, ReactDOM, htm } from './deps.js';
-import { UnicodeToLaTeX } from './unicode-to-latex.js';
-import { ReplaceText } from './replace-text.js';
 const { NavLink, Link, HashRouter, Routes, Route } = ReactRouter;
-
 const html = htm.bind(React.createElement)
+const UnicodeToLaTeX = React.lazy(() => import( './unicode-to-latex.js'));
+const ReplaceText = React.lazy(() => import( './replace-text.js'));
 
 function menuClassName({isActive}) {
     return [isActive ? "active" : "", "list-group-item", "list-group-item-action"].join(" ")
@@ -26,9 +25,11 @@ function App() {
                     </div>
                 </div>
                 <div className="col-sm-10 pt-3">
-                    <${Routes}>
-                        <${Route} path="/unicode-to-latex" element=${html`<${UnicodeToLaTeX} />`} />
-                        <${Route} path="/replace-text" element=${html`<${ReplaceText} />`} />
+                    <${React.Suspense} fallback=${html`<div>Loading...</div>`}>
+                        <${Routes}>
+                            <${Route} path="/unicode-to-latex" element=${html`<${UnicodeToLaTeX} />`} />
+                            <${Route} path="/replace-text" element=${html`<${ReplaceText} />`} />
+                        <//>
                     <//>
                 </div>
             </div>

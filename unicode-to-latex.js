@@ -13,7 +13,7 @@ function replace(str) {
     return str.replaceAll(/\$\$/g, '')
 }
 
-export function UnicodeToLaTeX() {
+export default function UnicodeToLaTeX() {
     const [state, setState] = React.useState({ value: "" })
     const handleInput = (event) => setState({ ...state, value: event.target.value })
     return html`

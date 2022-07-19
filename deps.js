@@ -1,5 +1,5 @@
-export { default as React } from "https://esm.sh/react@18"
-export * as ReactDOM from "https://esm.sh/react-dom@18"
+export * as React from "https://esm.sh/react@18"
+export * as ReactDOM from "https://esm.sh/react-dom@18/client"
 export * as ReactRouter from "https://esm.sh/react-router-dom@6"
 export { default as htm } from "https://esm.sh/htm@3"
 export { default as ReactDiffViewer } from "https://esm.sh/react-diff-viewer@3"

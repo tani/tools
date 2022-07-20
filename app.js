@@ -3,6 +3,7 @@ const { NavLink, Link, HashRouter, Routes, Route } = ReactRouter;
 const html = htm.bind(React.createElement)
 const UnicodeToLaTeX = React.lazy(() => import( './unicode-to-latex.js'));
 const ReplaceText = React.lazy(() => import( './replace-text.js'));
+const DiffText = React.lazy(() => import( './diff-text.js'));
 
 function menuClassName({isActive}) {
     return [isActive ? "active" : "", "list-group-item", "list-group-item-action"].join(" ")
@@ -22,6 +23,7 @@ function App() {
                     <div className="list-group">
                         <${NavLink} className=${menuClassName} to="/unicode-to-latex">Unicode To LaTeX<//>
                         <${NavLink} className=${menuClassName} to="/replace-text">Replace Text<//>
+                        <${NavLink} className=${menuClassName} to="/diff-text">Diff Text<//>
                     </div>
                 </div>
                 <div className="col-sm-10 pt-3">
@@ -29,6 +31,7 @@ function App() {
                         <${Routes}>
                             <${Route} path="/unicode-to-latex" element=${html`<${UnicodeToLaTeX} />`} />
                             <${Route} path="/replace-text" element=${html`<${ReplaceText} />`} />
+                            <${Route} path="/diff-text" element=${html`<${DiffText} />`} />
                         <//>
                     <//>
                 </div>

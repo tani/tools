@@ -4,6 +4,7 @@ const html = htm.bind(React.createElement)
 const UnicodeToLaTeX = React.lazy(() => import( './unicode-to-latex.js'));
 const ReplaceText = React.lazy(() => import( './replace-text.js'));
 const DiffText = React.lazy(() => import( './diff-text.js'));
+const SvgToPng = React.lazy(() => import( './svg-to-png.js'));
 
 function menuClassName({isActive}) {
     return [isActive ? "active" : "", "list-group-item", "list-group-item-action"].join(" ")
@@ -24,6 +25,7 @@ function App() {
                         <${NavLink} className=${menuClassName} to="/unicode-to-latex">Unicode To LaTeX<//>
                         <${NavLink} className=${menuClassName} to="/replace-text">Replace Text<//>
                         <${NavLink} className=${menuClassName} to="/diff-text">Diff Text<//>
+                        <${NavLink} className=${menuClassName} to="/svg-to-png">SVG to PNG<//>
                     </div>
                 </div>
                 <div className="col-sm-10 pt-3">
@@ -32,6 +34,7 @@ function App() {
                             <${Route} path="/unicode-to-latex" element=${html`<${UnicodeToLaTeX} />`} />
                             <${Route} path="/replace-text" element=${html`<${ReplaceText} />`} />
                             <${Route} path="/diff-text" element=${html`<${DiffText} />`} />
+                            <${Route} path="/svg-to-png" element=${html`<${SvgToPng} />`} />
                         <//>
                     <//>
                 </div>

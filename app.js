@@ -5,6 +5,7 @@ const UnicodeToLaTeX = React.lazy(() => import( './unicode-to-latex.js'));
 const ReplaceText = React.lazy(() => import( './replace-text.js'));
 const DiffText = React.lazy(() => import( './diff-text.js'));
 const SvgToPng = React.lazy(() => import( './svg-to-png.js'));
+const WordCount = React.lazy(() => import( './word-count.js'));
 
 function menuClassName({isActive}) {
     return [isActive ? "active" : "", "list-group-item", "list-group-item-action"].join(" ")
@@ -26,6 +27,7 @@ function App() {
                         <${NavLink} className=${menuClassName} to="/replace-text">Replace Text<//>
                         <${NavLink} className=${menuClassName} to="/diff-text">Diff Text<//>
                         <${NavLink} className=${menuClassName} to="/svg-to-png">SVG to PNG<//>
+                        <${NavLink} className=${menuClassName} to="/word-count">Word Count<//>
                     </div>
                 </div>
                 <div className="col-sm-10 pt-3">
@@ -35,6 +37,7 @@ function App() {
                             <${Route} path="/replace-text" element=${html`<${ReplaceText} />`} />
                             <${Route} path="/diff-text" element=${html`<${DiffText} />`} />
                             <${Route} path="/svg-to-png" element=${html`<${SvgToPng} />`} />
+                            <${Route} path="/word-count" element=${html`<${WordCount} />`} />
                         <//>
                     <//>
                 </div>

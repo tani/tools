@@ -1,7 +1,7 @@
 import { htm, React, Canvg } from './deps.js'
 const html = htm.bind(React.createElement);
 
-export default function ReplaceText() {
+export default function SvgToPng() {
     const [state, setState] = React.useState({ x: 300, y: 300, svg: "", png: "", raw: "" })
     const handleInput = (key) => async (event) => {
         await setState({ ...state, [key]: event.target.value })

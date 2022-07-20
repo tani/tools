@@ -1,7 +1,7 @@
 import { htm, React, ReactDiffViewer } from './deps.js'
 const html = htm.bind(React.createElement);
 
-export default function ReplaceText() {
+export default function DiffText() {
     const [state, setState] = React.useState({ newText: "", oldText: "" })
     const handleInput = (key) => (event) => setState({ ...state, [key]: event.target.value })
     return html`

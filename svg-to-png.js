@@ -1,4 +1,6 @@
-import { htm, React, Canvg } from './deps.js'
+import * as React from 'react';
+import htm from 'htm';
+import { Canvg } from 'canvg';
 const html = htm.bind(React.createElement);
 
 export default function SvgToPng() {

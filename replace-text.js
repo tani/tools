@@ -1,4 +1,6 @@
-import { htm, React, ReactDiffViewer } from './deps.js'
+import * as React from 'react';
+import htm from 'htm';
+import ReactDiffViewer from 'react-diff-viewer';
 const html = htm.bind(React.createElement);
 
 export default function ReplaceText() {

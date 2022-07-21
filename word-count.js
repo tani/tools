@@ -1,4 +1,6 @@
-import { htm, React, _ } from './deps.js'
+import * as React from 'react';
+import htm from 'htm';
+import _ from 'lodash';
 const html = htm.bind(React.createElement)
 
 export default function WordCount() {

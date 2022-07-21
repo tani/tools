@@ -1,5 +1,7 @@
-import { ReactRouter, React, ReactDOM, htm } from './deps.js';
-const { NavLink, Link, HashRouter, Routes, Route } = ReactRouter;
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import htm from "htm"
+import{ NavLink, Link, HashRouter, Routes, Route } from "react-router-dom";
 const html = htm.bind(React.createElement)
 const UnicodeToLaTeX = React.lazy(() => import( './unicode-to-latex.js'));
 const ReplaceText = React.lazy(() => import( './replace-text.js'));

@@ -1,4 +1,5 @@
-import { htm, React } from './deps.js'
+import * as React from 'react';
+import htm from 'htm';
 const html = htm.bind(React.createElement)
 
 var response = await fetch('./unicode_latex_unicodemath.json')

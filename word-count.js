@@ -1,6 +1,7 @@
 import * as React from 'react';
 import htm from 'htm';
 import _ from 'lodash';
+import graphemesplit from 'graphemesplit';
 const html = htm.bind(React.createElement)
 
 export default function WordCount() {
@@ -15,7 +16,7 @@ export default function WordCount() {
                         <tbody>
                             <tr>
                                 <th>Characters</th>
-                                <td>${[...state.value].length}</td>
+                                <td>${graphemesplit(state.value).length}</td>
                                 <th>Words</th>
                                 <td>${_.words(state.value).length}</td>
                                 <th>Lines</th>

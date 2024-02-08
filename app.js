@@ -9,6 +9,7 @@ const DiffText = React.lazy(() => import( './diff-text.js'));
 const SvgToPng = React.lazy(() => import( './svg-to-png.js'));
 const WordCount = React.lazy(() => import( './word-count.js'));
 
+
 function menuClassName({isActive}) {
     return [isActive ? "active" : "", "list-group-item", "list-group-item-action"].join(" ")
 }

@@ -135,7 +135,7 @@ function hist(nums) {
 }
 
 function split(str) {
-    return str.trim().split(/\s+/).map(Number).filter(x => !isNaN(x))
+    return str.split(/[^0-9.+-]+/).filter(x => x !== '').map(Number).filter(x => !isNaN(x))
 }
 
 export default function WordCount() {
@@ -177,6 +177,8 @@ export default function WordCount() {
                                 <td>${midRange(state.value)}</td>
                                 <th>Range</th>
                                 <td>${range(state.value)}</td>
+                                <th>Count</th>
+                                <td>${state.value.length}</td>
                             </tr>
                         </tbody>
                     </table>

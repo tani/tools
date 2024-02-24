@@ -94,11 +94,13 @@ function median(nums) {
         return NaN;
     } else if(nums.length % 2 === 1) {
         const mid = Math.floor(nums.length / 2);
-        const med = nums[mid];
+        const sorted = nums.toSorted();
+        const med = sorted[mid];
         return med;
     } else {
         const mid = nums.length / 2;
-        const med = (nums[mid - 1] + nums[mid]) / 2;
+        const sorted = nums.toSorted();
+        const med = (sorted[mid - 1] + sorted[mid]) / 2;
         return med;
     }
 }

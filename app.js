@@ -53,4 +53,5 @@ function App() {
     `
 }
 
-ReactDOM.createRoot(document.getElementById('app')).render(html`<${App} />`)
+ReactDOM.render(html`<${App} />`, document.getElementById('app'))
+//ReactDOM.createRoot().render()

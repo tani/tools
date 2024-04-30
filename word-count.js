@@ -1,12 +1,32 @@
 import * as React from 'react';
 import htm from 'htm';
-import _ from 'lodash';
-import graphemesplit from 'graphemesplit';
-const html = htm.bind(React.createElement)
+const html = htm.bind(React.createElement);
 
 export default function WordCount() {
-    const [state, setState] = React.useState({ value: "" })
-    const handleInput = (event) => setState({ ...state, value: event.target.value })
+    const [state, setState] = React.useState({ value: "" });
+
+    const handleInput = (event) => setState({ ...state, value: event.target.value });
+
+    // グラフェムによる文字数のカウントを行う関数
+    const countGraphemeClusters = (text) => {
+        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const segments = segmenter.segment(text);
+        return Array.from(segments).length;
+    };
+
+    // 単語数をカウントする関数
+    const countWords = (text) => {
+        const segmenter = new Intl.Segmenter('en', { granularity: 'word' });
+        const segments = segmenter.segment(text);
+        let wordCount = 0;
+        for (const {segment, isWordLike} of segments) {
+            if (isWordLike) {
+                wordCount++;
+            }
+        }
+        return wordCount;
+    };
+
     return html`
         <div>
             <h2>Word Count</h2>
@@ -16,9 +36,9 @@ export default function WordCount() {
                         <tbody>
                             <tr>
                                 <th>Characters</th>
-                                <td>${graphemesplit(state.value).length}</td>
+                                <td>${countGraphemeClusters(state.value)}</td>
                                 <th>Words</th>
-                                <td>${_.words(state.value).length}</td>
+                                <td>${countWords(state.value)}</td>
                                 <th>Lines</th>
                                 <td>${state.value.split(/\r\n|\r|\n/).length}</td>
                             </tr>
@@ -32,5 +52,5 @@ export default function WordCount() {
                 </div>
             </div>
         </div>
-    `
+    `;
 }

@@ -1,5 +1,5 @@
 import * as React from "react";
-import ReactDiffViewer from "react-diff-viewer";
+import ReactDiffViewer from "react-diff-viewer-continued";
 
 export default function ReplaceText() {
 	const [state, setState] = React.useState({

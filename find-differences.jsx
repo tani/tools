@@ -1,5 +1,5 @@
 import * as React from "react";
-import ReactDiffViewer from "react-diff-viewer";
+import ReactDiffViewer from "react-diff-viewer-continued";
 
 const style = {
 	height: "18em",

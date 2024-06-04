@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom/client";
 import { NavLink, Link, BrowserRouter, Routes, Route } from "react-router-dom";
 import "bootswatch/dist/lumen/bootstrap.min.css";
 const UnicodeToLaTeX = React.lazy(() => import("./unicode-to-latex.jsx"));
+const LaTeXToUnicode = React.lazy(() => import("./latex-to-unicode.jsx"));
 const ReplaceText = React.lazy(() => import("./replace-text.jsx"));
 const FindDifferences = React.lazy(() => import("./find-differences.jsx"));
 const SvgToPng = React.lazy(() => import("./svg-to-png.jsx"));
@@ -34,6 +35,9 @@ function App() {
 							<NavLink className={menuClassName} to="/unicode-to-latex">
 								Unicode to LaTeX
 							</NavLink>
+							<NavLink className={menuClassName} to="/latex-to-unicode">
+								LaTeX Unicode
+							</NavLink>
 							<NavLink className={menuClassName} to="/replace-text">
 								Replace Text
 							</NavLink>
@@ -55,6 +59,7 @@ function App() {
 						<React.Suspense fallback={<div>Loading...</div>}>
 							<Routes>
 								<Route path="/unicode-to-latex" element={<UnicodeToLaTeX />} />
+								<Route path="/latex-to-unicode" element={<LaTeXToUnicode />} />
 								<Route path="/replace-text" element={<ReplaceText />} />
 								<Route path="/find-differences" element={<FindDifferences />} />
 								<Route path="/svg-to-png" element={<SvgToPng />} />

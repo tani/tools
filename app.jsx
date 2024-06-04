@@ -36,7 +36,7 @@ function App() {
 								Unicode to LaTeX
 							</NavLink>
 							<NavLink className={menuClassName} to="/latex-to-unicode">
-								LaTeX Unicode
+								LaTeX to Unicode
 							</NavLink>
 							<NavLink className={menuClassName} to="/replace-text">
 								Replace Text

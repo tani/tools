@@ -7,14 +7,15 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "npx @biomejs/biome lint ./*.jsx",
-    "lint!": "npx @biomejs/biome lint --write ./*.jsx",
-    "format": "npx @biomejs/biome format ./*.jsx",
-    "format!": "npx @biomejs/biome format --write ./*.jsx"
+    "check": "tsc",
+    "lint": "oxlint",
+    "format": "oxfmt"
   },
   "dependencies": {
     "bootswatch": "^5.3.8",
     "mermaid": "^11.12.2",
+    "oxfmt": "^0.21.0",
+    "oxlint": "^1.36.0",
     "react": "^18.3.1",
     "react-apexcharts": "^1.9.0",
     "react-diff-viewer-continued": "^3.4.0",
@@ -22,10 +23,11 @@
     "react-router-dom": "^7.11.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
-    "babel-plugin-react-compiler": "^1.0.0",
-    "process": "^0.11.10",
+    "typescript": "^5.9.3",
     "vite": "^7.3.0"
   }
 }

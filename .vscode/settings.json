@@ -1,6 +1,6 @@
 {
-    "editor.formatOnType": true,
-    "[commonlisp]": {
-        "editor.wordSeparators": "`|;:'\",()"
-    }
+  "editor.formatOnType": true,
+  "[commonlisp]": {
+    "editor.wordSeparators": "`|;:'\",()"
+  }
 }

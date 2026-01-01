@@ -1,5 +1,6 @@
 import * as React from "react";
-import ReactDiffViewer from "react-diff-viewer-continued";
+import { DiffView, DiffModeEnum } from "@git-diff-view/react";
+import { generateDiffFile } from "@git-diff-view/file";
 
 const style: React.CSSProperties = {
   height: "18em",
@@ -13,6 +14,28 @@ export default function DiffText() {
   const handleInput =
     (key: "newText" | "oldText") => (event: React.ChangeEvent<HTMLTextAreaElement>) =>
       setState({ ...state, [key]: event.target.value });
+
+  const diffFile = React.useMemo(() => {
+    let oldText = (state.oldText || "").replace(/\r\n/g, "\n");
+    let newText = (state.newText || "").replace(/\r\n/g, "\n");
+    if (oldText === newText) return null;
+
+    // Ensure they end with newline to avoid mismatch warnings in the viewer
+    if (oldText && !oldText.endsWith("\n")) oldText += "\n";
+    if (newText && !newText.endsWith("\n")) newText += "\n";
+
+    const file = generateDiffFile(
+      "oldText",
+      oldText,
+      "newText",
+      newText,
+      "plaintext",
+      "plaintext",
+    );
+    file.initRaw();
+    return file;
+  }, [state.oldText, state.newText]);
+
   return (
     <div>
       <h2>Diff Text</h2>
@@ -44,7 +67,11 @@ export default function DiffText() {
             Diff
           </label>
           <div id="diffText" style={style}>
-            <ReactDiffViewer splitView={false} oldValue={state.oldText} newValue={state.newText} />
+            {diffFile ? (
+              <DiffView diffFile={diffFile} diffViewMode={DiffModeEnum.Unified} />
+            ) : (
+              <div className="p-3 text-center text-muted">No differences found</div>
+            )}
           </div>
         </div>
       </div>

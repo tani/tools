@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { NavLink, Link, BrowserRouter, Routes, Route } from "react-router-dom";
 import "bootswatch/dist/lumen/bootstrap.min.css";
+import "@git-diff-view/react/styles/diff-view.css";
 const UnicodeToLaTeX = React.lazy(() => import("./unicode-to-latex"));
 const LaTeXToUnicode = React.lazy(() => import("./latex-to-unicode"));
 const ReplaceText = React.lazy(() => import("./replace-text"));

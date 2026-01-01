@@ -1,5 +1,6 @@
 import * as React from "react";
-import ReactDiffViewer from "react-diff-viewer-continued";
+import { DiffView, DiffModeEnum } from "@git-diff-view/react";
+import { generateDiffFile } from "@git-diff-view/file";
 
 export default function ReplaceText() {
   const [state, setState] = React.useState({
@@ -22,6 +23,27 @@ export default function ReplaceText() {
       return state.text;
     }
   })();
+
+  const diffFile = React.useMemo(() => {
+    let oldText = (state.text || "").replace(/\r\n/g, "\n");
+    let newText = (result || "").replace(/\r\n/g, "\n");
+    if (oldText === newText) return null;
+
+    // Ensure they end with newline to avoid mismatch warnings in the viewer
+    if (oldText && !oldText.endsWith("\n")) oldText += "\n";
+    if (newText && !newText.endsWith("\n")) newText += "\n";
+
+    const file = generateDiffFile(
+      "Deleted",
+      oldText,
+      "Added",
+      newText,
+      "plaintext",
+      "plaintext",
+    );
+    file.initRaw();
+    return file;
+  }, [state.text, result]);
 
   return (
     <div>
@@ -48,15 +70,9 @@ export default function ReplaceText() {
           <textarea name="result" className="form-control" value={result} readOnly rows={20} />
         </div>
       </div>
-      {state.text !== result && (
+      {diffFile && (
         <div className="mt-5">
-          <ReactDiffViewer
-            oldValue={state.text}
-            newValue={result}
-            leftTitle="Deleted"
-            rightTitle="Added"
-            splitView={true}
-          />
+          <DiffView diffFile={diffFile} diffViewMode={DiffModeEnum.Split} />
         </div>
       )}
     </div>

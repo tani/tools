@@ -9,6 +9,7 @@ const FindDifferences = React.lazy(() => import("./find-differences.jsx"));
 const SvgToPng = React.lazy(() => import("./svg-to-png.jsx"));
 const WordCount = React.lazy(() => import("./word-count.jsx"));
 const BasicStatistics = React.lazy(() => import("./basic-statistics.jsx"));
+const MermaidEditor = React.lazy(() => import("./mermaid-editor.jsx"));
 
 function menuClassName({ isActive }) {
 	return [
@@ -53,6 +54,9 @@ function App() {
 							<NavLink className={menuClassName} to="/basic-statistics">
 								Basic Statistics
 							</NavLink>
+							<NavLink className={menuClassName} to="/mermaid-editor">
+								Mermaid Editor
+							</NavLink>
 						</div>
 					</div>
 					<div className="col-sm-10 pt-3">
@@ -65,6 +69,7 @@ function App() {
 								<Route path="/svg-to-png" element={<SvgToPng />} />
 								<Route path="/word-count" element={<WordCount />} />
 								<Route path="/basic-statistics" element={<BasicStatistics />} />
+								<Route path="/mermaid-editor" element={<MermaidEditor />} />
 							</Routes>
 						</React.Suspense>
 					</div>

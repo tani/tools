@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Canvg } from "canvg";
 
 export default function SvgToPng() {
 	const [state, setState] = React.useState({
@@ -10,23 +9,43 @@ export default function SvgToPng() {
 		raw: "",
 	});
 	const handleInput = (key) => async (event) => {
-		await setState({ ...state, [key]: event.target.value });
+		setState({ ...state, [key]: event.target.value });
 	};
 	const handleClick = async () => {
 		const canvas = document.createElement("canvas");
 		canvas.width = state.x;
 		canvas.height = state.y;
 		const context = canvas.getContext("2d");
-		const graphics = await Canvg.fromString(context, state.raw);
-		await graphics.render();
-		const png = canvas.toDataURL();
-		await setState({ ...state, png });
+
+		const img = new Image();
+		const svgBlob = new Blob([state.raw], {
+			type: "image/svg+xml;charset=utf-8",
+		});
+		const url = URL.createObjectURL(svgBlob);
+
+		try {
+			await new Promise((resolve, reject) => {
+				img.onload = () => {
+					context.drawImage(img, 0, 0, state.x, state.y);
+					URL.revokeObjectURL(url);
+					resolve();
+				};
+				img.onerror = reject;
+				img.src = url;
+			});
+
+			const png = canvas.toDataURL();
+			setState({ ...state, png });
+		} catch (error) {
+			console.error("Conversion failed", error);
+			URL.revokeObjectURL(url);
+		}
 	};
 	const handleChange = async (event) => {
 		const file = event.target.files[0];
 		const raw = await file.text();
 		const svg = `data:image/svg+xml,${encodeURIComponent(raw)}`;
-		await setState({ ...state, raw, svg });
+		setState({ ...state, raw, svg });
 	};
 	const style = {
 		display: "flex",
@@ -84,7 +103,7 @@ export default function SvgToPng() {
 						{state.svg === "" ? (
 							<h3>SVG</h3>
 						) : (
-							<img with={state.x} height={state.y} src={state.svg} alt="svg" />
+							<img width={state.x} height={state.y} src={state.svg} alt="svg" />
 						)}
 					</div>
 				</div>
@@ -93,7 +112,7 @@ export default function SvgToPng() {
 						{state.png === "" ? (
 							<h3>PNG</h3>
 						) : (
-							<img with={state.x} height={state.y} src={state.png} alt="png" />
+							<img width={state.x} height={state.y} src={state.png} alt="png" />
 						)}
 					</div>
 				</div>

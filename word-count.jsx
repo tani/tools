@@ -16,7 +16,7 @@ export default function WordCount() {
 		const segmenter = new Intl.Segmenter("en", { granularity: "word" });
 		const segments = segmenter.segment(text);
 		let wordCount = 0;
-		for (const { segment, isWordLike } of segments) {
+		for (const { isWordLike } of segments) {
 			if (isWordLike) {
 				wordCount++;
 			}

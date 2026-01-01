@@ -1,6 +1,8 @@
 import * as React from "react";
 import json from "./unicode_latex_unicodemath.json" with { type: "json" };
-import { subscript, superscript } from "./subscript_superscript.json" with { type: "json" };
+import { subscript, superscript } from "./subscript_superscript.json" with {
+	type: "json",
+};
 
 export default function LaTeXToUnicode() {
 	const [state, setState] = React.useState({ value: "" });
@@ -13,8 +15,12 @@ export default function LaTeXToUnicode() {
 			}
 		}
 		val = val
-			.replaceAll(/_\{(.*?)\}/g, (_, sub) => sub.replaceAll(/./g, (sub) => subscript[sub] ?? sub))
-			.replaceAll(/\^\{(.*?)\}/g, (_, sub) => sub.replaceAll(/./g, (sup) => superscript[sup] ?? sup))
+			.replaceAll(/_\{(.*?)\}/g, (_, sub) =>
+				sub.replaceAll(/./g, (sub) => subscript[sub] ?? sub),
+			)
+			.replaceAll(/\^\{(.*?)\}/g, (_, sub) =>
+				sub.replaceAll(/./g, (sup) => superscript[sup] ?? sup),
+			)
 			.replaceAll(/_(.)/g, (_, sub) => subscript[sub] ?? sub)
 			.replaceAll(/\^(.)/g, (_, sup) => superscript[sup] ?? sup);
 		return val.replaceAll(/\$(.*?)\$/g, "$1");

@@ -80,13 +80,22 @@ const copyToClipboard = () => {
           <div class="col-md-4">
             <label class="form-label fw-bold small">Language</label>
             <select v-model="language" class="form-select">
-              <option value="eng">English</option>
-              <option value="jpn">Japanese</option>
+              <option value="ara">Arabic</option>
               <option value="chi_sim">Chinese - Simplified</option>
               <option value="chi_tra">Chinese - Traditional</option>
+              <option value="eng">English</option>
               <option value="fra">French</option>
               <option value="deu">German</option>
+              <option value="ell">Greek</option>
+              <option value="heb">Hebrew</option>
+              <option value="jpn">Japanese</option>
+              <option value="kor">Korean</option>
+              <option value="lat">Latin</option>
+              <option value="fas">Persian</option>
+              <option value="rus">Russian</option>
               <option value="spa">Spanish</option>
+              <option value="tha">Thai</option>
+              <option value="vie">Vietnamese</option>
             </select>
           </div>
           <div class="col-md-5">

@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Tesseract from "tesseract.js";
+import * as mupdf from "mupdf";
 
 const image = ref<string | null>(null);
+const fileData = ref<Uint8Array | null>(null);
+const fileType = ref<string | null>(null);
 const result = ref("");
 const progress = ref(0);
 const status = ref("");
@@ -63,19 +66,29 @@ const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
+    fileType.value = file.type;
     const reader = new FileReader();
     reader.onload = (e) => {
-      image.value = e.target?.result as string;
+      const arrayBuffer = e.target?.result as ArrayBuffer;
+      fileData.value = new Uint8Array(arrayBuffer);
+      
+      if (file.type === "application/pdf") {
+        image.value = null; // Don't show preview for PDF yet or show icon
+        status.value = "PDF Loaded. Ready to recognize.";
+      } else {
+        const blob = new Blob([fileData.value as any], { type: file.type });
+        image.value = URL.createObjectURL(blob);
+        status.value = "Image Loaded. Ready to recognize.";
+      }
       result.value = "";
       progress.value = 0;
-      status.value = "Ready to recognize";
     };
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(file);
   }
 };
 
 const recognizeText = async () => {
-  if (!image.value) return;
+  if (!fileData.value) return;
 
   isProcessing.value = true;
   result.value = "";
@@ -83,20 +96,66 @@ const recognizeText = async () => {
   status.value = "Initializing...";
 
   try {
-    const { data: { text } } = await Tesseract.recognize(
-      image.value,
-      language.value,
-      {
-        logger: (m) => {
-          if (m.status === "recognizing text") {
-            progress.value = m.progress;
+    if (fileType.value === "application/pdf") {
+      const doc = mupdf.Document.openDocument(fileData.value!, "application/pdf");
+      const pageCount = doc.countPages();
+      let combinedText = "";
+
+      for (let i = 0; i < pageCount; i++) {
+        status.value = `Processing PDF page ${i + 1} of ${pageCount}...`;
+        const page = doc.loadPage(i);
+        const pixmap = page.toPixmap(mupdf.Matrix.identity, mupdf.ColorSpace.DeviceRGB, true);
+        const width = pixmap.getWidth();
+        const height = pixmap.getHeight();
+        
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          pixmap.destroy();
+          continue;
+        }
+
+        const samples = new Uint8ClampedArray(pixmap.getPixels());
+        const imageData = new ImageData(samples, width, height);
+        ctx.putImageData(imageData, 0, 0);
+        
+        const pageImage = canvas.toDataURL("image/png");
+        
+        const { data: { text } } = await Tesseract.recognize(
+          pageImage,
+          language.value,
+          {
+            logger: (m) => {
+              if (m.status === "recognizing text") {
+                progress.value = ((i / pageCount) + (m.progress / pageCount));
+              }
+            },
           }
-          status.value = m.status;
-        },
+        );
+        combinedText += `--- Page ${i + 1} ---\n${text}\n\n`;
+        pixmap.destroy();
       }
-    );
-    result.value = text;
+      result.value = combinedText;
+      doc.destroy();
+    } else {
+      const { data: { text } } = await Tesseract.recognize(
+        image.value!,
+        language.value,
+        {
+          logger: (m) => {
+            if (m.status === "recognizing text") {
+              progress.value = m.progress;
+            }
+            status.value = m.status;
+          },
+        }
+      );
+      result.value = text;
+    }
     status.value = "Recognition complete";
+    progress.value = 1;
   } catch (error) {
     console.error("OCR Error:", error);
     status.value = "Error occurred during recognition";
@@ -119,7 +178,7 @@ const copyToClipboard = () => {
   <div>
     <h2 class="display-6">OCR Tool</h2>
     <p class="text-muted mb-4">
-      Extract text from images using Optical Character Recognition (OCR) powered by Tesseract.js.
+      Extract text from images or PDF documents using Optical Character Recognition (OCR) powered by Tesseract.js and MuPDF.
     </p>
 
     <div class="card mb-4 shadow-sm">
@@ -135,11 +194,11 @@ const copyToClipboard = () => {
             </select>
           </div>
           <div class="col-md-5">
-            <label class="form-label fw-bold small">Upload Image</label>
+            <label class="form-label fw-bold small">Upload Image or PDF</label>
             <input
               class="form-control"
               type="file"
-              accept="image/*"
+              accept="image/*,application/pdf"
               @change="handleFileChange"
             />
           </div>
@@ -148,7 +207,7 @@ const copyToClipboard = () => {
               class="btn btn-primary w-100" 
               type="button" 
               @click="recognizeText"
-              :disabled="!image || isProcessing"
+              :disabled="!fileData || isProcessing"
             >
               <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
               {{ isProcessing ? 'Processing...' : 'Start OCR' }}
@@ -178,10 +237,14 @@ const copyToClipboard = () => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Source Image</div>
+          <div class="card-header fw-bold small text-uppercase text-muted">Source Preview</div>
           <div class="card-body bg-light overflow-auto p-3 d-flex align-items-center justify-content-center" style="min-height: 400px">
             <img v-if="image" :src="image" class="img-fluid border shadow-sm" alt="OCR Source" />
-            <div v-else class="text-muted small">No image uploaded</div>
+            <div v-else-if="fileType === 'application/pdf'" class="text-center">
+              <i class="bi bi-file-pdf fs-1 text-danger"></i>
+              <div class="text-muted small mt-2">PDF Document Loaded</div>
+            </div>
+            <div v-else class="text-muted small">No file uploaded</div>
           </div>
         </div>
       </div>

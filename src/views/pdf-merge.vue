@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import * as mupdf from 'mupdf';
+import PdfViewer from '../components/PdfViewer.vue';
 
 interface FileItem {
   id: string;
   name: string;
   data: Uint8Array;
+  showPreview: boolean;
 }
 
 const files = ref<FileItem[]>([]);
@@ -25,7 +27,8 @@ const handleFileChange = async (event: Event) => {
     files.value.push({
       id: Math.random().toString(36).substr(2, 9),
       name: file.name,
-      data: new Uint8Array(arrayBuffer)
+      data: new Uint8Array(arrayBuffer),
+      showPreview: false
     });
   }
   // Reset input
@@ -36,6 +39,13 @@ const handleFileChange = async (event: Event) => {
 const removeFile = (id: string) => {
   files.value = files.value.filter(f => f.id !== id);
   downloadUrl.value = null;
+};
+
+const togglePreview = (id: string) => {
+  const file = files.value.find(f => f.id === id);
+  if (file) {
+    file.showPreview = !file.showPreview;
+  }
 };
 
 const moveFile = (index: number, direction: number) => {
@@ -124,13 +134,23 @@ const mergePdfs = async () => {
       </div>
       <div class="card-body p-0">
         <ul v-if="files.length > 0" class="list-group list-group-flush">
-          <li v-for="(file, index) in files" :key="file.id" class="list-group-item d-flex align-items-center gap-3">
-            <div class="d-flex flex-column gap-1">
-              <button class="btn btn-sm btn-outline-secondary p-0 px-1" @click="moveFile(index, -1)" :disabled="index === 0">▲</button>
-              <button class="btn btn-sm btn-outline-secondary p-0 px-1" @click="moveFile(index, 1)" :disabled="index === files.length - 1">▼</button>
+          <li v-for="(file, index) in files" :key="file.id" class="list-group-item p-0">
+            <div class="d-flex align-items-center gap-3 p-3">
+              <div class="d-flex flex-column gap-1">
+                <button class="btn btn-sm btn-outline-secondary p-0 px-1" @click="moveFile(index, -1)" :disabled="index === 0">▲</button>
+                <button class="btn btn-sm btn-outline-secondary p-0 px-1" @click="moveFile(index, 1)" :disabled="index === files.length - 1">▼</button>
+              </div>
+              <span class="flex-grow-1 text-truncate fw-bold">{{ file.name }}</span>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary" @click="togglePreview(file.id)">
+                  {{ file.showPreview ? 'Hide Preview' : 'Preview' }}
+                </button>
+                <button class="btn btn-sm btn-outline-danger" @click="removeFile(file.id)">Remove</button>
+              </div>
             </div>
-            <span class="flex-grow-1 text-truncate">{{ file.name }}</span>
-            <button class="btn btn-sm btn-outline-danger" @click="removeFile(file.id)">Remove</button>
+            <div v-if="file.showPreview" class="bg-light border-top p-3">
+              <PdfViewer :data="file.data" />
+            </div>
           </li>
         </ul>
         <div v-else class="text-center py-5 text-muted small uppercase fw-bold">

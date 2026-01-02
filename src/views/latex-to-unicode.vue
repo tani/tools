@@ -30,7 +30,7 @@ const output = computed(() => replace(input.value));
 
 <template>
   <div>
-    <h2>LaTeX To Unicode</h2>
+    <h2 class="display-6">LaTeX To Unicode</h2>
     <div class="row">
       <div class="col-sm-6">
         <textarea v-model="input" class="form-control mt-3" rows="20" />

@@ -32,7 +32,7 @@ const diffFile = computed(() => {
 
 <template>
   <div>
-    <h2>Replace Text</h2>
+    <h2 class="display-6">Replace Text</h2>
     <label for="search" class="form-label">Search</label>
     <input id="search" v-model="search" class="form-control" />
     <label for="replace" class="form-label">Replace</label>

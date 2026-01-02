@@ -117,7 +117,7 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <h2>Pomodoro Timer</h2>
+    <h2 class="display-6">Pomodoro Timer</h2>
 
     <div class="row mt-3">
       <div class="col-sm-12">
@@ -150,8 +150,8 @@ onUnmounted(() => {
     <div class="row">
       <div class="col-sm-6">
         <div class="text-center p-5 bg-light rounded shadow-sm">
-          <h1 class="display-1 fw-bold mb-4">{{ displayTime }}</h1>
-          <div class="progress mb-4" style="height: 10px">
+          <div class="display-1 fw-bold">{{ displayTime }}</div>
+          <div class="progress " style="height: 10px">
             <div
               class="progress-bar"
               role="progressbar"
@@ -204,7 +204,7 @@ onUnmounted(() => {
         </table>
 
         <div class="mt-4">
-          <h5>Instructions</h5>
+          <h3>Instructions</h3>
           <ul class="text-muted">
             <li>Work for 25 minutes.</li>
             <li>Take a 5-minute short break.</li>

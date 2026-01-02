@@ -32,7 +32,7 @@ const lineCount = computed(() => input.value.split(/\r\n|\r|\n/).length);
 
 <template>
   <div>
-    <h2>Word Count</h2>
+    <h2 class="display-6">Word Count</h2>
     <div class="row">
       <div class="col-sm-12">
         <table class="table">

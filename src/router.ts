@@ -38,6 +38,10 @@ const routes = [
     path: "/pomodoro-timer",
     component: () => import("./views/pomodoro-timer.vue"),
   },
+  {
+    path: "/math-preview",
+    component: () => import("./views/math-preview.vue"),
+  },
 ];
 
 export const router = createRouter({

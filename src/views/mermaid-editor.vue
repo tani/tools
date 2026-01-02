@@ -129,7 +129,7 @@ watch(
 
 <template>
   <div class="mermaid-editor">
-    <h2>Mermaid Editor</h2>
+    <h2 class="display-6">Mermaid Editor</h2>
     <div class="row">
       <div class="col-sm-12">
         <textarea
@@ -142,7 +142,7 @@ watch(
 
     <div class="row mb-2">
       <div class="col-sm-6 text-start">
-        <h5>Preview (PNG Image)</h5>
+        <h3>Preview (PNG Image)</h3>
       </div>
       <div class="col-sm-6 text-end">
         <a

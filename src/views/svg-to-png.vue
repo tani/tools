@@ -50,7 +50,7 @@ const handleChange = async (event: Event) => {
 
 <template>
   <div>
-    <h2>SVG to PNG</h2>
+    <h2 class="display-6">SVG to PNG</h2>
     <div class="row">
       <div class="col-sm-3">
         <input v-model.number="x" name="x" class="form-control" type="number" />
@@ -73,15 +73,15 @@ const handleChange = async (event: Event) => {
     </div>
     <div class="row mt-2">
       <div class="col-sm-6">
-        <div class="preview-container">
-          <h3 v-if="svg === ''">SVG</h3>
-          <img v-else :width="x" :height="y" :src="svg" alt="svg" />
+        <div class="p-3 bg-light border rounded" style="min-height: 500px">
+          <h4 v-if="svg === ''">SVG</h4>
+          <div v-html="svg" />
         </div>
       </div>
-      <div class="col-sm-6">
-        <div class="preview-container">
-          <h3 v-if="png === ''">PNG</h3>
-          <img v-else :width="x" :height="y" :src="png" alt="png" />
+      <div class="col-sm-6 text-center">
+        <div class="p-3 bg-light border rounded" style="min-height: 500px">
+          <h4 v-if="png === ''">PNG</h4>
+          <img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
         </div>
       </div>
     </div>

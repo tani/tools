@@ -73,6 +73,13 @@
               >
                 Pomodoro Timer
               </RouterLink>
+              <RouterLink
+                class="list-group-item list-group-item-action"
+                active-class="active"
+                to="/math-preview"
+              >
+                Math Preview
+              </RouterLink>
             </div>
           </div>
           <div class="col-sm-10 pt-3">

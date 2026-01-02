@@ -22,7 +22,7 @@ const diffFile = computed(() => {
 
 <template>
   <div>
-    <h2>Diff Text</h2>
+    <h2 class="display-6">Diff Text</h2>
     <div class="row">
       <div class="col-sm-6">
         <label for="oldText" class="form-label">Old</label>

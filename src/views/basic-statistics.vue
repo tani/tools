@@ -169,7 +169,7 @@ const chartData = computed(() => {
 
 <template>
   <div>
-    <h2>Basic Statistics</h2>
+    <h2 class="display-6">Basic Statistics</h2>
     <div class="row">
       <div class="col-sm-12">
         <table class="table">

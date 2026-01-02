@@ -115,8 +115,12 @@ const copyToClipboard = () => {
           </div>
           <div class="progress" style="height: 10px;">
             <div 
-              class="progress-bar progress-bar-striped progress-bar-animated" 
+              class="progress-bar" 
               role="progressbar" 
+              :class="{ 
+                'progress-bar-striped progress-bar-animated': isProcessing,
+                'bg-success': status === 'Recognition complete'
+              }"
               :style="{ width: `${progress * 100}%` }"
             ></div>
           </div>

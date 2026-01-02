@@ -6,6 +6,7 @@ const input = ref("\\xymatrix{A \\ar[r]^f \\ar[d]_g & B \\ar[d]^h \\\\ C \\ar[r]
 const output = ref("");
 const imageUrl = ref("");
 const error = ref("");
+const isRendering = ref(false);
 
 async function convertSvgToPng(svgString: string, scale = 2) {
   const parser = new DOMParser();
@@ -20,7 +21,6 @@ async function convertSvgToPng(svgString: string, scale = 2) {
   let height = 0;
 
   if (widthAttr && heightAttr) {
-    // MathJax SVG often has units like "10ex" or "5em"
     const container = document.createElement("div");
     container.style.position = "absolute";
     container.style.visibility = "hidden";
@@ -63,9 +63,11 @@ const renderMath = async () => {
     output.value = "";
     imageUrl.value = "";
     error.value = "";
+    isRendering.value = false;
     return;
   }
 
+  isRendering.value = true;
   try {
     const result = tex2svgHtml(input.value, {
       display: true,
@@ -75,7 +77,6 @@ const renderMath = async () => {
     output.value = result;
     error.value = "";
 
-    // Extract SVG from result
     const parser = new DOMParser();
     const doc = parser.parseFromString(result, "text/html");
     const svg = doc.querySelector("svg");
@@ -86,6 +87,8 @@ const renderMath = async () => {
     console.error("MathJax Render Error:", err);
     error.value = err instanceof Error ? err.message : "Invalid TeX syntax";
     imageUrl.value = "";
+  } finally {
+    isRendering.value = false;
   }
 };
 
@@ -132,7 +135,13 @@ onMounted(() => {
           <div v-if="!input.trim()" class="text-muted">
             Enter some TeX to see the preview
           </div>
-          <div v-else v-html="output"></div>
+          <div v-else-if="isRendering" class="text-muted">
+            <output class="spinner-border text-primary spinner-border-sm me-2">
+              <span class="visually-hidden">Loading...</span>
+            </output>
+            Rendering...
+          </div>
+          <img v-else-if="imageUrl" :src="imageUrl" class="img-fluid" alt="Math Preview" />
         </div>
       </div>
     </div>

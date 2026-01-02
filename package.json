@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "check": "tsc && vue-tsc",
     "lint": "oxlint",
-    "format": "oxfmt"
+    "format": "oxfmt",
+    "test": "tsx --test src/utils/*.test.ts"
   },
   "dependencies": {
     "@git-diff-view/file": "^0.0.35",
@@ -25,6 +26,7 @@
     "@types/node": "^25.0.3",
     "oxfmt": "^0.21.0",
     "oxlint": "^1.36.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "unplugin-vue": "^7.1.0",
     "vite": "^7.3.0",

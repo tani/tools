@@ -10,6 +10,55 @@ const isProcessing = ref(false);
 const language = ref("eng");
 const copyBtnText = ref("Copy");
 
+const supportedLanguages = [
+  { code: "amh", name: "Amharic" },
+  { code: "ara", name: "Arabic" },
+  { code: "ben", name: "Bengali" },
+  { code: "mya", name: "Burmese" },
+  { code: "chi_sim", name: "Chinese - Simplified" },
+  { code: "chi_tra", name: "Chinese - Traditional" },
+  { code: "ces", name: "Czech" },
+  { code: "dan", name: "Danish" },
+  { code: "nld", name: "Dutch" },
+  { code: "eng", name: "English" },
+  { code: "fas", name: "Persian" },
+  { code: "fin", name: "Finnish" },
+  { code: "fra", name: "French" },
+  { code: "deu", name: "German" },
+  { code: "ell", name: "Greek" },
+  { code: "guj", name: "Gujarati" },
+  { code: "heb", name: "Hebrew" },
+  { code: "hin", name: "Hindi" },
+  { code: "ind", name: "Indonesian" },
+  { code: "ita", name: "Italian" },
+  { code: "jpn", name: "Japanese" },
+  { code: "kan", name: "Kannada" },
+  { code: "khm", name: "Khmer" },
+  { code: "kor", name: "Korean" },
+  { code: "lao", name: "Lao" },
+  { code: "lat", name: "Latin" },
+  { code: "msa", name: "Malay" },
+  { code: "mal", name: "Malayalam" },
+  { code: "mar", name: "Marathi" },
+  { code: "nor", name: "Norwegian" },
+  { code: "pol", name: "Polish" },
+  { code: "por", name: "Portuguese" },
+  { code: "pan", name: "Punjabi" },
+  { code: "rus", name: "Russian" },
+  { code: "slk", name: "Slovak" },
+  { code: "spa", name: "Spanish" },
+  { code: "swa", name: "Swahili" },
+  { code: "swe", name: "Swedish" },
+  { code: "tgl", name: "Tagalog" },
+  { code: "tam", name: "Tamil" },
+  { code: "tel", name: "Telugu" },
+  { code: "tha", name: "Thai" },
+  { code: "tur", name: "Turkish" },
+  { code: "ukr", name: "Ukrainian" },
+  { code: "urd", name: "Urdu" },
+  { code: "vie", name: "Vietnamese" },
+];
+
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -80,22 +129,9 @@ const copyToClipboard = () => {
           <div class="col-md-4">
             <label class="form-label fw-bold small">Language</label>
             <select v-model="language" class="form-select">
-              <option value="ara">Arabic</option>
-              <option value="chi_sim">Chinese - Simplified</option>
-              <option value="chi_tra">Chinese - Traditional</option>
-              <option value="eng">English</option>
-              <option value="fra">French</option>
-              <option value="deu">German</option>
-              <option value="ell">Greek</option>
-              <option value="heb">Hebrew</option>
-              <option value="jpn">Japanese</option>
-              <option value="kor">Korean</option>
-              <option value="lat">Latin</option>
-              <option value="fas">Persian</option>
-              <option value="rus">Russian</option>
-              <option value="spa">Spanish</option>
-              <option value="tha">Thai</option>
-              <option value="vie">Vietnamese</option>
+              <option v-for="lang in supportedLanguages" :key="lang.code" :value="lang.code">
+                {{ lang.name }}
+              </option>
             </select>
           </div>
           <div class="col-md-5">

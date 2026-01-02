@@ -3,6 +3,7 @@ import { ref, watch, onMounted } from "vue";
 import { tex2svgHtml } from "mathxyjax3";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import DownloadLink from "../components/DownloadLink.vue";
 
 const input = ref(`\\xymatrix{
   A \\ar[r]^f \\ar[d]_g & B \\ar[d]^h \\\\
@@ -128,14 +129,7 @@ onMounted(() => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="Preview" class="h-100" no-padding>
           <template #header-actions>
-            <a
-              :href="imageUrl || '#'"
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              :class="{ disabled: !imageUrl || error }"
-              download="math-expression.png"
-            >
-              Download PNG
-            </a>
+            <DownloadLink :href="imageUrl" filename="math-expression.png" label="Download PNG" />
           </template>
           <div class="bg-light">
             <div v-if="error" class="alert alert-danger m-3 small">

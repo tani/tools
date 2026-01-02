@@ -4,6 +4,7 @@ import * as mupdf from 'mupdf';
 import PdfViewer from '../components/PdfViewer.vue';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import DownloadLink from "../components/DownloadLink.vue";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
@@ -141,9 +142,12 @@ const resizePdf = async () => {
       class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
     >
       <span><strong>Success!</strong> All pages have been resized to {{ targetFormat }}.</span>
-      <a :href="downloadUrl" :download="'resized_' + fileName" class="btn btn-success btn-sm"
-        >Download Resized PDF</a
-      >
+      <DownloadLink
+        :href="downloadUrl"
+        :filename="'resized_' + fileName"
+        label="Download Resized PDF"
+        class="btn btn-success btn-sm"
+      />
     </div>
 
     <div class="row">

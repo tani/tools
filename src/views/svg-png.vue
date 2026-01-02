@@ -2,6 +2,7 @@
 import { ref, watch } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import DownloadLink from "../components/DownloadLink.vue";
 
 const x = ref(300);
 const y = ref(300);
@@ -116,14 +117,7 @@ const handleChange = async (event: Event) => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="PNG Preview" class="h-100">
           <template #header-actions>
-            <a
-              v-if="png"
-              :href="png"
-              download="converted.png"
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-            >
-              Download
-            </a>
+            <DownloadLink :href="png" filename="converted.png" />
           </template>
           <div
             class="bg-light text-center p-3 d-flex align-items-center justify-content-center"

@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import CopyButton from "../components/CopyButton.vue";
 import jsonRaw from "../assets/unicode_latex_unicodemath.json";
 import subscriptSuperscriptRaw from "../assets/subscript_superscript.json";
 
@@ -9,7 +10,6 @@ const json = jsonRaw as [string, string, string][];
 const subscript = subscriptSuperscriptRaw.subscript as Record<string, string>;
 const superscript = subscriptSuperscriptRaw.superscript as Record<string, string>;
 const input = ref("E = mc^2\n\\alpha^2 + \\beta^2 = \\gamma^2\nx_{i+1} = x_i + \\Delta x");
-const copyBtnText = ref("Copy");
 
 function replace(value: string) {
   let val = value;
@@ -29,15 +29,6 @@ function replace(value: string) {
 }
 
 const output = computed(() => replace(input.value));
-
-const copyToClipboard = () => {
-  navigator.clipboard.writeText(output.value).then(() => {
-    copyBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyBtnText.value = "Copy";
-    }, 2000);
-  });
-};
 </script>
 
 <template>
@@ -61,12 +52,7 @@ const copyToClipboard = () => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="Unicode Output" class="h-100" no-padding>
           <template #header-actions>
-            <button
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              @click="copyToClipboard"
-            >
-              {{ copyBtnText }}
-            </button>
+            <CopyButton :content="output" />
           </template>
           <textarea
             class="form-control border-0 font-monospace p-3 bg-light"

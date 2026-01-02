@@ -3,6 +3,7 @@ import { ref, watch, onWatcherCleanup } from "vue";
 import mermaid from "mermaid";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import DownloadLink from "../components/DownloadLink.vue";
 
 mermaid.initialize({
   startOnLoad: false,
@@ -149,14 +150,7 @@ watch(
       <div class="col-lg-6 mb-4">
         <ToolCard title="Preview" class="h-100" no-padding>
           <template #header-actions>
-            <a
-              :href="imageUrl || '#'"
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              :class="{ disabled: !imageUrl || error }"
-              download="mermaid-diagram.png"
-            >
-              Download PNG
-            </a>
+            <DownloadLink :href="imageUrl" filename="mermaid-diagram.png" label="Download PNG" />
           </template>
           <div
             class="preview-container border-0 rounded-0 bg-light d-flex align-items-center justify-content-center"

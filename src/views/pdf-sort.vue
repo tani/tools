@@ -4,6 +4,7 @@ import * as mupdf from 'mupdf';
 import Sortable from 'sortablejs';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import DownloadLink from "../components/DownloadLink.vue";
 
 interface PageItem {
   id: string;
@@ -157,9 +158,12 @@ const exportPdf = async () => {
       class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
     >
       <span><strong>Success!</strong> Your rearranged PDF is ready.</span>
-      <a :href="downloadUrl" :download="'sorted_' + fileName" class="btn btn-success btn-sm"
-        >Download Sorted PDF</a
-      >
+      <DownloadLink
+        :href="downloadUrl"
+        :filename="'sorted_' + fileName"
+        label="Download Sorted PDF"
+        class="btn btn-success btn-sm"
+      />
     </div>
 
     <ToolCard title="Page Workspace" class="mb-4">

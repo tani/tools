@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import CopyButton from "../components/CopyButton.vue";
 
 const inputText = ref(`John bought 3 apples for 30 cents with 100 cents. How much is the change?
 Jane bought 1 candy for 5 cents with 50 cents. How much is the change?
@@ -15,8 +16,6 @@ Naoto bought 5 chocolates for 8 cents with 60 cents. How much is the change?
 Sakura bought 1 car for 500000 cents with 1000000 cents. How much is the change?`);
 const showSteps = ref(false);
 const diffChar = ref("#");
-const copyBtnText = ref("Copy");
-const copyRegexBtnText = ref("Copy Regex");
 
 const lineCount = computed(() => inputText.value.split(/\n/).filter(line => line.trim()).length);
 
@@ -94,24 +93,6 @@ const processedData = computed(() => {
 
   return { finalResult: currentResult, regexResult, steps };
 });
-
-const copyToClipboard = () => {
-  navigator.clipboard.writeText(processedData.value.finalResult).then(() => {
-    copyBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyBtnText.value = "Copy";
-    }, 2000);
-  });
-};
-
-const copyRegexToClipboard = () => {
-  navigator.clipboard.writeText(processedData.value.regexResult).then(() => {
-    copyRegexBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyRegexBtnText.value = "Copy Regex";
-    }, 2000);
-  });
-};
 </script>
 
 <template>
@@ -188,13 +169,7 @@ const copyRegexToClipboard = () => {
                     style="font-size: 0.7rem;"
                     >Regex Pattern</label
                   >
-                  <button
-                    class="btn btn-sm btn-link p-0 text-decoration-none small"
-                    style="font-size: 0.7rem;"
-                    @click="copyRegexToClipboard"
-                  >
-                    {{ copyRegexBtnText }}
-                  </button>
+                  <CopyButton :content="processedData.regexResult" />
                 </div>
                 <div
                   class="p-3 border rounded bg-white font-monospace text-break small"
@@ -212,13 +187,7 @@ const copyRegexToClipboard = () => {
                     style="font-size: 0.7rem;"
                     >Final Folded Result</label
                   >
-                  <button
-                    class="btn btn-sm btn-link p-0 text-decoration-none small"
-                    style="font-size: 0.7rem;"
-                    @click="copyToClipboard"
-                  >
-                    {{ copyBtnText }}
-                  </button>
+                  <CopyButton :content="processedData.finalResult" />
                 </div>
                 <div class="p-3 border rounded bg-white font-monospace text-break fw-bold fs-6">
                   {{ processedData.finalResult || "(No input)" }}

@@ -4,6 +4,7 @@ import * as mupdf from 'mupdf';
 import PdfViewer from '../components/PdfViewer.vue';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import DownloadLink from "../components/DownloadLink.vue";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
@@ -131,9 +132,12 @@ const extractPages = async () => {
       class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
     >
       <span><strong>Success!</strong> Selected pages have been extracted.</span>
-      <a :href="downloadUrl" :download="'extracted_' + fileName" class="btn btn-success btn-sm"
-        >Download Extracted PDF</a
-      >
+      <DownloadLink
+        :href="downloadUrl"
+        :filename="'extracted_' + fileName"
+        label="Download Extracted PDF"
+        class="btn btn-success btn-sm"
+      />
     </div>
 
     <div class="row">

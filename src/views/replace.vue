@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import CopyButton from "../components/CopyButton.vue";
 import { DiffModeEnum, DiffView } from "@git-diff-view/vue";
 import { generateDiffFile } from "@git-diff-view/file";
 import { compileOnigurumaRegex, replaceMatches } from "../utils/text-finder";
@@ -10,7 +11,6 @@ const text = ref("The year is 2025. The next year will be 2026. My favorite numb
 const replaceText = ref("[year]");
 const search = ref("\\d{4}");
 const flags = ref("");
-const copyBtnText = ref("Copy");
 
 const compileResult = computed(() =>
   compileOnigurumaRegex(search.value, { flags: flags.value, target: "auto" }),
@@ -37,15 +37,6 @@ const diffFile = computed(() => {
   file.initRaw();
   return file;
 });
-
-const copyToClipboard = () => {
-  navigator.clipboard.writeText(result.value).then(() => {
-    copyBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyBtnText.value = "Copy";
-    }, 2000);
-  });
-};
 </script>
 
 <template>
@@ -114,12 +105,7 @@ const copyToClipboard = () => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="Output" class="h-100" no-padding>
           <template #header-actions>
-            <button
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              @click="copyToClipboard"
-            >
-              {{ copyBtnText }}
-            </button>
+            <CopyButton :content="result" />
           </template>
           <textarea
             id="result"

@@ -5,6 +5,7 @@ import * as mupdf from "mupdf";
 import PdfViewer from "../components/PdfViewer.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import CopyButton from "../components/CopyButton.vue";
 
 const image = ref<string | null>(null);
 const fileData = ref<Uint8Array | null>(null);
@@ -14,7 +15,6 @@ const progress = ref(0);
 const status = ref("");
 const isProcessing = ref(false);
 const language = ref("eng");
-const copyBtnText = ref("Copy");
 
 const supportedLanguages = [
   { code: "amh", name: "Amharic" },
@@ -166,15 +166,6 @@ const recognizeText = async () => {
     isProcessing.value = false;
   }
 };
-
-const copyToClipboard = () => {
-  navigator.clipboard.writeText(result.value).then(() => {
-    copyBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyBtnText.value = "Copy";
-    }, 2000);
-  });
-};
 </script>
 
 <template>
@@ -252,13 +243,7 @@ const copyToClipboard = () => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="Extracted Text" class="h-100" no-padding>
           <template #header-actions>
-            <button
-              v-if="result"
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              @click="copyToClipboard"
-            >
-              {{ copyBtnText }}
-            </button>
+            <CopyButton :content="result" />
           </template>
           <div class="d-flex flex-column h-100">
             <textarea

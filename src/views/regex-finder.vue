@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import CopyButton from "../components/CopyButton.vue";
 import {
   buildHighlightedHtml,
   compileOnigurumaRegex,
@@ -16,7 +17,6 @@ const pattern = ref("\\b\\h+\\b");
 const flags = ref("i");
 const target = ref<OnigurumaTarget>("auto");
 const maxMatches = ref(500);
-const copyBtnText = ref("Copy");
 
 const compileResult = computed(() =>
   compileOnigurumaRegex(pattern.value, { flags: flags.value, target: target.value }),
@@ -57,19 +57,6 @@ const compiledPreview = computed(() => {
   }
   return `/${compiled.pattern}/${compiled.flags}`;
 });
-
-const copyMatches = () => {
-  if (!matchList.value) {
-    return;
-  }
-
-  navigator.clipboard.writeText(matchList.value).then(() => {
-    copyBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyBtnText.value = "Copy";
-    }, 2000);
-  });
-};
 </script>
 
 <template>
@@ -167,13 +154,7 @@ const copyMatches = () => {
       <div class="col-12 mb-4">
         <ToolCard title="Matched Text" no-padding>
           <template #header-actions>
-            <button
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              :disabled="!matchList"
-              @click="copyMatches"
-            >
-              {{ copyBtnText }}
-            </button>
+            <CopyButton :content="matchList" />
           </template>
           <textarea
             class="form-control border-0 font-monospace p-3 bg-light"

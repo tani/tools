@@ -4,6 +4,7 @@ import { Cropper } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import DownloadLink from "../components/DownloadLink.vue";
 
 const sourceImageUrl = ref<string | null>(null);
 const resultImageUrl = ref<string | null>(null);
@@ -205,13 +206,11 @@ watch([() => config.format, () => config.quality], applyResize);
               >
                 Update Resize
               </button>
-              <a
-                v-if="resultImageUrl"
+              <DownloadLink
                 :href="resultImageUrl"
-                :download="'processed_' + (config.format === 'image/png' ? 'image.png' : 'image.jpg')"
-                class="btn btn-sm btn-link p-0 text-decoration-none small"
-                >Download</a
-              >
+                :filename="'processed_' + (config.format === 'image/png' ? 'image.png' : 'image.jpg')"
+                label="Download"
+              />
             </div>
           </template>
           <div

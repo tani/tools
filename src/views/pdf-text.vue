@@ -4,12 +4,12 @@ import * as mupdf from 'mupdf';
 import PdfViewer from '../components/PdfViewer.vue';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import CopyButton from "../components/CopyButton.vue";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
 const resultText = ref("");
 const isProcessing = ref(false);
-const copyBtnText = ref("Copy");
 
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -52,15 +52,6 @@ const extractText = async () => {
   } finally {
     isProcessing.value = false;
   }
-};
-
-const copyToClipboard = () => {
-  navigator.clipboard.writeText(resultText.value).then(() => {
-    copyBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyBtnText.value = "Copy";
-    }, 2000);
-  });
 };
 </script>
 
@@ -109,13 +100,7 @@ const copyToClipboard = () => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="Extracted Text" class="h-100" no-padding>
           <template #header-actions>
-            <button
-              v-if="resultText"
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              @click="copyToClipboard"
-            >
-              {{ copyBtnText }}
-            </button>
+            <CopyButton :content="resultText" />
           </template>
           <textarea
             v-model="resultText"

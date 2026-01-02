@@ -5,6 +5,7 @@ import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
 import MonospaceEditor from "../components/MonospaceEditor.vue";
+import LoadingOverlay from "../components/LoadingOverlay.vue";
 
 mermaid.initialize({
   startOnLoad: false,
@@ -158,12 +159,7 @@ watch(
           >
             <div v-if="!code" class="text-muted small">Please enter Mermaid code</div>
 
-            <div v-else-if="isRendering" class="text-muted small">
-              <output class="spinner-border text-primary spinner-border-sm me-2">
-                <span class="visually-hidden">Loading...</span>
-              </output>
-              Rendering...
-            </div>
+            <LoadingOverlay v-else-if="isRendering" :loading="true" message="Rendering..." />
 
             <div v-else-if="error" class="alert alert-danger m-3 text-start small w-100">
               <strong>Error:</strong> <span>{{ error }}</span>

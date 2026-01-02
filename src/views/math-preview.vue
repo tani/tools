@@ -5,6 +5,7 @@ import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
 import MonospaceEditor from "../components/MonospaceEditor.vue";
+import LoadingOverlay from "../components/LoadingOverlay.vue";
 
 const input = ref(`\\xymatrix{
   A \\ar[r]^f \\ar[d]_g & B \\ar[d]^h \\\\
@@ -142,12 +143,7 @@ onMounted(() => {
               <div v-if="!input.trim()" class="text-muted small">
                 Enter some TeX to see the preview
               </div>
-              <div v-else-if="isRendering" class="text-muted small">
-                <output class="spinner-border text-primary spinner-border-sm me-2">
-                  <span class="visually-hidden">Loading...</span>
-                </output>
-                Rendering...
-              </div>
+              <LoadingOverlay v-else-if="isRendering" :loading="true" message="Rendering..." />
               <img v-else-if="imageUrl" :src="imageUrl" class="img-fluid" alt="Math Preview" />
             </div>
           </div>

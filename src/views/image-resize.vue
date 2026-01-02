@@ -6,10 +6,12 @@ import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
 import FilePicker from "../components/FilePicker.vue";
+import LoadingOverlay from "../components/LoadingOverlay.vue";
 
 const sourceImageUrl = ref<string | null>(null);
 const resultImageUrl = ref<string | null>(null);
 const cropper = ref<any>(null);
+const isProcessing = ref(false);
 
 const config = reactive({
   width: 0,
@@ -36,10 +38,12 @@ const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
+    isProcessing.value = true;
     const reader = new FileReader();
     reader.onload = (e) => {
       sourceImageUrl.value = e.target?.result as string;
       resultImageUrl.value = null;
+      isProcessing.value = false;
     };
     reader.readAsDataURL(file);
   }
@@ -59,6 +63,7 @@ const applyResize = () => {
   if (!cropper.value) return;
   const { canvas } = cropper.value.getResult();
   if (canvas) {
+    isProcessing.value = true;
     const targetWidth = Math.round(toPx(config.width, config.unit));
     const targetHeight = Math.round(toPx(config.height, config.unit));
 
@@ -70,6 +75,7 @@ const applyResize = () => {
       ctx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
       resultImageUrl.value = resizedCanvas.toDataURL(config.format, config.quality);
     }
+    isProcessing.value = false;
   }
 };
 
@@ -175,9 +181,10 @@ watch([() => config.format, () => config.quality], applyResize);
       <div class="col-lg-6 mb-4">
         <ToolCard title="Cropper Workspace" class="h-100">
           <div
-            class="bg-secondary bg-opacity-10 p-0 overflow-hidden d-flex align-items-center justify-content-center"
+            class="bg-secondary bg-opacity-10 p-0 overflow-hidden d-flex align-items-center justify-content-center position-relative"
             style="min-height: 500px"
           >
+            <LoadingOverlay :loading="isProcessing && !sourceImageUrl" message="Loading Image..." />
             <Cropper
               v-if="sourceImageUrl"
               ref="cropper"
@@ -186,7 +193,7 @@ watch([() => config.format, () => config.quality], applyResize);
               @change="handleCropChange"
               style="width: 100%; height: 500px;"
             />
-            <div v-else class="text-muted small">Upload an image to start cropping</div>
+            <div v-else-if="!isProcessing" class="text-muted small">Upload an image to start cropping</div>
           </div>
         </ToolCard>
       </div>
@@ -209,16 +216,17 @@ watch([() => config.format, () => config.quality], applyResize);
             </div>
           </template>
           <div
-            class="bg-light p-3 d-flex align-items-center justify-content-center overflow-auto"
+            class="bg-light p-3 d-flex align-items-center justify-content-center overflow-auto position-relative"
             style="min-height: 500px"
           >
+            <LoadingOverlay :loading="isProcessing && !!sourceImageUrl" message="Processing..." />
             <img
-              v-if="resultImageUrl"
+              v-if="resultImageUrl && !isProcessing"
               :src="resultImageUrl"
               class="img-fluid border shadow-sm"
               alt="Result"
             />
-            <div v-else class="text-muted small">Result will appear here</div>
+            <div v-else-if="!isProcessing" class="text-muted small">Result will appear here</div>
           </div>
         </ToolCard>
       </div>

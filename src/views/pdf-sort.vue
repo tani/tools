@@ -6,6 +6,7 @@ import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
 import FilePicker from "../components/FilePicker.vue";
+import LoadingOverlay from "../components/LoadingOverlay.vue";
 
 interface PageItem {
   id: string;
@@ -167,13 +168,10 @@ const exportPdf = async () => {
       </template>
 
       <div class="bg-light p-3 rounded">
-        <div v-if="isProcessing && pages.length === 0" class="text-center py-5">
-          <div class="spinner-border text-primary" role="status"></div>
-          <div class="mt-2 text-muted small fw-bold text-uppercase">Loading Pages...</div>
-        </div>
+        <LoadingOverlay :loading="isProcessing && pages.length === 0" message="Loading Pages..." />
 
         <div
-          v-else-if="pages.length > 0"
+          v-if="pages.length > 0"
           ref="sortableList"
           class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 g-3"
         >

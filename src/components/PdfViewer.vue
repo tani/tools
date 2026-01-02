@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import * as mupdf from 'mupdf';
+import LoadingOverlay from './LoadingOverlay.vue';
 
 const props = defineProps<{
   data: Uint8Array | null;
@@ -67,14 +68,9 @@ watch(() => props.data, renderPdf);
     class="pdf-viewer-container bg-secondary bg-opacity-10 p-3 rounded overflow-auto"
     style="max-height: 800px;"
   >
-    <div v-if="isRendering" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <div class="mt-2 text-muted small uppercase fw-bold">Rendering Document...</div>
-    </div>
+    <LoadingOverlay :loading="isRendering" message="Rendering Document..." />
 
-    <div v-else-if="error" class="alert alert-danger m-0">
+    <div v-if="error && !isRendering" class="alert alert-danger m-0">
       {{ error }}
     </div>
 

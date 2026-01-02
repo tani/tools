@@ -70,6 +70,10 @@ const routes = [
     path: "/pdf-resizer",
     component: () => import("./views/pdf-resizer.vue"),
   },
+  {
+    path: "/pdf-to-text",
+    component: () => import("./views/pdf-to-text.vue"),
+  },
 ];
 
 export const router = createRouter({

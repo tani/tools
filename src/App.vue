@@ -150,6 +150,13 @@
                 >
                   📏 PDF Resizer
                 </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/pdf-to-text"
+                >
+                  📝 PDF to Text
+                </RouterLink>
               </div>
             </div>
           </div>

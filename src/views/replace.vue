@@ -94,10 +94,7 @@ const diffFile = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Input" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="text"
-            :rows="20"
-          />
+          <MonospaceEditor v-model="text" :rows="20" />
         </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
@@ -105,12 +102,7 @@ const diffFile = computed(() => {
           <template #header-actions>
             <CopyButton :content="result" />
           </template>
-          <MonospaceEditor
-            :model-value="result"
-            bg-light
-            readonly
-            :rows="20"
-          />
+          <MonospaceEditor :model-value="result" bg-light readonly :rows="20" />
         </ToolCard>
       </div>
     </div>

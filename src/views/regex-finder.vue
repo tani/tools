@@ -71,7 +71,12 @@ const compiledPreview = computed(() => {
       <div class="row g-3">
         <div class="col-12">
           <label for="pattern" class="form-label fw-bold small">Oniguruma Pattern</label>
-          <input id="pattern" v-model="pattern" placeholder="e.g., \\b\\h+\\b" class="form-control font-monospace" />
+          <input
+            id="pattern"
+            v-model="pattern"
+            placeholder="e.g., \\b\\h+\\b"
+            class="form-control font-monospace"
+          />
           <div class="form-text mt-0">
             Supports Oniguruma syntax like <span class="font-monospace">\\h</span>,
             <span class="font-monospace">\\R</span>, and inline modifiers.
@@ -85,9 +90,7 @@ const compiledPreview = computed(() => {
             class="form-control font-monospace"
             placeholder="i, m, x, D, S, W, y{g}"
           />
-          <div class="form-text">
-            Oniguruma <span class="font-monospace">m</span> = JS dotAll.
-          </div>
+          <div class="form-text">Oniguruma <span class="font-monospace">m</span> = JS dotAll.</div>
         </div>
         <div class="col-md-4">
           <label for="target" class="form-label fw-bold small">Target</label>
@@ -126,10 +129,7 @@ const compiledPreview = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Input Text" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="text"
-            :rows="18"
-          />
+          <MonospaceEditor v-model="text" :rows="18" />
         </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
@@ -148,12 +148,7 @@ const compiledPreview = computed(() => {
           <template #header-actions>
             <CopyButton :content="matchList" />
           </template>
-          <MonospaceEditor
-            :model-value="matchList"
-            bg-light
-            readonly
-            :rows="8"
-          />
+          <MonospaceEditor :model-value="matchList" bg-light readonly :rows="8" />
         </ToolCard>
       </div>
     </div>

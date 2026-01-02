@@ -82,9 +82,7 @@ const handleChange = async (event: Event) => {
           <FilePicker label="Upload SVG" accept="image/svg+xml" @change="handleChange" />
         </div>
         <div class="col-md-2">
-          <button class="btn btn-primary w-100" type="button" @click="handleClick">
-            Convert
-          </button>
+          <button class="btn btn-primary w-100" type="button" @click="handleClick">Convert</button>
         </div>
       </div>
     </ToolCard>
@@ -92,11 +90,7 @@ const handleChange = async (event: Event) => {
     <div class="row">
       <div class="col-12 mb-4">
         <ToolCard title="SVG Code" no-padding>
-          <MonospaceEditor
-            v-model="raw"
-            :rows="10"
-            placeholder="Paste or edit SVG code here..."
-          />
+          <MonospaceEditor v-model="raw" :rows="10" placeholder="Paste or edit SVG code here..." />
         </ToolCard>
       </div>
     </div>

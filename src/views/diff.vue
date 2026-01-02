@@ -33,18 +33,12 @@ const diffFile = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Old Version" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="oldText"
-            :rows="10"
-          />
+          <MonospaceEditor v-model="oldText" :rows="10" />
         </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
         <ToolCard title="New Version" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="newText"
-            :rows="10"
-          />
+          <MonospaceEditor v-model="newText" :rows="10" />
         </ToolCard>
       </div>
       <div class="col-12 mb-4">

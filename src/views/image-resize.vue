@@ -123,7 +123,11 @@ watch([() => config.format, () => config.quality], applyResize);
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3">
         <div class="col-md-4">
-          <FilePicker label="Upload Image" accept="image/png,image/jpeg" @change="handleFileChange" />
+          <FilePicker
+            label="Upload Image"
+            accept="image/png,image/jpeg"
+            @change="handleFileChange"
+          />
         </div>
         <div class="col-md-2">
           <label class="form-label fw-bold small">Width</label>
@@ -193,7 +197,9 @@ watch([() => config.format, () => config.quality], applyResize);
               @change="handleCropChange"
               style="width: 100%; height: 500px;"
             />
-            <div v-else-if="!isProcessing" class="text-muted small">Upload an image to start cropping</div>
+            <div v-else-if="!isProcessing" class="text-muted small">
+              Upload an image to start cropping
+            </div>
           </div>
         </ToolCard>
       </div>

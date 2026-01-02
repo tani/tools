@@ -123,18 +123,12 @@ const chartData = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Input Numbers" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="input"
-            :rows="15"
-          />
+          <MonospaceEditor v-model="input" :rows="15" />
         </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
         <ToolCard title="Histogram View" class="h-100">
-          <div
-            class="d-flex flex-column bg-light"
-            style="overflow-x: auto; min-height: 300px"
-          >
+          <div class="d-flex flex-column bg-light" style="overflow-x: auto; min-height: 300px">
             <svg
               v-if="chartData.data.length > 0"
               :viewBox="`0 0 ${Math.max(400, chartData.data.length * 40)} 300`"

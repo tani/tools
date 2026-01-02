@@ -188,7 +188,11 @@ const recognizeText = async () => {
           </select>
         </div>
         <div class="col-md-5">
-          <FilePicker label="Upload Image or PDF" accept="image/*,application/pdf" @change="handleFileChange" />
+          <FilePicker
+            label="Upload Image or PDF"
+            accept="image/*,application/pdf"
+            @change="handleFileChange"
+          />
         </div>
         <div class="col-md-3">
           <button

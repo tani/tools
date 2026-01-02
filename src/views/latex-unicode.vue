@@ -42,10 +42,7 @@ const output = computed(() => replace(input.value));
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="LaTeX Input" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="input"
-            :rows="20"
-          />
+          <MonospaceEditor v-model="input" :rows="20" />
         </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
@@ -53,12 +50,7 @@ const output = computed(() => replace(input.value));
           <template #header-actions>
             <CopyButton :content="output" />
           </template>
-          <MonospaceEditor
-            :model-value="output"
-            bg-light
-            readonly
-            :rows="20"
-          />
+          <MonospaceEditor :model-value="output" bg-light readonly :rows="20" />
         </ToolCard>
       </div>
     </div>

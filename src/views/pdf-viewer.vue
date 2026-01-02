@@ -33,7 +33,11 @@ const handleFileChange = (event: Event) => {
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3 align-items-end">
         <div class="col-md-9">
-          <FilePicker label="Upload PDF Document" accept="application/pdf" @change="handleFileChange" />
+          <FilePicker
+            label="Upload PDF Document"
+            accept="application/pdf"
+            @change="handleFileChange"
+          />
         </div>
         <div class="col-md-3">
           <div v-if="fileName" class="text-muted small mb-2 text-truncate">

@@ -7,7 +7,10 @@ defineProps<{
 
 <template>
   <div class="card shadow-sm h-100">
-    <div v-if="title || $slots['header-actions']" class="card-header d-flex justify-content-between align-items-center">
+    <div
+      v-if="title || $slots['header-actions']"
+      class="card-header d-flex justify-content-between align-items-center"
+    >
       <span class="fw-bold small text-uppercase text-muted">{{ title }}</span>
       <slot name="header-actions" />
     </div>

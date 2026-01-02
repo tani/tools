@@ -106,9 +106,7 @@ const processedData = computed(() => {
     <ToolCard title="Configuration" class="mb-4">
       <div class="row align-items-center g-3">
         <div class="col-auto">
-          <label for="diffChar" class="form-label mb-0 fw-bold small"
-            >Replacement Character</label
-          >
+          <label for="diffChar" class="form-label mb-0 fw-bold small">Replacement Character</label>
         </div>
         <div class="col-auto">
           <input

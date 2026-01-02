@@ -42,6 +42,10 @@ const routes = [
     path: "/math-preview",
     component: () => import("./views/math-preview.vue"),
   },
+  {
+    path: "/string-folding",
+    component: () => import("./views/string-folding.vue"),
+  },
 ];
 
 export const router = createRouter({

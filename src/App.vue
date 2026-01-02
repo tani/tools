@@ -122,6 +122,13 @@
                 >
                   📄 PDF Viewer
                 </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/pdf-merge"
+                >
+                  🔗 PDF Merge
+                </RouterLink>
               </div>
             </div>
           </div>

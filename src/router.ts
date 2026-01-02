@@ -54,6 +54,10 @@ const routes = [
     path: "/pdf-viewer",
     component: () => import("./views/pdf-tool.vue"),
   },
+  {
+    path: "/pdf-merge",
+    component: () => import("./views/pdf-merge.vue"),
+  },
 ];
 
 export const router = createRouter({

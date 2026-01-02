@@ -33,6 +33,9 @@ const lineCount = computed(() => input.value.split(/\r\n|\r|\n/).length);
 <template>
   <div>
     <h2 class="display-6">Word Count</h2>
+    <p class="text-muted">
+      Count characters, words, and lines in your text using high-precision segmentation.
+    </p>
     <div class="row">
       <div class="col-sm-12">
         <table class="table">

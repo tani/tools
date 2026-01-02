@@ -41,6 +41,9 @@ const copyToClipboard = () => {
 <template>
   <div>
     <h2 class="display-6">LaTeX To Unicode</h2>
+    <p class="text-muted">
+      Convert LaTeX mathematical symbols and expressions to their Unicode equivalents.
+    </p>
     <div class="row">
       <div class="col-sm-6 mb-3">
         <div class="card h-100">

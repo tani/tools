@@ -43,6 +43,9 @@ const copyToClipboard = () => {
 <template>
   <div>
     <h2 class="display-6">Replace Text</h2>
+    <p class="text-muted">
+      Search and replace text using regular expressions with a side-by-side diff preview.
+    </p>
     <div class="card mb-3">
       <div class="card-body">
         <div class="row g-3">

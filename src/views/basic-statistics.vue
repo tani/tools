@@ -170,6 +170,9 @@ const chartData = computed(() => {
 <template>
   <div>
     <h2 class="display-6">Basic Statistics</h2>
+    <p class="text-muted">
+      Calculate mean, variance, standard deviation, and other basic statistical measures from a list of numbers.
+    </p>
     <div class="row">
       <div class="col-sm-12">
         <table class="table">

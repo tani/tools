@@ -23,6 +23,9 @@ const diffFile = computed(() => {
 <template>
   <div>
     <h2 class="display-6">Diff Text</h2>
+    <p class="text-muted">
+      Compare two text blocks and visualize the differences using a unified diff view.
+    </p>
     <div class="row">
       <div class="col-sm-6 mb-3">
         <div class="card h-100">

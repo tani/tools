@@ -104,6 +104,9 @@ onMounted(() => {
 <template>
   <div>
     <h2 class="display-6">Math Preview</h2>
+    <p class="text-muted">
+      Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a PNG.
+    </p>
     <div class="row">
       <div class="col-sm-12 mb-4">
         <div class="card">

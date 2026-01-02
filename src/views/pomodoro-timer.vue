@@ -118,8 +118,10 @@ onUnmounted(() => {
 <template>
   <div>
     <h2 class="display-6">Pomodoro Timer</h2>
-
-    <div class="row mt-3">
+    <p class="text-muted">
+      A simple Pomodoro timer to help you stay focused and productive.
+    </p>
+    <div class="row">
       <div class="col-sm-12">
         <div class="nav nav-pills mb-3">
           <button

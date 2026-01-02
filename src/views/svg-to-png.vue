@@ -51,6 +51,9 @@ const handleChange = async (event: Event) => {
 <template>
   <div>
     <h2 class="display-6">SVG to PNG</h2>
+    <p class="text-muted">
+      Convert SVG images to PNG format with custom dimensions.
+    </p>
     <div class="row">
       <div class="col-sm-3">
         <input v-model.number="x" name="x" class="form-control" type="number" />

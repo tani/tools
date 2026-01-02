@@ -11,4 +11,7 @@ export default defineConfig({
       module: fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
     },
   },
+  optimizeDeps: {
+    exclude: ["mupdf"],
+  },
 });

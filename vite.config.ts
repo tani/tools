@@ -1,9 +1,14 @@
 import { defineConfig } from "vite";
 import vue from "unplugin-vue/vite";
 
+import { fileURLToPath, URL } from "node:url";
+
 export default defineConfig({
   plugins: [vue()],
-  optimizeDeps: {
-    exclude: ["mupdf"],
+  resolve: {
+    alias: {
+      "node:fs": fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
+      module: fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
+    },
   },
 });

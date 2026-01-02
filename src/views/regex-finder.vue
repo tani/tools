@@ -71,12 +71,7 @@ const compiledPreview = computed(() => {
       <div class="row g-3">
         <div class="col-12">
           <label for="pattern" class="form-label fw-bold small">Oniguruma Pattern</label>
-          <MonospaceEditor
-            v-model="pattern"
-            :rows="3"
-            placeholder="e.g., \\b\\h+\\b"
-            class="mb-2"
-          />
+          <input id="pattern" v-model="pattern" placeholder="e.g., \\b\\h+\\b" class="form-control font-monospace" />
           <div class="form-text mt-0">
             Supports Oniguruma syntax like <span class="font-monospace">\\h</span>,
             <span class="font-monospace">\\R</span>, and inline modifiers.

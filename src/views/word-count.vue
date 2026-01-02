@@ -41,18 +41,20 @@ const lineCount = computed(() => input.value.split(/\r\n|\r|\n/).length);
         <div class="card shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Statistics Summary</div>
           <div class="card-body p-0">
-            <table class="table table-bordered mb-0">
-              <tbody>
-                <tr>
-                  <th class="ps-3 small text-uppercase text-muted">Characters</th>
-                  <td class="fw-bold fs-5">{{ graphemeCount }}</td>
-                  <th class="ps-3 small text-uppercase text-muted">Words</th>
-                  <td class="fw-bold fs-5">{{ wordCount }}</td>
-                  <th class="ps-3 small text-uppercase text-muted">Lines</th>
-                  <td class="fw-bold fs-5 pe-3 text-end">{{ lineCount }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="row g-0 text-center">
+              <div class="col-md-4 border-end py-4">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">Characters</div>
+                <div class="display-6 fw-bold text-primary">{{ graphemeCount }}</div>
+              </div>
+              <div class="col-md-4 border-end py-4">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">Words</div>
+                <div class="display-6 fw-bold text-primary">{{ wordCount }}</div>
+              </div>
+              <div class="col-md-4 py-4">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">Lines</div>
+                <div class="display-6 fw-bold text-primary">{{ lineCount }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

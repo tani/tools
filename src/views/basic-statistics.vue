@@ -178,34 +178,55 @@ const chartData = computed(() => {
         <div class="card shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Statistics Summary</div>
           <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
-              <tbody>
-                <tr>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Mean</th>
-                  <td class="fw-bold py-2">{{ round(mean(values))?.toString() }}</td>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Variance</th>
-                  <td class="fw-bold py-2">{{ round(variance(values))?.toString() }}</td>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Std Dev</th>
-                  <td class="fw-bold py-2 pe-3">{{ round(standardDeviation(values))?.toString() }}</td>
-                </tr>
-                <tr>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Q1</th>
-                  <td class="fw-bold py-2">{{ firstQuartile(values)?.toString() }}</td>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Median</th>
-                  <td class="fw-bold py-2">{{ median(values)?.toString() }}</td>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Q3</th>
-                  <td class="fw-bold py-2 pe-3">{{ thirdQuartile(values)?.toString() }}</td>
-                </tr>
-                <tr>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Mode</th>
-                  <td class="fw-bold py-2">{{ modes(values)?.join(", ") }}</td>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Max</th>
-                  <td class="fw-bold py-2">{{ max(values)?.toString() }}</td>
-                  <th class="ps-3 small text-uppercase text-muted py-2">Min</th>
-                  <td class="fw-bold py-2 pe-3">{{ min(values)?.toString() }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <!-- Row 1 -->
+            <div class="row g-0 text-center border-bottom">
+              <div class="col-md-4 border-end py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Mean</div>
+                <div class="fs-4 fw-bold text-primary">{{ values.length ? round(mean(values)) : '-' }}</div>
+              </div>
+              <div class="col-md-4 border-end py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Variance</div>
+                <div class="fs-4 fw-bold text-primary">{{ values.length ? round(variance(values)) : '-' }}</div>
+              </div>
+              <div class="col-md-4 py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Std Deviation</div>
+                <div class="fs-4 fw-bold text-primary">{{ values.length ? round(standardDeviation(values)) : '-' }}</div>
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div class="row g-0 text-center border-bottom">
+              <div class="col-md-4 border-end py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Q1 (25th)</div>
+                <div class="fs-4 fw-bold">{{ values.length ? firstQuartile(values) : '-' }}</div>
+              </div>
+              <div class="col-md-4 border-end py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Median (50th)</div>
+                <div class="fs-4 fw-bold">{{ values.length ? median(values) : '-' }}</div>
+              </div>
+              <div class="col-md-4 py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Q3 (75th)</div>
+                <div class="fs-4 fw-bold">{{ values.length ? thirdQuartile(values) : '-' }}</div>
+              </div>
+            </div>
+            <!-- Row 3 -->
+            <div class="row g-0 text-center">
+              <div class="col-md-4 border-end py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Mode</div>
+                <div class="fs-4 fw-bold">{{ values.length ? modes(values)?.join(", ") : '-' }}</div>
+              </div>
+              <div class="col-md-4 border-end py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Max / Min</div>
+                <div class="fs-4 fw-bold">
+                  <span class="text-success">{{ values.length ? max(values) : '-' }}</span>
+                  <span class="mx-2 text-muted">/</span>
+                  <span class="text-danger">{{ values.length ? min(values) : '-' }}</span>
+                </div>
+              </div>
+              <div class="col-md-4 py-3">
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.7rem;">Total Count</div>
+                <div class="fs-4 fw-bold">{{ values.length }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

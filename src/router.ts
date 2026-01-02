@@ -31,6 +31,10 @@ const routes = [
     path: "/fold-strings",
     component: () => import("./views/fold-strings.vue"),
   },
+  {
+    path: "/code-highlight",
+    component: () => import("./views/code-highlight.vue"),
+  },
   // Math & LaTeX
   {
     path: "/unicode-latex",

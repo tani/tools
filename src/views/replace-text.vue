@@ -84,8 +84,15 @@ const copyToClipboard = () => {
         </div>
       </div>
     </div>
-    <div v-if="diffFile" class="mt-5">
-      <DiffView :diff-file="diffFile" :diff-view-mode="DiffModeEnum.Split" />
+    <div v-if="diffFile" class="row">
+      <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Visual Diff</div>
+          <div class="card-body p-0">
+            <DiffView :diff-file="diffFile" :diff-view-mode="DiffModeEnum.Split" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

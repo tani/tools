@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import * as mupdf from 'mupdf';
 import PdfViewer from '../components/PdfViewer.vue';
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
@@ -64,52 +66,49 @@ const copyToClipboard = () => {
 
 <template>
   <div>
-    <h2 class="display-6">PDF → Text</h2>
-    <p class="text-muted mb-4">Extract searchable text from PDF documents using MuPDF.</p>
+    <ToolHeader
+      title="PDF → Text"
+      description="Extract searchable text from PDF documents using MuPDF."
+    />
 
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-9">
-            <label class="form-label fw-bold small">Upload PDF</label>
-            <input
-              class="form-control"
-              type="file"
-              accept="application/pdf"
-              @change="handleFileChange"
-            />
-          </div>
-          <div class="col-md-3">
-            <button
-              class="btn btn-primary w-100"
-              @click="extractText"
-              :disabled="!fileData || isProcessing"
-            >
-              <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-              Extract Text
-            </button>
-          </div>
+    <ToolCard title="Configuration" class="mb-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-9">
+          <label class="form-label fw-bold small">Upload PDF</label>
+          <input
+            class="form-control"
+            type="file"
+            accept="application/pdf"
+            @change="handleFileChange"
+          />
+        </div>
+        <div class="col-md-3">
+          <button
+            class="btn btn-primary w-100"
+            @click="extractText"
+            :disabled="!fileData || isProcessing"
+          >
+            <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+            Extract Text
+          </button>
         </div>
       </div>
-    </div>
+    </ToolCard>
 
     <div class="row">
       <!-- Preview Area -->
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Source Preview</div>
-          <div class="card-body bg-light p-0 overflow-auto" style="min-height: 500px">
+        <ToolCard title="Source Preview" class="h-100" no-padding>
+          <div class="overflow-auto" style="min-height: 500px; max-height: 800px;">
             <PdfViewer :data="fileData" />
           </div>
-        </div>
+        </ToolCard>
       </div>
 
       <!-- Result Area -->
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">Extracted Text</span>
+        <ToolCard title="Extracted Text" class="h-100" no-padding>
+          <template #header-actions>
             <button
               v-if="resultText"
               class="btn btn-sm btn-link p-0 text-decoration-none small"
@@ -117,17 +116,15 @@ const copyToClipboard = () => {
             >
               {{ copyBtnText }}
             </button>
-          </div>
-          <div class="card-body p-0">
-            <textarea
-              v-model="resultText"
-              class="form-control border-0 font-monospace p-3 bg-light"
-              style="resize: none; min-height: 500px; height: 100%;"
-              readonly
-              placeholder="Extracted text will appear here..."
-            />
-          </div>
-        </div>
+          </template>
+          <textarea
+            v-model="resultText"
+            class="form-control border-0 font-monospace p-3 bg-light"
+            style="resize: none; min-height: 500px; height: 100%;"
+            readonly
+            placeholder="Extracted text will appear here..."
+          />
+        </ToolCard>
       </div>
     </div>
   </div>

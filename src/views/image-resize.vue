@@ -2,6 +2,8 @@
 import { ref, reactive, watch } from 'vue';
 import { Cropper } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css';
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 const sourceImageUrl = ref<string | null>(null);
 const resultImageUrl = ref<string | null>(null);
@@ -105,83 +107,79 @@ watch([() => config.format, () => config.quality], applyResize);
 
 <template>
   <div>
-    <h2 class="display-6">Image Resize</h2>
-    <p class="text-muted mb-4">
-      Resize and crop images visually. Adjust the crop box or set specific dimensions.
-    </p>
+    <ToolHeader
+      title="Image Resize"
+      description="Resize and crop images visually. Adjust the crop box or set specific dimensions."
+    />
 
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label fw-bold small">Upload Image</label>
+    <ToolCard title="Configuration" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-bold small">Upload Image</label>
+          <input
+            class="form-control"
+            type="file"
+            accept="image/png,image/jpeg"
+            @change="handleFileChange"
+          />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-bold small">Width</label>
+          <div class="input-group input-group-sm">
             <input
+              v-model.number="config.width"
+              type="number"
               class="form-control"
-              type="file"
-              accept="image/png,image/jpeg"
-              @change="handleFileChange"
+              @input="updateWidth(config.width)"
             />
           </div>
-          <div class="col-md-2">
-            <label class="form-label fw-bold small">Width</label>
-            <div class="input-group input-group-sm">
-              <input
-                v-model.number="config.width"
-                type="number"
-                class="form-control"
-                @input="updateWidth(config.width)"
-              />
-            </div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-bold small">Height</label>
+          <div class="input-group input-group-sm">
+            <input
+              v-model.number="config.height"
+              type="number"
+              class="form-control"
+              @input="updateHeight(config.height)"
+            />
           </div>
-          <div class="col-md-2">
-            <label class="form-label fw-bold small">Height</label>
-            <div class="input-group input-group-sm">
-              <input
-                v-model.number="config.height"
-                type="number"
-                class="form-control"
-                @input="updateHeight(config.height)"
-              />
-            </div>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label fw-bold small">Unit</label>
-            <select v-model="config.unit" class="form-select form-select-sm" @change="updateUnit()">
-              <option value="px">Pixels (px)</option>
-              <option value="cm">Centimeters (cm)</option>
-              <option value="mm">Millimeters (mm)</option>
-              <option value="in">Inches (in)</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label fw-bold small">Format</label>
-            <select v-model="config.format" class="form-select form-select-sm">
-              <option value="image/png">PNG</option>
-              <option value="image/jpeg">JPG</option>
-            </select>
-          </div>
-          <div class="col-md-2 d-flex align-items-end">
-            <div class="form-check mb-2">
-              <input
-                v-model="config.maintainAspectRatio"
-                class="form-check-input"
-                type="checkbox"
-                id="aspectRatio"
-              />
-              <label class="form-check-label small" for="aspectRatio">Lock Ratio</label>
-            </div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-bold small">Unit</label>
+          <select v-model="config.unit" class="form-select form-select-sm" @change="updateUnit()">
+            <option value="px">Pixels (px)</option>
+            <option value="cm">Centimeters (cm)</option>
+            <option value="mm">Millimeters (mm)</option>
+            <option value="in">Inches (in)</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-bold small">Format</label>
+          <select v-model="config.format" class="form-select form-select-sm">
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPG</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <div class="form-check mb-2">
+            <input
+              v-model="config.maintainAspectRatio"
+              class="form-check-input"
+              type="checkbox"
+              id="aspectRatio"
+            />
+            <label class="form-check-label small" for="aspectRatio">Lock Ratio</label>
           </div>
         </div>
       </div>
-    </div>
+    </ToolCard>
 
     <div class="row">
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Cropper Workspace</div>
+        <ToolCard title="Cropper Workspace" class="h-100">
           <div
-            class="card-body bg-secondary bg-opacity-10 p-0 overflow-hidden d-flex align-items-center justify-content-center"
+            class="bg-secondary bg-opacity-10 p-0 overflow-hidden d-flex align-items-center justify-content-center"
             style="min-height: 500px"
           >
             <Cropper
@@ -194,12 +192,11 @@ watch([() => config.format, () => config.quality], applyResize);
             />
             <div v-else class="text-muted small">Upload an image to start cropping</div>
           </div>
-        </div>
+        </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">Final Result Preview</span>
+        <ToolCard title="Final Result Preview" class="h-100">
+          <template #header-actions>
             <div class="d-flex gap-3">
               <button
                 v-if="resultImageUrl"
@@ -216,9 +213,9 @@ watch([() => config.format, () => config.quality], applyResize);
                 >Download</a
               >
             </div>
-          </div>
+          </template>
           <div
-            class="card-body bg-light p-3 d-flex align-items-center justify-content-center overflow-auto"
+            class="bg-light p-3 d-flex align-items-center justify-content-center overflow-auto"
             style="min-height: 500px"
           >
             <img
@@ -229,7 +226,7 @@ watch([() => config.format, () => config.quality], applyResize);
             />
             <div v-else class="text-muted small">Result will appear here</div>
           </div>
-        </div>
+        </ToolCard>
       </div>
     </div>
   </div>

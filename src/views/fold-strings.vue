@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 const inputText = ref(`John bought 3 apples for 30 cents with 100 cents. How much is the change?
 Jane bought 1 candy for 5 cents with 50 cents. How much is the change?
@@ -114,74 +116,65 @@ const copyRegexToClipboard = () => {
 
 <template>
   <div>
-    <h2 class="display-6">Fold Strings</h2>
-    <p class="text-muted mb-4">
-      Compare strings line-by-line using the LCS algorithm and replace differences with "{{ diffChar
+    <ToolHeader
+      title="Fold Strings"
+      :description="`Compare strings line-by-line using the LCS algorithm and replace differences with '${diffChar}'.`"
+    />
 
-      }}".
-    </p>
-
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row align-items-center g-3">
-          <div class="col-auto">
-            <label for="diffChar" class="form-label mb-0 fw-bold small"
-              >Replacement Character</label
+    <ToolCard title="Configuration" class="mb-4">
+      <div class="row align-items-center g-3">
+        <div class="col-auto">
+          <label for="diffChar" class="form-label mb-0 fw-bold small"
+            >Replacement Character</label
+          >
+        </div>
+        <div class="col-auto">
+          <input
+            id="diffChar"
+            type="text"
+            v-model="diffChar"
+            @input="limitDiffChar"
+            class="form-control form-control-sm text-center font-monospace"
+            style="width: 3rem;"
+          />
+        </div>
+        <div class="col-auto ms-auto">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" v-model="showSteps" id="showSteps" />
+            <label
+              class="form-check-label small fw-bold text-muted text-uppercase"
+              for="showSteps"
+              style="font-size: 0.75rem;"
             >
-          </div>
-          <div class="col-auto">
-            <input
-              id="diffChar"
-              type="text"
-              v-model="diffChar"
-              @input="limitDiffChar"
-              class="form-control form-control-sm text-center font-monospace"
-              style="width: 3rem;"
-            />
-          </div>
-          <div class="col-auto ms-auto">
-            <div class="form-check mb-0">
-              <input class="form-check-input" type="checkbox" v-model="showSteps" id="showSteps" />
-              <label
-                class="form-check-label small fw-bold text-muted text-uppercase"
-                for="showSteps"
-                style="font-size: 0.75rem;"
-              >
-                Show Calculation Steps
-              </label>
-            </div>
+              Show Calculation Steps
+            </label>
           </div>
         </div>
       </div>
-    </div>
+    </ToolCard>
 
     <div class="row">
       <!-- Input Area -->
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">Unicode Input</span>
+        <ToolCard title="Unicode Input" class="h-100" no-padding>
+          <template #header-actions>
             <span class="badge bg-secondary opacity-75">{{ lineCount }} lines</span>
-          </div>
-          <div class="card-body p-0">
-            <textarea
-              class="form-control border-0 font-monospace p-3"
-              placeholder="Enter your strings here..."
-              v-model="inputText"
-              spellcheck="false"
-              rows="15"
-              style="resize: none;"
-            ></textarea>
-          </div>
-        </div>
+          </template>
+          <textarea
+            class="form-control border-0 font-monospace p-3"
+            placeholder="Enter your strings here..."
+            v-model="inputText"
+            spellcheck="false"
+            rows="15"
+            style="resize: none;"
+          ></textarea>
+        </ToolCard>
       </div>
 
       <!-- Result Area -->
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Processed Results</div>
-          <div class="card-body bg-light overflow-auto p-3" style="min-height: 382px;">
+        <ToolCard title="Processed Results" class="h-100">
+          <div class="overflow-auto" style="min-height: 382px;">
             <div v-if="!inputText.trim()" class="text-center text-muted py-5 small">
               Results will appear here
             </div>
@@ -263,7 +256,7 @@ const copyRegexToClipboard = () => {
               </div>
             </div>
           </div>
-        </div>
+        </ToolCard>
       </div>
     </div>
   </div>

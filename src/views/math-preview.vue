@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { tex2svgHtml } from "mathxyjax3";
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 const input = ref(`\\xymatrix{
   A \\ar[r]^f \\ar[d]_g & B \\ar[d]^h \\\\
@@ -106,30 +108,26 @@ onMounted(() => {
 
 <template>
   <div>
-    <h2 class="display-6">Math Preview</h2>
-    <p class="text-muted mb-4">
-      Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a
-      PNG.
-    </p>
+    <ToolHeader
+      title="Math Preview"
+      description="Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a PNG."
+    />
+
     <div class="row">
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">TeX Input</div>
-          <div class="card-body p-0">
-            <textarea
-              v-model="input"
-              class="form-control border-0 font-monospace p-3 math-textarea"
-              placeholder="Enter TeX/LaTeX or Xy-pic code here..."
-              rows="15"
-              style="resize: none;"
-            />
-          </div>
-        </div>
+        <ToolCard title="TeX Input" class="h-100" no-padding>
+          <textarea
+            v-model="input"
+            class="form-control border-0 font-monospace p-3 math-textarea"
+            placeholder="Enter TeX/LaTeX or Xy-pic code here..."
+            rows="15"
+            style="resize: none;"
+          />
+        </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">Preview</span>
+        <ToolCard title="Preview" class="h-100" no-padding>
+          <template #header-actions>
             <a
               :href="imageUrl || '#'"
               class="btn btn-sm btn-link p-0 text-decoration-none small"
@@ -138,8 +136,8 @@ onMounted(() => {
             >
               Download PNG
             </a>
-          </div>
-          <div class="card-body p-0 bg-light">
+          </template>
+          <div class="bg-light">
             <div v-if="error" class="alert alert-danger m-3 small">
               <strong>Error:</strong> {{ error }}
             </div>
@@ -159,7 +157,7 @@ onMounted(() => {
               <img v-else-if="imageUrl" :src="imageUrl" class="img-fluid" alt="Math Preview" />
             </div>
           </div>
-        </div>
+        </ToolCard>
       </div>
     </div>
   </div>

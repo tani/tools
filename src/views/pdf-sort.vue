@@ -2,6 +2,8 @@
 import { ref, onMounted, watch } from 'vue';
 import * as mupdf from 'mupdf';
 import Sortable from 'sortablejs';
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 interface PageItem {
   id: string;
@@ -121,35 +123,34 @@ const exportPdf = async () => {
 
 <template>
   <div>
-    <h2 class="display-6">PDF Sort</h2>
-    <p class="text-muted mb-4">Rearrange or remove pages from a PDF document visually.</p>
+    <ToolHeader
+      title="PDF Sort"
+      description="Rearrange or remove pages from a PDF document visually."
+    />
 
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-9">
-            <label class="form-label fw-bold small">Upload PDF</label>
-            <input
-              class="form-control"
-              type="file"
-              accept="application/pdf"
-              @change="handleFileChange"
-            />
-          </div>
-          <div class="col-md-3">
-            <button
-              class="btn btn-primary w-100"
-              @click="exportPdf"
-              :disabled="pages.length === 0 || isProcessing"
-            >
-              <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-              Export PDF
-            </button>
-          </div>
+    <ToolCard title="Configuration" class="mb-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-9">
+          <label class="form-label fw-bold small">Upload PDF</label>
+          <input
+            class="form-control"
+            type="file"
+            accept="application/pdf"
+            @change="handleFileChange"
+          />
+        </div>
+        <div class="col-md-3">
+          <button
+            class="btn btn-primary w-100"
+            @click="exportPdf"
+            :disabled="pages.length === 0 || isProcessing"
+          >
+            <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+            Export PDF
+          </button>
         </div>
       </div>
-    </div>
+    </ToolCard>
 
     <div
       v-if="downloadUrl"
@@ -161,12 +162,12 @@ const exportPdf = async () => {
       >
     </div>
 
-    <div class="card shadow-sm mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <span class="fw-bold small text-uppercase text-muted">Page Workspace</span>
+    <ToolCard title="Page Workspace" class="mb-4">
+      <template #header-actions>
         <span class="badge bg-secondary opacity-75">{{ pages.length }} pages</span>
-      </div>
-      <div class="card-body bg-light">
+      </template>
+
+      <div class="bg-light p-3 rounded">
         <div v-if="isProcessing && pages.length === 0" class="text-center py-5">
           <div class="spinner-border text-primary" role="status"></div>
           <div class="mt-2 text-muted small fw-bold text-uppercase">Loading Pages...</div>
@@ -207,7 +208,7 @@ const exportPdf = async () => {
           No document loaded
         </div>
       </div>
-    </div>
+    </ToolCard>
   </div>
 </template>
 

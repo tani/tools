@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, onWatcherCleanup } from "vue";
 import mermaid from "mermaid";
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 mermaid.initialize({
   startOnLoad: false,
@@ -127,29 +129,26 @@ watch(
 
 <template>
   <div class="mermaid-editor">
-    <h2 class="display-6">Mermaid</h2>
-    <p class="text-muted mb-4">
-      Create and preview diagrams using Mermaid syntax and export them as PNG images.
-    </p>
+    <ToolHeader
+      title="Mermaid"
+      description="Create and preview diagrams using Mermaid syntax and export them as PNG images."
+    />
+
     <div class="row">
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Mermaid Code</div>
-          <div class="card-body p-0">
-            <textarea
-              v-model="code"
-              class="form-control border-0 font-monospace p-3 mermaid-textarea"
-              placeholder="graph TD; A-->B;"
-              style="resize: none;"
-              rows="15"
-            />
-          </div>
-        </div>
+        <ToolCard title="Mermaid Code" class="h-100" no-padding>
+          <textarea
+            v-model="code"
+            class="form-control border-0 font-monospace p-3 mermaid-textarea"
+            placeholder="graph TD; A-->B;"
+            style="resize: none;"
+            rows="15"
+          />
+        </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">Preview</span>
+        <ToolCard title="Preview" class="h-100" no-padding>
+          <template #header-actions>
             <a
               :href="imageUrl || '#'"
               class="btn btn-sm btn-link p-0 text-decoration-none small"
@@ -158,35 +157,33 @@ watch(
             >
               Download PNG
             </a>
-          </div>
-          <div class="card-body p-0">
-            <div
-              class="preview-container border-0 rounded-0 bg-light d-flex align-items-center justify-content-center"
-              style="min-height: 382px;"
-            >
-              <div v-if="!code" class="text-muted small">Please enter Mermaid code</div>
+          </template>
+          <div
+            class="preview-container border-0 rounded-0 bg-light d-flex align-items-center justify-content-center"
+            style="min-height: 382px;"
+          >
+            <div v-if="!code" class="text-muted small">Please enter Mermaid code</div>
 
-              <div v-else-if="isRendering" class="text-muted small">
-                <output class="spinner-border text-primary spinner-border-sm me-2">
-                  <span class="visually-hidden">Loading...</span>
-                </output>
-                Rendering...
-              </div>
-
-              <div v-else-if="error" class="alert alert-danger m-3 text-start small w-100">
-                <strong>Error:</strong> <span>{{ error }}</span>
-              </div>
-
-              <img
-                v-else-if="imageUrl"
-                :src="imageUrl"
-                class="img-fluid p-3"
-                alt="Rendered Diagram"
-                title="Right click to save"
-              />
+            <div v-else-if="isRendering" class="text-muted small">
+              <output class="spinner-border text-primary spinner-border-sm me-2">
+                <span class="visually-hidden">Loading...</span>
+              </output>
+              Rendering...
             </div>
+
+            <div v-else-if="error" class="alert alert-danger m-3 text-start small w-100">
+              <strong>Error:</strong> <span>{{ error }}</span>
+            </div>
+
+            <img
+              v-else-if="imageUrl"
+              :src="imageUrl"
+              class="img-fluid p-3"
+              alt="Rendered Diagram"
+              title="Right click to save"
+            />
           </div>
-        </div>
+        </ToolCard>
       </div>
     </div>
   </div>

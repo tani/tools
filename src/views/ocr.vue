@@ -3,6 +3,8 @@ import { ref } from "vue";
 import Tesseract from "tesseract.js";
 import * as mupdf from "mupdf";
 import PdfViewer from "../components/PdfViewer.vue";
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 const image = ref<string | null>(null);
 const fileData = ref<Uint8Array | null>(null);
@@ -177,71 +179,66 @@ const copyToClipboard = () => {
 
 <template>
   <div>
-    <h2 class="display-6">OCR</h2>
-    <p class="text-muted mb-4">
-      Extract text from images or PDF documents using Optical Character Recognition (OCR) powered by
-      Tesseract.js and MuPDF.
-    </p>
+    <ToolHeader
+      title="OCR"
+      description="Extract text from images or PDF documents using Optical Character Recognition (OCR) powered by Tesseract.js and MuPDF."
+    />
 
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-4">
-            <label class="form-label fw-bold small">Language</label>
-            <select v-model="language" class="form-select">
-              <option v-for="lang in supportedLanguages" :key="lang.code" :value="lang.code">
-                {{ lang.name }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-5">
-            <label class="form-label fw-bold small">Upload Image or PDF</label>
-            <input
-              class="form-control"
-              type="file"
-              accept="image/*,application/pdf"
-              @change="handleFileChange"
-            />
-          </div>
-          <div class="col-md-3">
-            <button
-              class="btn btn-primary w-100"
-              type="button"
-              @click="recognizeText"
-              :disabled="!fileData || isProcessing"
-            >
-              <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isProcessing ? 'Processing...' : 'Start OCR' }}
-            </button>
-          </div>
+    <ToolCard title="Configuration" class="mb-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label fw-bold small">Language</label>
+          <select v-model="language" class="form-select">
+            <option v-for="lang in supportedLanguages" :key="lang.code" :value="lang.code">
+              {{ lang.name }}
+            </option>
+          </select>
         </div>
-        <div v-if="isProcessing || progress > 0" class="mt-3">
-          <div class="d-flex justify-content-between mb-1">
-            <span class="small text-muted text-uppercase fw-bold">{{ status }}</span>
-            <span class="small text-muted">{{ Math.round(progress * 100) }}%</span>
-          </div>
-          <div class="progress" style="height: 10px;">
-            <div
-              class="progress-bar"
-              role="progressbar"
-              :class="{ 
-                'progress-bar-striped progress-bar-animated': isProcessing,
-                'bg-success': status === 'Recognition complete'
-              }"
-              :style="{ width: `${progress * 100}%` }"
-            ></div>
-          </div>
+        <div class="col-md-5">
+          <label class="form-label fw-bold small">Upload Image or PDF</label>
+          <input
+            class="form-control"
+            type="file"
+            accept="image/*,application/pdf"
+            @change="handleFileChange"
+          />
+        </div>
+        <div class="col-md-3">
+          <button
+            class="btn btn-primary w-100"
+            type="button"
+            @click="recognizeText"
+            :disabled="!fileData || isProcessing"
+          >
+            <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isProcessing ? 'Processing...' : 'Start OCR' }}
+          </button>
         </div>
       </div>
-    </div>
+      <div v-if="isProcessing || progress > 0" class="mt-3">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="small text-muted text-uppercase fw-bold">{{ status }}</span>
+          <span class="small text-muted">{{ Math.round(progress * 100) }}%</span>
+        </div>
+        <div class="progress" style="height: 10px;">
+          <div
+            class="progress-bar"
+            role="progressbar"
+            :class="{ 
+              'progress-bar-striped progress-bar-animated': isProcessing,
+              'bg-success': status === 'Recognition complete'
+            }"
+            :style="{ width: `${progress * 100}%` }"
+          ></div>
+        </div>
+      </div>
+    </ToolCard>
 
     <div class="row">
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Source Preview</div>
+        <ToolCard title="Source Preview" class="h-100" no-padding>
           <div
-            class="card-body bg-light overflow-auto p-0 d-flex align-items-center justify-content-center"
+            class="bg-light overflow-auto p-0 d-flex align-items-center justify-content-center"
             style="min-height: 400px"
           >
             <div v-if="image" class="p-3">
@@ -250,12 +247,11 @@ const copyToClipboard = () => {
             <PdfViewer v-else-if="fileType === 'application/pdf'" :data="fileData" />
             <div v-else class="text-muted small">No file uploaded</div>
           </div>
-        </div>
+        </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">Extracted Text</span>
+        <ToolCard title="Extracted Text" class="h-100" no-padding>
+          <template #header-actions>
             <button
               v-if="result"
               class="btn btn-sm btn-link p-0 text-decoration-none small"
@@ -263,8 +259,8 @@ const copyToClipboard = () => {
             >
               {{ copyBtnText }}
             </button>
-          </div>
-          <div class="card-body bg-light p-0 d-flex flex-column">
+          </template>
+          <div class="d-flex flex-column h-100">
             <textarea
               v-model="result"
               class="form-control border-0 font-monospace p-3 bg-light flex-grow-1"
@@ -273,7 +269,7 @@ const copyToClipboard = () => {
               placeholder="Extracted text will appear here..."
             />
           </div>
-        </div>
+        </ToolCard>
       </div>
     </div>
   </div>

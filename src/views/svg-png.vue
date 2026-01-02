@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
 
 const x = ref(300);
 const y = ref(300);
@@ -58,84 +60,79 @@ const handleChange = async (event: Event) => {
 
 <template>
   <div>
-    <h2 class="display-6">SVG → PNG</h2>
-    <p class="text-muted mb-4">Convert SVG images to PNG format with custom dimensions.</p>
+    <ToolHeader
+      title="SVG → PNG"
+      description="Convert SVG images to PNG format with custom dimensions."
+    />
 
-    <div class="card mb-4">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-3">
-            <label class="form-label fw-bold small">Width (px)</label>
-            <input v-model.number="x" class="form-control" type="number" />
-          </div>
-          <div class="col-md-3">
-            <label class="form-label fw-bold small">Height (px)</label>
-            <input v-model.number="y" class="form-control" type="number" />
-          </div>
-          <div class="col-md-4">
-            <label class="form-label fw-bold small">Upload SVG</label>
-            <input class="form-control" type="file" accept="image/svg+xml" @change="handleChange" />
-          </div>
-          <div class="col-md-2">
-            <button class="btn btn-primary w-100" type="button" @click="handleClick">
-              Convert
-            </button>
-          </div>
+    <ToolCard title="Configuration" class="mb-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label fw-bold small">Width (px)</label>
+          <input v-model.number="x" class="form-control" type="number" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold small">Height (px)</label>
+          <input v-model.number="y" class="form-control" type="number" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold small">Upload SVG</label>
+          <input class="form-control" type="file" accept="image/svg+xml" @change="handleChange" />
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100" type="button" @click="handleClick">
+            Convert
+          </button>
         </div>
       </div>
-    </div>
+    </ToolCard>
 
     <div class="row">
       <div class="col-12 mb-4">
-        <div class="card shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">SVG Code</div>
-          <div class="card-body p-0">
-            <textarea
-              v-model="raw"
-              class="form-control border-0 font-monospace p-3"
-              rows="10"
-              style="resize: none;"
-              placeholder="Paste or edit SVG code here..."
-            />
-          </div>
-        </div>
+        <ToolCard title="SVG Code" no-padding>
+          <textarea
+            v-model="raw"
+            class="form-control border-0 font-monospace p-3"
+            rows="10"
+            style="resize: none;"
+            placeholder="Paste or edit SVG code here..."
+          />
+        </ToolCard>
       </div>
     </div>
 
     <div class="row">
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">SVG Preview</div>
+        <ToolCard title="SVG Preview" class="h-100">
           <div
-            class="card-body bg-light overflow-auto p-3 d-flex align-items-center justify-content-center"
+            class="bg-light overflow-auto p-3 d-flex align-items-center justify-content-center"
             style="min-height: 400px"
           >
             <img v-if="svg" :src="svg" class="img-fluid" alt="SVG preview" />
             <div v-else class="text-muted small">SVG preview will appear here</div>
           </div>
-        </div>
+        </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">PNG Preview</span>
+        <ToolCard title="PNG Preview" class="h-100">
+          <template #header-actions>
             <a
               v-if="png"
               :href="png"
               download="converted.png"
               class="btn btn-sm btn-link p-0 text-decoration-none small"
-              >Download</a
             >
-          </div>
+              Download
+            </a>
+          </template>
           <div
-            class="card-body bg-light text-center p-3 d-flex align-items-center justify-content-center"
+            class="bg-light text-center p-3 d-flex align-items-center justify-content-center"
             style="min-height: 400px"
           >
             <img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
             <div v-else class="text-muted small">PNG preview will appear here</div>
           </div>
-        </div>
+        </ToolCard>
       </div>
     </div>
   </div>

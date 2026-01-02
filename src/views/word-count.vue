@@ -51,8 +51,19 @@ const lineCount = computed(() => input.value.split(/\r\n|\r|\n/).length);
     </div>
     <div class="row">
       <div class="col-sm-12">
-        <textarea v-model="input" class="form-control mt-3" rows="20" />
+        <div class="card">
+          <div class="card-header">Input</div>
+          <div class="card-body p-0">
+            <textarea v-model="input" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.font-monospace {
+  font-family: var(--bs-font-monospace);
+}
+</style>

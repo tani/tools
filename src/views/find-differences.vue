@@ -24,19 +24,31 @@ const diffFile = computed(() => {
   <div>
     <h2 class="display-6">Diff Text</h2>
     <div class="row">
-      <div class="col-sm-6">
-        <label for="oldText" class="form-label">Old</label>
-        <textarea id="oldText" v-model="oldText" class="form-control" rows="10" />
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">Old</div>
+          <div class="card-body p-0">
+            <textarea id="oldText" v-model="oldText" class="form-control border-0 font-monospace p-3" rows="10" style="resize: none;" />
+          </div>
+        </div>
       </div>
-      <div class="col-sm-6">
-        <label for="newText" class="form-label">New</label>
-        <textarea id="newText" v-model="newText" class="form-control" rows="10" />
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">New</div>
+          <div class="card-body p-0">
+            <textarea id="newText" v-model="newText" class="form-control border-0 font-monospace p-3" rows="10" style="resize: none;" />
+          </div>
+        </div>
       </div>
       <div class="col-sm-12">
-        <label for="diffText" class="form-label">Diff</label>
-        <div id="diffText" class="diff-container">
-          <DiffView v-if="diffFile" :diff-file="diffFile" :diff-view-mode="DiffModeEnum.Unified" />
-          <div v-else class="p-3 text-center text-muted">No differences found</div>
+        <div class="card">
+          <div class="card-header">Diff</div>
+          <div class="card-body p-0">
+            <div id="diffText" class="diff-container border-0">
+              <DiffView v-if="diffFile" :diff-file="diffFile" :diff-view-mode="DiffModeEnum.Unified" />
+              <div v-else class="p-3 text-center text-muted">No differences found</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -46,8 +58,9 @@ const diffFile = computed(() => {
 <style scoped>
 .diff-container {
   height: 18em;
-  border-radius: 5px;
-  border: solid 1px #ccc;
   overflow-y: scroll;
+}
+.font-monospace {
+  font-family: var(--bs-font-monospace);
 }
 </style>

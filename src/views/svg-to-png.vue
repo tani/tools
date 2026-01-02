@@ -71,17 +71,26 @@ const handleChange = async (event: Event) => {
         <button class="btn btn-primary" type="button" @click="handleClick">Convert</button>
       </div>
     </div>
-    <div class="row mt-2">
-      <div class="col-sm-6">
-        <div class="p-3 bg-light border rounded" style="min-height: 500px">
-          <h4 v-if="svg === ''">SVG</h4>
-          <div v-html="svg" />
+    <div class="row mt-3">
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">SVG Preview</div>
+          <div class="card-body bg-light overflow-auto p-3" style="min-height: 500px">
+            <div v-html="svg" />
+            <div v-if="!svg" class="text-center text-muted py-5">SVG preview will appear here</div>
+          </div>
         </div>
       </div>
-      <div class="col-sm-6 text-center">
-        <div class="p-3 bg-light border rounded" style="min-height: 500px">
-          <h4 v-if="png === ''">PNG</h4>
-          <img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>PNG Preview</span>
+            <a v-if="png" :href="png" download="converted.png" class="btn btn-sm btn-link p-0 text-decoration-none">Download</a>
+          </div>
+          <div class="card-body bg-light text-center p-3" style="min-height: 500px">
+            <img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
+            <div v-else class="text-center text-muted py-5">PNG preview will appear here</div>
+          </div>
         </div>
       </div>
     </div>

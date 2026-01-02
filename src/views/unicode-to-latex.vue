@@ -4,6 +4,7 @@ import jsonRaw from "../assets/unicode_latex_unicodemath.json";
 
 const json = jsonRaw as [string, string, string][];
 const input = ref("");
+const copyBtnText = ref("Copy");
 
 function replace(value: string) {
   let val = value;
@@ -16,18 +17,48 @@ function replace(value: string) {
 }
 
 const output = computed(() => replace(input.value));
+
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(output.value).then(() => {
+    copyBtnText.value = "Copied!";
+    setTimeout(() => {
+      copyBtnText.value = "Copy";
+    }, 2000);
+  });
+};
 </script>
 
 <template>
   <div>
     <h2 class="display-6">Unicode To LaTeX</h2>
     <div class="row">
-      <div class="col-sm-6">
-        <textarea v-model="input" class="form-control mt-3" rows="20" />
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">Input</div>
+          <div class="card-body p-0">
+            <textarea v-model="input" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
+          </div>
+        </div>
       </div>
-      <div class="col-sm-6">
-        <textarea class="form-control mt-3" :value="output" readonly rows="20" />
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Output</span>
+            <button class="btn btn-sm btn-link p-0 text-decoration-none" @click="copyToClipboard">
+              {{ copyBtnText }}
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <textarea class="form-control border-0 font-monospace p-3 bg-light" :value="output" readonly rows="20" style="resize: none;" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.font-monospace {
+  font-family: var(--bs-font-monospace);
+}
+</style>

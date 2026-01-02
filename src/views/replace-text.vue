@@ -6,6 +6,7 @@ import { generateDiffFile } from "@git-diff-view/file";
 const text = ref("");
 const replaceText = ref("");
 const search = ref("");
+const copyBtnText = ref("Copy");
 
 const result = computed(() => {
   try {
@@ -28,23 +29,55 @@ const diffFile = computed(() => {
   file.initRaw();
   return file;
 });
+
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(result.value).then(() => {
+    copyBtnText.value = "Copied!";
+    setTimeout(() => {
+      copyBtnText.value = "Copy";
+    }, 2000);
+  });
+};
 </script>
 
 <template>
   <div>
     <h2 class="display-6">Replace Text</h2>
-    <label for="search" class="form-label">Search</label>
-    <input id="search" v-model="search" class="form-control" />
-    <label for="replace" class="form-label">Replace</label>
-    <input id="replace" v-model="replaceText" class="form-control" />
-    <div class="row">
-      <div class="col-sm-6">
-        <label for="text" class="form-label">Input</label>
-        <textarea id="text" v-model="text" class="form-control" rows="20" />
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="search" class="form-label fw-bold">Search</label>
+            <input id="search" v-model="search" class="form-control" placeholder="Regex pattern" />
+          </div>
+          <div class="col-md-6">
+            <label for="replace" class="form-label fw-bold">Replace</label>
+            <input id="replace" v-model="replaceText" class="form-control" placeholder="Replacement text" />
+          </div>
+        </div>
       </div>
-      <div class="col-sm-6">
-        <label for="result" class="form-label">Output</label>
-        <textarea id="result" class="form-control" :value="result" readonly rows="20" />
+    </div>
+    <div class="row">
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">Input</div>
+          <div class="card-body p-0">
+            <textarea id="text" v-model="text" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Output</span>
+            <button class="btn btn-sm btn-link p-0 text-decoration-none" @click="copyToClipboard">
+              {{ copyBtnText }}
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <textarea id="result" class="form-control border-0 font-monospace p-3 bg-light" :value="result" readonly rows="20" style="resize: none;" />
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="diffFile" class="mt-5">
@@ -52,3 +85,9 @@ const diffFile = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.font-monospace {
+  font-family: var(--bs-font-monospace);
+}
+</style>

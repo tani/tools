@@ -105,43 +105,53 @@ onMounted(() => {
   <div>
     <h2 class="display-6">Math Preview</h2>
     <div class="row">
-      <div class="col-sm-12">
-        <textarea
-          v-model="input"
-          class="form-control font-monospace mb-3 math-textarea"
-          placeholder="Enter TeX/LaTeX or Xy-pic code here..."
-          rows="10"
-        />
+      <div class="col-sm-12 mb-4">
+        <div class="card">
+          <div class="card-header">TeX Input</div>
+          <div class="card-body p-0">
+            <textarea
+              v-model="input"
+              class="form-control border-0 font-monospace p-3 math-textarea"
+              placeholder="Enter TeX/LaTeX or Xy-pic code here..."
+              rows="10"
+              style="resize: none;"
+            />
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="row">
       <div class="col-sm-12">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h3>Preview</h3>
-          <a
-            :href="imageUrl || '#'"
-            class="btn btn-primary btn-sm"
-            :class="{ disabled: !imageUrl || error }"
-            download="math-expression.png"
-          >
-            Download PNG
-          </a>
-        </div>
-        <div v-if="error" class="alert alert-danger">
-          <strong>Error:</strong> {{ error }}
-        </div>
-        <div class="preview-container p-4 bg-white border rounded shadow-sm text-center">
-          <div v-if="!input.trim()" class="text-muted">
-            Enter some TeX to see the preview
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Preview</span>
+            <a
+              :href="imageUrl || '#'"
+              class="btn btn-sm btn-link p-0 text-decoration-none"
+              :class="{ disabled: !imageUrl || error }"
+              download="math-expression.png"
+            >
+              Download PNG
+            </a>
           </div>
-          <div v-else-if="isRendering" class="text-muted">
-            <output class="spinner-border text-primary spinner-border-sm me-2">
-              <span class="visually-hidden">Loading...</span>
-            </output>
-            Rendering...
+          <div class="card-body p-0">
+            <div v-if="error" class="alert alert-danger m-3">
+              <strong>Error:</strong> {{ error }}
+            </div>
+            <div class="preview-container border-0 rounded-0 p-4 bg-white text-center">
+              <div v-if="!input.trim()" class="text-muted">
+                Enter some TeX to see the preview
+              </div>
+              <div v-else-if="isRendering" class="text-muted">
+                <output class="spinner-border text-primary spinner-border-sm me-2">
+                  <span class="visually-hidden">Loading...</span>
+                </output>
+                Rendering...
+              </div>
+              <img v-else-if="imageUrl" :src="imageUrl" class="img-fluid" alt="Math Preview" />
+            </div>
           </div>
-          <img v-else-if="imageUrl" :src="imageUrl" class="img-fluid" alt="Math Preview" />
         </div>
       </div>
     </div>

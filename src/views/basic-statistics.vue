@@ -211,19 +211,26 @@ const chartData = computed(() => {
       </div>
     </div>
     <div class="row mt-3">
-      <div class="col-sm-6">
-        <textarea
-          v-model="input"
-          class="form-control"
-          rows="20"
-          style="height: 100%; min-height: 400px"
-        />
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">Input</div>
+          <div class="card-body p-0">
+            <textarea
+              v-model="input"
+              class="form-control border-0 font-monospace p-3"
+              rows="20"
+              style="height: 100%; min-height: 400px; resize: none;"
+            />
+          </div>
+        </div>
       </div>
-      <div class="col-sm-6">
-        <div
-          class="border rounded bg-light p-2 h-100 d-flex flex-column"
-          style="overflow-x: auto; min-height: 400px"
-        >
+      <div class="col-sm-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">Histogram</div>
+          <div
+            class="card-body p-2 d-flex flex-column bg-light"
+            style="overflow-x: auto; min-height: 400px"
+          >
           <svg
             v-if="chartData.data.length > 0"
             :viewBox="`0 0 ${Math.max(400, chartData.data.length * 40)} 300`"
@@ -271,4 +278,11 @@ const chartData = computed(() => {
       </div>
     </div>
   </div>
+</div>
 </template>
+
+<style scoped>
+.font-monospace {
+  font-family: var(--bs-font-monospace);
+}
+</style>

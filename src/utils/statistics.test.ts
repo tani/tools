@@ -9,7 +9,7 @@ import {
   standardDeviation,
   round,
   split
-} from './statistics.ts';
+} from './statistics';
 
 test('mean calculation', () => {
   assert.equal(mean([10, 20, 30]), 20);

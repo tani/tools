@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const x = ref(300);
 const y = ref(300);
@@ -11,8 +11,10 @@ const raw = ref(`<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg
   <text x="150" y="160" font-size="24" text-anchor="middle" fill="white" font-family="sans-serif">SVG</text>
 </svg>`);
 
-// Initialize preview
-svg.value = `data:image/svg+xml,${encodeURIComponent(raw.value)}`;
+// Watch raw and update svg preview
+watch(raw, (newRaw) => {
+  svg.value = `data:image/svg+xml,${encodeURIComponent(newRaw)}`;
+}, { immediate: true });
 
 const handleClick = async () => {
   const canvas = document.createElement("canvas");
@@ -51,7 +53,6 @@ const handleChange = async (event: Event) => {
   if (!file) return;
   const rawText = await file.text();
   raw.value = rawText;
-  svg.value = `data:image/svg+xml,${encodeURIComponent(rawText)}`;
 };
 </script>
 
@@ -91,11 +92,28 @@ const handleChange = async (event: Event) => {
     </div>
 
     <div class="row">
+      <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">SVG Code</div>
+          <div class="card-body p-0">
+            <textarea
+              v-model="raw"
+              class="form-control border-0 font-monospace p-3"
+              rows="10"
+              style="resize: none;"
+              placeholder="Paste or edit SVG code here..."
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">SVG Preview</div>
           <div class="card-body bg-light overflow-auto p-3 d-flex align-items-center justify-content-center" style="min-height: 400px">
-            <div v-if="svg" v-html="svg" class="img-fluid" />
+            <img v-if="svg" :src="svg" class="img-fluid" alt="SVG preview" />
             <div v-else class="text-muted small">SVG preview will appear here</div>
           </div>
         </div>
@@ -117,13 +135,4 @@ const handleChange = async (event: Event) => {
 </template>
 
 <style scoped>
-.preview-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-  border: solid 1px #ccc;
-  border-radius: 5px;
-  overflow-y: auto;
-}
 </style>

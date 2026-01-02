@@ -105,7 +105,7 @@ watch([() => config.format, () => config.quality], applyResize);
 
 <template>
   <div>
-    <h2 class="display-6">Image Resizer & Cropper</h2>
+    <h2 class="display-6">Image Resize</h2>
     <p class="text-muted mb-4">
       Resize and crop images visually. Adjust the crop box or set specific dimensions.
     </p>

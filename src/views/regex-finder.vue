@@ -72,7 +72,7 @@ const copyMatches = () => {
 
 <template>
   <div>
-    <h2 class="display-6">Text Finder</h2>
+    <h2 class="display-6">Regex Finder</h2>
     <p class="text-muted mb-4">
       Highlight Oniguruma-style regex matches with an instant preview, powered by
       oniguruma-to-es.

@@ -64,7 +64,7 @@ const copyToClipboard = () => {
 
 <template>
   <div>
-    <h2 class="display-6">PDF to Text</h2>
+    <h2 class="display-6">PDF → Text</h2>
     <p class="text-muted mb-4">Extract searchable text from PDF documents using MuPDF.</p>
 
     <div class="card mb-4 shadow-sm">

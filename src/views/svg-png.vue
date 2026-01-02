@@ -58,7 +58,7 @@ const handleChange = async (event: Event) => {
 
 <template>
   <div>
-    <h2 class="display-6">SVG to PNG</h2>
+    <h2 class="display-6">SVG → PNG</h2>
     <p class="text-muted mb-4">Convert SVG images to PNG format with custom dimensions.</p>
 
     <div class="card mb-4">

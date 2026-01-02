@@ -30,30 +30,30 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/replace-text"
+                  to="/replace"
                 >
-                  🔁 Replace Text
+                  🔁 Replace
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/find-differences"
+                  to="/diff"
                 >
-                  🔍 Find Differences
+                  🔍 Diff
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/text-finder"
+                  to="/regex-finder"
                 >
-                  🧭 Text Finder
+                  🧭 Regex Finder
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/oniguruma-cheat-sheet"
+                  to="/regex-cheat-sheet"
                 >
-                  📚 Oniguruma Cheat Sheet
+                  📚 Regex Cheat Sheet
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
@@ -65,9 +65,9 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/string-folding"
+                  to="/fold-strings"
                 >
-                  📂 String Folding
+                  📂 Fold Strings
                 </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
@@ -76,16 +76,16 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/unicode-to-latex"
+                  to="/unicode-latex"
                 >
-                  🔣 Unicode to LaTeX
+                  🔣 Unicode → LaTeX
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/latex-to-unicode"
+                  to="/latex-unicode"
                 >
-                  🧮 LaTeX to Unicode
+                  🧮 LaTeX → Unicode
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
@@ -97,9 +97,9 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/basic-statistics"
+                  to="/statistics"
                 >
-                  📊 Basic Statistics
+                  📊 Statistics
                 </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
@@ -108,30 +108,30 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/image-tools"
+                  to="/image-resize"
                 >
-                  🖼️ Image Resizer
+                  🖼️ Image Resize
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/ocr-tool"
+                  to="/ocr"
                 >
-                  👁️ OCR Reader
+                  👁️ OCR
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/svg-to-png"
+                  to="/svg-png"
                 >
-                  🖼️ Convert SVG to PNG
+                  🖼️ SVG → PNG
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/mermaid-editor"
+                  to="/mermaid"
                 >
-                  🧜‍♀️ Mermaid Editor
+                  🧜‍♀️ Mermaid
                 </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
@@ -149,35 +149,35 @@
                   active-class="active"
                   to="/pdf-merge"
                 >
-                  🔗 PDF Merger
+                  🔗 PDF Merge
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/pdf-extract"
                 >
-                  ✂️ PDF Extractor
+                  ✂️ PDF Extract
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/pdf-resizer"
+                  to="/pdf-resize"
                 >
-                  📏 PDF Resizer
+                  📏 PDF Resize
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/pdf-sorter"
+                  to="/pdf-sort"
                 >
-                  🔃 PDF Sorter
+                  🔃 PDF Sort
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/pdf-to-text"
+                  to="/pdf-text"
                 >
-                  📝 PDF to Text
+                  📝 PDF → Text
                 </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
@@ -186,9 +186,9 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/pomodoro-timer"
+                  to="/pomodoro"
                 >
-                  ⏱️ Pomodoro Timer
+                  ⏱️ Pomodoro
                 </RouterLink>
               </div>
             </div>

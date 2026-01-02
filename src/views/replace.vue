@@ -48,7 +48,7 @@ const copyToClipboard = () => {
 
 <template>
   <div>
-    <h2 class="display-6">Replace Text</h2>
+    <h2 class="display-6">Replace</h2>
     <p class="text-muted mb-4">
       Search and replace text using Oniguruma-style regular expressions with a side-by-side diff
       preview.

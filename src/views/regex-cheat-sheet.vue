@@ -146,7 +146,7 @@ const caveats = [
 
 <template>
   <div>
-    <h2 class="display-6">Oniguruma Regex Cheat Sheet</h2>
+    <h2 class="display-6">Regex Cheat Sheet</h2>
     <p class="text-muted mb-4">
       A practical reference of Oniguruma syntax, flags, and key differences when using
       oniguruma-to-es in the browser.

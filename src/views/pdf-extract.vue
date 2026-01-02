@@ -85,7 +85,7 @@ const extractPages = async () => {
 
 <template>
   <div>
-    <h2 class="display-6">PDF Extractor</h2>
+    <h2 class="display-6">PDF Extract</h2>
     <p class="text-muted mb-4">
       Extract specific pages or ranges from a PDF document into a new file.
     </p>

@@ -92,7 +92,7 @@ const resizePdf = async () => {
 
 <template>
   <div>
-    <h2 class="display-6">PDF Resizer</h2>
+    <h2 class="display-6">PDF Resize</h2>
     <p class="text-muted mb-4">
       Resize all pages of a PDF document to a standard format like A4 or Letter.
     </p>

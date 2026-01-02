@@ -127,7 +127,7 @@ watch(
 
 <template>
   <div class="mermaid-editor">
-    <h2 class="display-6">Mermaid Editor</h2>
+    <h2 class="display-6">Mermaid</h2>
     <p class="text-muted mb-4">
       Create and preview diagrams using Mermaid syntax and export them as PNG images.
     </p>

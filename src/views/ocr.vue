@@ -177,7 +177,7 @@ const copyToClipboard = () => {
 
 <template>
   <div>
-    <h2 class="display-6">OCR Tool</h2>
+    <h2 class="display-6">OCR</h2>
     <p class="text-muted mb-4">
       Extract text from images or PDF documents using Optical Character Recognition (OCR) powered by
       Tesseract.js and MuPDF.

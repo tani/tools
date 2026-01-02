@@ -121,7 +121,7 @@ const exportPdf = async () => {
 
 <template>
   <div>
-    <h2 class="display-6">PDF Sorter</h2>
+    <h2 class="display-6">PDF Sort</h2>
     <p class="text-muted mb-4">Rearrange or remove pages from a PDF document visually.</p>
 
     <div class="card mb-4 shadow-sm">

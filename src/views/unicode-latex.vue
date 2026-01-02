@@ -30,7 +30,7 @@ const copyToClipboard = () => {
 
 <template>
   <div>
-    <h2 class="display-6">Unicode To LaTeX</h2>
+    <h2 class="display-6">Unicode → LaTeX</h2>
     <p class="text-muted mb-4">
       Convert Unicode mathematical characters to their corresponding LaTeX commands.
     </p>

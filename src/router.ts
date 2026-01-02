@@ -1,65 +1,65 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
-  { path: "/", redirect: "/replace-text" },
+  { path: "/", redirect: "/replace" },
   // Text & Coding
   {
-    path: "/replace-text",
-    component: () => import("./views/replace-text.vue"),
+    path: "/replace",
+    component: () => import("./views/replace.vue"),
   },
   {
-    path: "/find-differences",
-    component: () => import("./views/find-differences.vue"),
+    path: "/diff",
+    component: () => import("./views/diff.vue"),
   },
   {
-    path: "/text-finder",
-    component: () => import("./views/text-finder.vue"),
+    path: "/regex-finder",
+    component: () => import("./views/regex-finder.vue"),
   },
   {
-    path: "/oniguruma-cheat-sheet",
-    component: () => import("./views/oniguruma-cheat-sheet.vue"),
+    path: "/regex-cheat-sheet",
+    component: () => import("./views/regex-cheat-sheet.vue"),
   },
   {
     path: "/word-count",
     component: () => import("./views/word-count.vue"),
   },
   {
-    path: "/string-folding",
-    component: () => import("./views/string-folding.vue"),
+    path: "/fold-strings",
+    component: () => import("./views/fold-strings.vue"),
   },
   // Math & LaTeX
   {
-    path: "/unicode-to-latex",
-    component: () => import("./views/unicode-to-latex.vue"),
+    path: "/unicode-latex",
+    component: () => import("./views/unicode-latex.vue"),
   },
   {
-    path: "/latex-to-unicode",
-    component: () => import("./views/latex-to-unicode.vue"),
+    path: "/latex-unicode",
+    component: () => import("./views/latex-unicode.vue"),
   },
   {
     path: "/math-preview",
     component: () => import("./views/math-preview.vue"),
   },
   {
-    path: "/basic-statistics",
-    component: () => import("./views/basic-statistics.vue"),
+    path: "/statistics",
+    component: () => import("./views/statistics.vue"),
   },
   // Graphics & Images
   {
-    path: "/image-tools",
-    component: () => import("./views/image-tools.vue"),
+    path: "/image-resize",
+    component: () => import("./views/image-resize.vue"),
   },
   {
-    path: "/ocr-tool",
-    component: () => import("./views/ocr-reader.vue"),
+    path: "/ocr",
+    component: () => import("./views/ocr.vue"),
   },
   {
-    path: "/svg-to-png",
-    component: () => import("./views/svg-to-png.vue"),
+    path: "/svg-png",
+    component: () => import("./views/svg-png.vue"),
   },
   {
-    path: "/mermaid-editor",
-    component: () => import("./views/mermaid-editor.vue"),
+    path: "/mermaid",
+    component: () => import("./views/mermaid.vue"),
   },
   // PDF Tools
   {
@@ -75,21 +75,21 @@ const routes = [
     component: () => import("./views/pdf-extract.vue"),
   },
   {
-    path: "/pdf-resizer",
-    component: () => import("./views/pdf-resizer.vue"),
+    path: "/pdf-resize",
+    component: () => import("./views/pdf-resize.vue"),
   },
   {
-    path: "/pdf-sorter",
-    component: () => import("./views/pdf-sorter.vue"),
+    path: "/pdf-sort",
+    component: () => import("./views/pdf-sort.vue"),
   },
   {
-    path: "/pdf-to-text",
-    component: () => import("./views/pdf-to-text.vue"),
+    path: "/pdf-text",
+    component: () => import("./views/pdf-text.vue"),
   },
   // Utilities
   {
-    path: "/pomodoro-timer",
-    component: () => import("./views/pomodoro-timer.vue"),
+    path: "/pomodoro",
+    component: () => import("./views/pomodoro.vue"),
   },
 ];
 

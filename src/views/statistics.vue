@@ -31,7 +31,7 @@ const chartData = computed(() => {
 
 <template>
   <div>
-    <h2 class="display-6">Basic Statistics</h2>
+    <h2 class="display-6">Statistics</h2>
     <p class="text-muted mb-4">
       Calculate mean, variance, standard deviation, and other basic statistical measures from a list
       of numbers.

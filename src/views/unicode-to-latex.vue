@@ -39,7 +39,12 @@ const copyToClipboard = () => {
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Unicode Input</div>
           <div class="card-body p-0">
-            <textarea v-model="input" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
+            <textarea
+              v-model="input"
+              class="form-control border-0 font-monospace p-3"
+              rows="20"
+              style="resize: none;"
+            />
           </div>
         </div>
       </div>
@@ -47,12 +52,21 @@ const copyToClipboard = () => {
         <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold small text-uppercase text-muted">LaTeX Output</span>
-            <button class="btn btn-sm btn-link p-0 text-decoration-none small" @click="copyToClipboard">
+            <button
+              class="btn btn-sm btn-link p-0 text-decoration-none small"
+              @click="copyToClipboard"
+            >
               {{ copyBtnText }}
             </button>
           </div>
           <div class="card-body p-0">
-            <textarea class="form-control border-0 font-monospace p-3 bg-light" :value="output" readonly rows="20" style="resize: none;" />
+            <textarea
+              class="form-control border-0 font-monospace p-3 bg-light"
+              :value="output"
+              readonly
+              rows="20"
+              style="resize: none;"
+            />
           </div>
         </div>
       </div>

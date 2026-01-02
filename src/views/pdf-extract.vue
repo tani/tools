@@ -114,8 +114,8 @@ const extractPages = async () => {
             />
           </div>
           <div class="col-md-3">
-            <button 
-              class="btn btn-primary w-100" 
+            <button
+              class="btn btn-primary w-100"
               @click="extractPages"
               :disabled="!fileData || isProcessing"
             >
@@ -127,15 +127,22 @@ const extractPages = async () => {
       </div>
     </div>
 
-    <div v-if="downloadUrl" class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4">
+    <div
+      v-if="downloadUrl"
+      class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
+    >
       <span><strong>Success!</strong> Selected pages have been extracted.</span>
-      <a :href="downloadUrl" :download="'extracted_' + fileName" class="btn btn-success btn-sm">Download Extracted PDF</a>
+      <a :href="downloadUrl" :download="'extracted_' + fileName" class="btn btn-success btn-sm"
+        >Download Extracted PDF</a
+      >
     </div>
 
     <div class="row">
       <div class="col-12 mb-4">
         <div class="card shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Source Document Preview</div>
+          <div class="card-header fw-bold small text-uppercase text-muted">
+            Source Document Preview
+          </div>
           <div class="card-body p-0">
             <PdfViewer :data="fileData" />
           </div>
@@ -145,5 +152,4 @@ const extractPages = async () => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -72,7 +72,7 @@ const handleFileChange = (event: Event) => {
     reader.onload = (e) => {
       const arrayBuffer = e.target?.result as ArrayBuffer;
       fileData.value = new Uint8Array(arrayBuffer);
-      
+
       if (file.type === "application/pdf") {
         image.value = null;
         status.value = "PDF Loaded. Ready to recognize.";
@@ -108,7 +108,7 @@ const recognizeText = async () => {
         const pixmap = page.toPixmap(mupdf.Matrix.identity, mupdf.ColorSpace.DeviceRGB, true);
         const width = pixmap.getWidth();
         const height = pixmap.getHeight();
-        
+
         const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
@@ -121,9 +121,9 @@ const recognizeText = async () => {
         const samples = new Uint8ClampedArray(pixmap.getPixels());
         const imageData = new ImageData(samples, width, height);
         ctx.putImageData(imageData, 0, 0);
-        
+
         const pageImage = canvas.toDataURL("image/png");
-        
+
         const { data: { text } } = await Tesseract.recognize(
           pageImage,
           language.value,
@@ -179,7 +179,8 @@ const copyToClipboard = () => {
   <div>
     <h2 class="display-6">OCR Tool</h2>
     <p class="text-muted mb-4">
-      Extract text from images or PDF documents using Optical Character Recognition (OCR) powered by Tesseract.js and MuPDF.
+      Extract text from images or PDF documents using Optical Character Recognition (OCR) powered by
+      Tesseract.js and MuPDF.
     </p>
 
     <div class="card mb-4 shadow-sm">
@@ -204,9 +205,9 @@ const copyToClipboard = () => {
             />
           </div>
           <div class="col-md-3">
-            <button 
-              class="btn btn-primary w-100" 
-              type="button" 
+            <button
+              class="btn btn-primary w-100"
+              type="button"
               @click="recognizeText"
               :disabled="!fileData || isProcessing"
             >
@@ -221,9 +222,9 @@ const copyToClipboard = () => {
             <span class="small text-muted">{{ Math.round(progress * 100) }}%</span>
           </div>
           <div class="progress" style="height: 10px;">
-            <div 
-              class="progress-bar" 
-              role="progressbar" 
+            <div
+              class="progress-bar"
+              role="progressbar"
               :class="{ 
                 'progress-bar-striped progress-bar-animated': isProcessing,
                 'bg-success': status === 'Recognition complete'
@@ -239,7 +240,10 @@ const copyToClipboard = () => {
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Source Preview</div>
-          <div class="card-body bg-light overflow-auto p-0 d-flex align-items-center justify-content-center" style="min-height: 400px">
+          <div
+            class="card-body bg-light overflow-auto p-0 d-flex align-items-center justify-content-center"
+            style="min-height: 400px"
+          >
             <div v-if="image" class="p-3">
               <img :src="image" class="img-fluid border shadow-sm" alt="OCR Source" />
             </div>
@@ -252,9 +256,9 @@ const copyToClipboard = () => {
         <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold small text-uppercase text-muted">Extracted Text</span>
-            <button 
-              v-if="result" 
-              class="btn btn-sm btn-link p-0 text-decoration-none small" 
+            <button
+              v-if="result"
+              class="btn btn-sm btn-link p-0 text-decoration-none small"
               @click="copyToClipboard"
             >
               {{ copyBtnText }}
@@ -275,5 +279,4 @@ const copyToClipboard = () => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

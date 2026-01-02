@@ -64,7 +64,7 @@ const computeLCSDiff = (str1: string, str2: string) => {
 
 const processedData = computed(() => {
   const lines = inputText.value.split(/\r\n|\r|\n/).filter(line => line.trim());
-  
+
   if (lines.length === 0) return { finalResult: "", regexResult: "", steps: [] };
   if (lines.length === 1) return { finalResult: lines[0], regexResult: lines[0], steps: [] };
 
@@ -116,7 +116,8 @@ const copyRegexToClipboard = () => {
   <div>
     <h2 class="display-6">String Folding Tool</h2>
     <p class="text-muted mb-4">
-      Compare strings line-by-line using the LCS algorithm and replace differences with "{{ diffChar }}".
+      Compare strings line-by-line using the LCS algorithm and replace differences with "{{ diffChar
+      }}".
     </p>
 
     <div class="card mb-4 shadow-sm">
@@ -124,27 +125,28 @@ const copyRegexToClipboard = () => {
       <div class="card-body">
         <div class="row align-items-center g-3">
           <div class="col-auto">
-            <label for="diffChar" class="form-label mb-0 fw-bold small">Replacement Character</label>
+            <label for="diffChar" class="form-label mb-0 fw-bold small"
+              >Replacement Character</label
+            >
           </div>
           <div class="col-auto">
-            <input 
+            <input
               id="diffChar"
-              type="text" 
+              type="text"
               v-model="diffChar"
               @input="limitDiffChar"
               class="form-control form-control-sm text-center font-monospace"
               style="width: 3rem;"
-            >
+            />
           </div>
           <div class="col-auto ms-auto">
             <div class="form-check mb-0">
-              <input 
-                class="form-check-input"
-                type="checkbox" 
-                v-model="showSteps"
-                id="showSteps"
+              <input class="form-check-input" type="checkbox" v-model="showSteps" id="showSteps" />
+              <label
+                class="form-check-label small fw-bold text-muted text-uppercase"
+                for="showSteps"
+                style="font-size: 0.75rem;"
               >
-              <label class="form-check-label small fw-bold text-muted text-uppercase" for="showSteps" style="font-size: 0.75rem;">
                 Show Calculation Steps
               </label>
             </div>
@@ -177,24 +179,33 @@ const copyRegexToClipboard = () => {
       <!-- Result Area -->
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">
-            Processed Results
-          </div>
+          <div class="card-header fw-bold small text-uppercase text-muted">Processed Results</div>
           <div class="card-body bg-light overflow-auto p-3" style="min-height: 382px;">
             <div v-if="!inputText.trim()" class="text-center text-muted py-5 small">
               Results will appear here
             </div>
-            
+
             <div v-else>
               <!-- Regex Result -->
               <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                  <label class="small fw-bold text-uppercase text-muted mb-0" style="font-size: 0.7rem;">Regex Pattern</label>
-                  <button class="btn btn-sm btn-link p-0 text-decoration-none small" style="font-size: 0.7rem;" @click="copyRegexToClipboard">
+                  <label
+                    class="small fw-bold text-uppercase text-muted mb-0"
+                    style="font-size: 0.7rem;"
+                    >Regex Pattern</label
+                  >
+                  <button
+                    class="btn btn-sm btn-link p-0 text-decoration-none small"
+                    style="font-size: 0.7rem;"
+                    @click="copyRegexToClipboard"
+                  >
                     {{ copyRegexBtnText }}
                   </button>
                 </div>
-                <div class="p-3 border rounded bg-white font-monospace text-break small" style="color: #d946ef;">
+                <div
+                  class="p-3 border rounded bg-white font-monospace text-break small"
+                  style="color: #d946ef;"
+                >
                   {{ processedData.regexResult || "(No input)" }}
                 </div>
               </div>
@@ -202,8 +213,16 @@ const copyRegexToClipboard = () => {
               <!-- Final Result -->
               <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                  <label class="small fw-bold text-uppercase text-muted mb-0" style="font-size: 0.7rem;">Final Folded Result</label>
-                  <button class="btn btn-sm btn-link p-0 text-decoration-none small" style="font-size: 0.7rem;" @click="copyToClipboard">
+                  <label
+                    class="small fw-bold text-uppercase text-muted mb-0"
+                    style="font-size: 0.7rem;"
+                    >Final Folded Result</label
+                  >
+                  <button
+                    class="btn btn-sm btn-link p-0 text-decoration-none small"
+                    style="font-size: 0.7rem;"
+                    @click="copyToClipboard"
+                  >
                     {{ copyBtnText }}
                   </button>
                 </div>
@@ -214,17 +233,27 @@ const copyRegexToClipboard = () => {
 
               <!-- Calculation Steps -->
               <div v-if="showSteps && processedData.steps.length > 0">
-                <label class="small fw-bold text-uppercase text-muted mb-2 d-block" style="font-size: 0.7rem;">Step-by-Step Evolution</label>
-                <div v-for="step in processedData.steps" :key="step.stepIndex" class="card mb-2 border-0 shadow-none bg-white">
+                <label
+                  class="small fw-bold text-uppercase text-muted mb-2 d-block"
+                  style="font-size: 0.7rem;"
+                  >Step-by-Step Evolution</label
+                >
+                <div
+                  v-for="step in processedData.steps"
+                  :key="step.stepIndex"
+                  class="card mb-2 border-0 shadow-none bg-white"
+                >
                   <div class="card-body p-2 border rounded">
-                    <span class="badge bg-info text-dark mb-2" style="font-size: 0.6rem;">Step {{ step.stepIndex }}</span>
+                    <span class="badge bg-info text-dark mb-2" style="font-size: 0.6rem;"
+                      >Step {{ step.stepIndex }}</span
+                    >
                     <div class="row g-1 font-monospace" style="font-size: 0.75rem;">
                       <div class="col-1 text-muted text-end">A:</div>
                       <div class="col-11 text-break">{{ step.inputA }}</div>
-                      
+
                       <div class="col-1 text-muted text-end">B:</div>
                       <div class="col-11 text-break">{{ step.inputB }}</div>
-                      
+
                       <div class="col-1 text-warning text-end">↓</div>
                       <div class="col-11 text-break text-primary fw-bold">{{ step.output }}</div>
                     </div>

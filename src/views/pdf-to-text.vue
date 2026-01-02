@@ -29,7 +29,7 @@ const extractText = async () => {
 
   isProcessing.value = true;
   resultText.value = "";
-  
+
   try {
     const doc = mupdf.Document.openDocument(fileData.value, "application/pdf");
     const pageCount = doc.countPages();
@@ -65,9 +65,7 @@ const copyToClipboard = () => {
 <template>
   <div>
     <h2 class="display-6">PDF to Text</h2>
-    <p class="text-muted mb-4">
-      Extract searchable text from PDF documents using MuPDF.
-    </p>
+    <p class="text-muted mb-4">Extract searchable text from PDF documents using MuPDF.</p>
 
     <div class="card mb-4 shadow-sm">
       <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
@@ -83,7 +81,7 @@ const copyToClipboard = () => {
             />
           </div>
           <div class="col-md-3">
-            <button 
+            <button
               class="btn btn-primary w-100"
               @click="extractText"
               :disabled="!fileData || isProcessing"
@@ -112,8 +110,8 @@ const copyToClipboard = () => {
         <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold small text-uppercase text-muted">Extracted Text</span>
-            <button 
-              v-if="resultText" 
+            <button
+              v-if="resultText"
               class="btn btn-sm btn-link p-0 text-decoration-none small"
               @click="copyToClipboard"
             >
@@ -135,5 +133,4 @@ const copyToClipboard = () => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

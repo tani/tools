@@ -23,9 +23,7 @@ const handleFileChange = (event: Event) => {
 <template>
   <div>
     <h2 class="display-6">PDF Viewer</h2>
-    <p class="text-muted mb-4">
-      View multi-page PDF documents directly in your browser.
-    </p>
+    <p class="text-muted mb-4">View multi-page PDF documents directly in your browser.</p>
 
     <div class="card mb-4 shadow-sm">
       <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
@@ -62,5 +60,4 @@ const handleFileChange = (event: Event) => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -160,7 +160,10 @@ watch(
             </a>
           </div>
           <div class="card-body p-0">
-            <div class="preview-container border-0 rounded-0 bg-light d-flex align-items-center justify-content-center" style="min-height: 382px;">
+            <div
+              class="preview-container border-0 rounded-0 bg-light d-flex align-items-center justify-content-center"
+              style="min-height: 382px;"
+            >
               <div v-if="!code" class="text-muted small">Please enter Mermaid code</div>
 
               <div v-else-if="isRendering" class="text-muted small">

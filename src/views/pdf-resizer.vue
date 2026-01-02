@@ -64,13 +64,13 @@ const resizePdf = async () => {
     for (let i = 0; i < pageCount; i++) {
       // Graft page into new document
       outDoc.graftPage(-1, srcDoc, i);
-      
+
       // Get the grafted page to adjust its box
       const outPage = outDoc.loadPage(i);
-      
+
       // Calculate scaling to fit (optional, but setting MediaBox is primary)
       // Note: Truly scaling content requires editing the content stream operators
-      // which is complex in WASM. For now, we set the MediaBox which is the 
+      // which is complex in WASM. For now, we set the MediaBox which is the
       // standard "Resize" behavior in many tools.
       outPage.setPageBox("MediaBox", [0, 0, tw, th]);
     }
@@ -124,8 +124,8 @@ const resizePdf = async () => {
             </select>
           </div>
           <div class="col-md-2">
-            <button 
-              class="btn btn-primary w-100" 
+            <button
+              class="btn btn-primary w-100"
               @click="resizePdf"
               :disabled="!fileData || isProcessing"
             >
@@ -137,9 +137,14 @@ const resizePdf = async () => {
       </div>
     </div>
 
-    <div v-if="downloadUrl" class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4">
+    <div
+      v-if="downloadUrl"
+      class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
+    >
       <span><strong>Success!</strong> All pages have been resized to {{ targetFormat }}.</span>
-      <a :href="downloadUrl" :download="'resized_' + fileName" class="btn btn-success btn-sm">Download Resized PDF</a>
+      <a :href="downloadUrl" :download="'resized_' + fileName" class="btn btn-success btn-sm"
+        >Download Resized PDF</a
+      >
     </div>
 
     <div class="row">
@@ -155,5 +160,4 @@ const resizePdf = async () => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

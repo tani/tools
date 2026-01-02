@@ -108,7 +108,8 @@ onMounted(() => {
   <div>
     <h2 class="display-6">Math Preview</h2>
     <p class="text-muted mb-4">
-      Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a PNG.
+      Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a
+      PNG.
     </p>
     <div class="row">
       <div class="col-lg-6 mb-4">
@@ -142,7 +143,10 @@ onMounted(() => {
             <div v-if="error" class="alert alert-danger m-3 small">
               <strong>Error:</strong> {{ error }}
             </div>
-            <div class="preview-container border-0 rounded-0 p-4 text-center d-flex align-items-center justify-content-center" style="min-height: 382px;">
+            <div
+              class="preview-container border-0 rounded-0 p-4 text-center d-flex align-items-center justify-content-center"
+              style="min-height: 382px;"
+            >
               <div v-if="!input.trim()" class="text-muted small">
                 Enter some TeX to see the preview
               </div>

@@ -57,7 +57,7 @@ const applyResize = () => {
   if (canvas) {
     const targetWidth = Math.round(toPx(config.width, config.unit));
     const targetHeight = Math.round(toPx(config.height, config.unit));
-    
+
     const resizedCanvas = document.createElement('canvas');
     resizedCanvas.width = targetWidth;
     resizedCanvas.height = targetHeight;
@@ -116,18 +116,33 @@ watch([() => config.format, () => config.quality], applyResize);
         <div class="row g-3">
           <div class="col-md-4">
             <label class="form-label fw-bold small">Upload Image</label>
-            <input class="form-control" type="file" accept="image/png,image/jpeg" @change="handleFileChange" />
+            <input
+              class="form-control"
+              type="file"
+              accept="image/png,image/jpeg"
+              @change="handleFileChange"
+            />
           </div>
           <div class="col-md-2">
             <label class="form-label fw-bold small">Width</label>
             <div class="input-group input-group-sm">
-              <input v-model.number="config.width" type="number" class="form-control" @input="updateWidth(config.width)" />
+              <input
+                v-model.number="config.width"
+                type="number"
+                class="form-control"
+                @input="updateWidth(config.width)"
+              />
             </div>
           </div>
           <div class="col-md-2">
             <label class="form-label fw-bold small">Height</label>
             <div class="input-group input-group-sm">
-              <input v-model.number="config.height" type="number" class="form-control" @input="updateHeight(config.height)" />
+              <input
+                v-model.number="config.height"
+                type="number"
+                class="form-control"
+                @input="updateHeight(config.height)"
+              />
             </div>
           </div>
           <div class="col-md-2">
@@ -148,7 +163,12 @@ watch([() => config.format, () => config.quality], applyResize);
           </div>
           <div class="col-md-2 d-flex align-items-end">
             <div class="form-check mb-2">
-              <input v-model="config.maintainAspectRatio" class="form-check-input" type="checkbox" id="aspectRatio">
+              <input
+                v-model="config.maintainAspectRatio"
+                class="form-check-input"
+                type="checkbox"
+                id="aspectRatio"
+              />
               <label class="form-check-label small" for="aspectRatio">Lock Ratio</label>
             </div>
           </div>
@@ -160,7 +180,10 @@ watch([() => config.format, () => config.quality], applyResize);
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Cropper Workspace</div>
-          <div class="card-body bg-secondary bg-opacity-10 p-0 overflow-hidden d-flex align-items-center justify-content-center" style="min-height: 500px">
+          <div
+            class="card-body bg-secondary bg-opacity-10 p-0 overflow-hidden d-flex align-items-center justify-content-center"
+            style="min-height: 500px"
+          >
             <Cropper
               v-if="sourceImageUrl"
               ref="cropper"
@@ -178,12 +201,32 @@ watch([() => config.format, () => config.quality], applyResize);
           <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold small text-uppercase text-muted">Final Result Preview</span>
             <div class="d-flex gap-3">
-              <button v-if="resultImageUrl" class="btn btn-sm btn-outline-primary p-0 px-2 text-decoration-none border-0 small" @click="applyResize">Update Resize</button>
-              <a v-if="resultImageUrl" :href="resultImageUrl" :download="'processed_' + (config.format === 'image/png' ? 'image.png' : 'image.jpg')" class="btn btn-sm btn-link p-0 text-decoration-none small">Download</a>
+              <button
+                v-if="resultImageUrl"
+                class="btn btn-sm btn-outline-primary p-0 px-2 text-decoration-none border-0 small"
+                @click="applyResize"
+              >
+                Update Resize
+              </button>
+              <a
+                v-if="resultImageUrl"
+                :href="resultImageUrl"
+                :download="'processed_' + (config.format === 'image/png' ? 'image.png' : 'image.jpg')"
+                class="btn btn-sm btn-link p-0 text-decoration-none small"
+                >Download</a
+              >
             </div>
           </div>
-          <div class="card-body bg-light p-3 d-flex align-items-center justify-content-center overflow-auto" style="min-height: 500px">
-            <img v-if="resultImageUrl" :src="resultImageUrl" class="img-fluid border shadow-sm" alt="Result" />
+          <div
+            class="card-body bg-light p-3 d-flex align-items-center justify-content-center overflow-auto"
+            style="min-height: 500px"
+          >
+            <img
+              v-if="resultImageUrl"
+              :src="resultImageUrl"
+              class="img-fluid border shadow-sm"
+              alt="Result"
+            />
             <div v-else class="text-muted small">Result will appear here</div>
           </div>
         </div>

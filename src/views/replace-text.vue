@@ -56,7 +56,12 @@ const copyToClipboard = () => {
           </div>
           <div class="col-md-6">
             <label for="replace" class="form-label fw-bold small">Replacement Text</label>
-            <input id="replace" v-model="replaceText" class="form-control" placeholder="e.g., [number]" />
+            <input
+              id="replace"
+              v-model="replaceText"
+              class="form-control"
+              placeholder="e.g., [number]"
+            />
           </div>
         </div>
       </div>
@@ -66,7 +71,13 @@ const copyToClipboard = () => {
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Input</div>
           <div class="card-body p-0">
-            <textarea id="text" v-model="text" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
+            <textarea
+              id="text"
+              v-model="text"
+              class="form-control border-0 font-monospace p-3"
+              rows="20"
+              style="resize: none;"
+            />
           </div>
         </div>
       </div>
@@ -74,12 +85,22 @@ const copyToClipboard = () => {
         <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold small text-uppercase text-muted">Output</span>
-            <button class="btn btn-sm btn-link p-0 text-decoration-none small" @click="copyToClipboard">
+            <button
+              class="btn btn-sm btn-link p-0 text-decoration-none small"
+              @click="copyToClipboard"
+            >
               {{ copyBtnText }}
             </button>
           </div>
           <div class="card-body p-0">
-            <textarea id="result" class="form-control border-0 font-monospace p-3 bg-light" :value="result" readonly rows="20" style="resize: none;" />
+            <textarea
+              id="result"
+              class="form-control border-0 font-monospace p-3 bg-light"
+              :value="result"
+              readonly
+              rows="20"
+              style="resize: none;"
+            />
           </div>
         </div>
       </div>

@@ -31,7 +31,13 @@ const diffFile = computed(() => {
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Old Version</div>
           <div class="card-body p-0">
-            <textarea id="oldText" v-model="oldText" class="form-control border-0 font-monospace p-3" rows="10" style="resize: none;" />
+            <textarea
+              id="oldText"
+              v-model="oldText"
+              class="form-control border-0 font-monospace p-3"
+              rows="10"
+              style="resize: none;"
+            />
           </div>
         </div>
       </div>
@@ -39,7 +45,13 @@ const diffFile = computed(() => {
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">New Version</div>
           <div class="card-body p-0">
-            <textarea id="newText" v-model="newText" class="form-control border-0 font-monospace p-3" rows="10" style="resize: none;" />
+            <textarea
+              id="newText"
+              v-model="newText"
+              class="form-control border-0 font-monospace p-3"
+              rows="10"
+              style="resize: none;"
+            />
           </div>
         </div>
       </div>
@@ -48,8 +60,14 @@ const diffFile = computed(() => {
           <div class="card-header fw-bold small text-uppercase text-muted">Visual Diff</div>
           <div class="card-body p-0">
             <div id="diffText" class="diff-container border-0 rounded-0">
-              <DiffView v-if="diffFile" :diff-file="diffFile" :diff-view-mode="DiffModeEnum.Unified" />
-              <div v-else class="p-5 text-center text-muted">No differences found between the two versions</div>
+              <DiffView
+                v-if="diffFile"
+                :diff-file="diffFile"
+                :diff-view-mode="DiffModeEnum.Unified"
+              />
+              <div v-else class="p-5 text-center text-muted">
+                No differences found between the two versions
+              </div>
             </div>
           </div>
         </div>

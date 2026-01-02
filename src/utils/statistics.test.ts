@@ -1,5 +1,5 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
+import { test } from "node:test";
+import assert from "node:assert/strict";
 import {
   mean,
   median,
@@ -8,25 +8,25 @@ import {
   variance,
   standardDeviation,
   round,
-  split
-} from './statistics';
+  split,
+} from "./statistics";
 
-test('mean calculation', () => {
+test("mean calculation", () => {
   assert.equal(mean([10, 20, 30]), 20);
   assert.equal(mean([1, 2]), 1.5);
   assert.ok(Number.isNaN(mean([])));
 });
 
-test('median calculation (odd)', () => {
+test("median calculation (odd)", () => {
   assert.equal(median([10, 20, 30]), 20);
   assert.equal(median([30, 10, 20]), 20); // sorting check
 });
 
-test('median calculation (even)', () => {
+test("median calculation (even)", () => {
   assert.equal(median([10, 20, 30, 40]), 25);
 });
 
-test('quartiles calculation (odd - Moore & McCabe)', () => {
+test("quartiles calculation (odd - Moore & McCabe)", () => {
   // dataset: 1, 2, 3, 4, 5
   // median: 3
   // lower half: 1, 2 -> Q1: 1.5
@@ -36,7 +36,7 @@ test('quartiles calculation (odd - Moore & McCabe)', () => {
   assert.equal(thirdQuartile(data), 4.5);
 });
 
-test('quartiles calculation (even)', () => {
+test("quartiles calculation (even)", () => {
   // dataset: 1, 2, 3, 4, 5, 6
   // median: 3.5
   // lower half: 1, 2, 3 -> Q1: 2
@@ -46,7 +46,7 @@ test('quartiles calculation (even)', () => {
   assert.equal(thirdQuartile(data), 5);
 });
 
-test('quartiles with duplicates', () => {
+test("quartiles with duplicates", () => {
   const data = [1, 2, 2, 2, 3];
   // sorted: 1, 2, 2, 2, 3
   // mid index: 2 (value 2)
@@ -56,7 +56,7 @@ test('quartiles with duplicates', () => {
   assert.equal(thirdQuartile(data), 2.5);
 });
 
-test('variance and std deviation', () => {
+test("variance and std deviation", () => {
   const data = [1, 2, 3];
   // mean: 2
   // diffs^2: (1-2)^2 + (2-2)^2 + (3-2)^2 = 1 + 0 + 1 = 2
@@ -65,7 +65,7 @@ test('variance and std deviation', () => {
   assert.equal(round(standardDeviation(data)), round(Math.sqrt(2 / 3)));
 });
 
-test('split function', () => {
+test("split function", () => {
   assert.deepEqual(split("10, 20 30\n40"), [10, 20, 30, 40]);
   assert.deepEqual(split("1.5; -2.5 +3"), [1.5, -2.5, 3]);
 });

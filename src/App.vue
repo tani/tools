@@ -24,7 +24,9 @@
           <div class="col-lg-2 pt-3 border-end sidebar-container">
             <div class="collapse d-lg-block" id="sidebarMenu">
               <div class="list-group list-group-flush mb-3">
-                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light">Text & Coding</div>
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light">
+                  Text & Coding
+                </div>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
@@ -54,7 +56,9 @@
                   📂 String Folding
                 </RouterLink>
 
-                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Math & LaTeX</div>
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
+                  Math & LaTeX
+                </div>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
@@ -84,7 +88,23 @@
                   📊 Basic Statistics
                 </RouterLink>
 
-                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Graphics</div>
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
+                  Graphics & Images
+                </div>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/image-tools"
+                >
+                  🖼️ Image Resizer
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/ocr-tool"
+                >
+                  👁️ OCR Reader
+                </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
@@ -99,29 +119,10 @@
                 >
                   🧜‍♀️ Mermaid Editor
                 </RouterLink>
-                <RouterLink
-                  class="list-group-item list-group-item-action"
-                  active-class="active"
-                  to="/ocr-tool"
-                >
-                  👁️ OCR Reader
-                </RouterLink>
-                <RouterLink
-                  class="list-group-item list-group-item-action"
-                  active-class="active"
-                  to="/image-tools"
-                >
-                  🖼️ Image Resizer
-                </RouterLink>
 
-                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Utilities</div>
-                <RouterLink
-                  class="list-group-item list-group-item-action"
-                  active-class="active"
-                  to="/pomodoro-timer"
-                >
-                  ⏱️ Pomodoro Timer
-                </RouterLink>
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
+                  PDF Tools
+                </div>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
@@ -153,9 +154,27 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
+                  to="/pdf-sorter"
+                >
+                  🔃 PDF Sorter
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
                   to="/pdf-to-text"
                 >
                   📝 PDF to Text
+                </RouterLink>
+
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
+                  Utilities
+                </div>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/pomodoro-timer"
+                >
+                  ⏱️ Pomodoro Timer
                 </RouterLink>
               </div>
             </div>

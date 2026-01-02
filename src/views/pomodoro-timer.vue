@@ -32,11 +32,11 @@ const progress = computed(() => {
 
 const playAlarm = (count: number = 1) => {
   const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-  
+
   for (let i = 0; i < count; i++) {
     const startTime = audioCtx.currentTime + i * 0.25;
     const duration = 0.1;
-    
+
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
 
@@ -45,7 +45,7 @@ const playAlarm = (count: number = 1) => {
 
     oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(880, startTime);
-    
+
     gainNode.gain.setValueAtTime(0.1, startTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
@@ -118,17 +118,11 @@ onUnmounted(() => {
 <template>
   <div>
     <h2 class="display-6">Pomodoro Timer</h2>
-    <p class="text-muted">
-      A simple Pomodoro timer to help you stay focused and productive.
-    </p>
+    <p class="text-muted">A simple Pomodoro timer to help you stay focused and productive.</p>
     <div class="row">
       <div class="col-sm-12">
         <div class="nav nav-pills mb-3">
-          <button
-            class="nav-link"
-            :class="{ active: mode === 'work' }"
-            @click="setMode('work')"
-          >
+          <button class="nav-link" :class="{ active: mode === 'work' }" @click="setMode('work')">
             Work
           </button>
           <button
@@ -164,23 +158,11 @@ onUnmounted(() => {
             ></div>
           </div>
           <div class="d-flex justify-content-center gap-2">
-            <button
-              v-if="!isRunning"
-              class="btn btn-primary px-4"
-              @click="startTimer"
-            >
+            <button v-if="!isRunning" class="btn btn-primary px-4" @click="startTimer">
               Start
             </button>
-            <button
-              v-else
-              class="btn btn-warning px-4"
-              @click="stopTimer"
-            >
-              Pause
-            </button>
-            <button class="btn btn-outline-secondary px-4" @click="resetTimer">
-              Reset
-            </button>
+            <button v-else class="btn btn-warning px-4" @click="stopTimer">Pause</button>
+            <button class="btn btn-outline-secondary px-4" @click="resetTimer">Reset</button>
             <button class="btn btn-outline-info px-4" @click="playAlarm(mode === 'work' ? 6 : 3)">
               Test Alarm
             </button>

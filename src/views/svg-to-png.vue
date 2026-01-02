@@ -59,9 +59,7 @@ const handleChange = async (event: Event) => {
 <template>
   <div>
     <h2 class="display-6">SVG to PNG</h2>
-    <p class="text-muted mb-4">
-      Convert SVG images to PNG format with custom dimensions.
-    </p>
+    <p class="text-muted mb-4">Convert SVG images to PNG format with custom dimensions.</p>
 
     <div class="card mb-4">
       <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
@@ -77,15 +75,12 @@ const handleChange = async (event: Event) => {
           </div>
           <div class="col-md-4">
             <label class="form-label fw-bold small">Upload SVG</label>
-            <input
-              class="form-control"
-              type="file"
-              accept="image/svg+xml"
-              @change="handleChange"
-            />
+            <input class="form-control" type="file" accept="image/svg+xml" @change="handleChange" />
           </div>
           <div class="col-md-2">
-            <button class="btn btn-primary w-100" type="button" @click="handleClick">Convert</button>
+            <button class="btn btn-primary w-100" type="button" @click="handleClick">
+              Convert
+            </button>
           </div>
         </div>
       </div>
@@ -112,7 +107,10 @@ const handleChange = async (event: Event) => {
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">SVG Preview</div>
-          <div class="card-body bg-light overflow-auto p-3 d-flex align-items-center justify-content-center" style="min-height: 400px">
+          <div
+            class="card-body bg-light overflow-auto p-3 d-flex align-items-center justify-content-center"
+            style="min-height: 400px"
+          >
             <img v-if="svg" :src="svg" class="img-fluid" alt="SVG preview" />
             <div v-else class="text-muted small">SVG preview will appear here</div>
           </div>
@@ -122,9 +120,18 @@ const handleChange = async (event: Event) => {
         <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold small text-uppercase text-muted">PNG Preview</span>
-            <a v-if="png" :href="png" download="converted.png" class="btn btn-sm btn-link p-0 text-decoration-none small">Download</a>
+            <a
+              v-if="png"
+              :href="png"
+              download="converted.png"
+              class="btn btn-sm btn-link p-0 text-decoration-none small"
+              >Download</a
+            >
           </div>
-          <div class="card-body bg-light text-center p-3 d-flex align-items-center justify-content-center" style="min-height: 400px">
+          <div
+            class="card-body bg-light text-center p-3 d-flex align-items-center justify-content-center"
+            style="min-height: 400px"
+          >
             <img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
             <div v-else class="text-muted small">PNG preview will appear here</div>
           </div>
@@ -134,5 +141,4 @@ const handleChange = async (event: Event) => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

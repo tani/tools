@@ -20,6 +20,7 @@
     "mathxyjax3": "^0.8.3",
     "mermaid": "^11.12.2",
     "mupdf": "^1.26.4",
+    "sortablejs": "^1.15.6",
     "tesseract.js": "^7.0.0",
     "vue": "^3.5.26",
     "vue-advanced-cropper": "^2.8.9",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
+    "@types/sortablejs": "^1.15.9",
     "oxfmt": "^0.21.0",
     "oxlint": "^1.36.0",
     "tsx": "^4.21.0",

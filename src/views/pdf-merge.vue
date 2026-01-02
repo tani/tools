@@ -63,7 +63,7 @@ const mergePdfs = async () => {
   isProcessing.value = true;
   try {
     const outDoc = new mupdf.PDFDocument();
-    
+
     for (const file of files.value) {
       const srcDoc = mupdf.Document.openDocument(file.data, "application/pdf").asPDF();
       if (srcDoc) {
@@ -109,8 +109,8 @@ const mergePdfs = async () => {
             />
           </div>
           <div class="col-md-4">
-            <button 
-              class="btn btn-primary w-100" 
+            <button
+              class="btn btn-primary w-100"
               @click="mergePdfs"
               :disabled="files.length < 2 || isProcessing"
             >
@@ -122,9 +122,14 @@ const mergePdfs = async () => {
       </div>
     </div>
 
-    <div v-if="downloadUrl" class="alert alert-success d-flex justify-content-between align-items-center shadow-sm">
+    <div
+      v-if="downloadUrl"
+      class="alert alert-success d-flex justify-content-between align-items-center shadow-sm"
+    >
       <span><strong>Success!</strong> Your PDFs have been merged.</span>
-      <a :href="downloadUrl" download="merged.pdf" class="btn btn-success btn-sm">Download Merged PDF</a>
+      <a :href="downloadUrl" download="merged.pdf" class="btn btn-success btn-sm"
+        >Download Merged PDF</a
+      >
     </div>
 
     <div class="card shadow-sm mb-4">
@@ -137,15 +142,29 @@ const mergePdfs = async () => {
           <li v-for="(file, index) in files" :key="file.id" class="list-group-item p-0">
             <div class="d-flex align-items-center gap-3 p-3">
               <div class="d-flex flex-column gap-1">
-                <button class="btn btn-sm btn-outline-secondary p-0 px-1" @click="moveFile(index, -1)" :disabled="index === 0">▲</button>
-                <button class="btn btn-sm btn-outline-secondary p-0 px-1" @click="moveFile(index, 1)" :disabled="index === files.length - 1">▼</button>
+                <button
+                  class="btn btn-sm btn-outline-secondary p-0 px-1"
+                  @click="moveFile(index, -1)"
+                  :disabled="index === 0"
+                >
+                  ▲
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-secondary p-0 px-1"
+                  @click="moveFile(index, 1)"
+                  :disabled="index === files.length - 1"
+                >
+                  ▼
+                </button>
               </div>
               <span class="flex-grow-1 text-truncate fw-bold">{{ file.name }}</span>
               <div class="d-flex gap-2">
                 <button class="btn btn-sm btn-outline-primary" @click="togglePreview(file.id)">
                   {{ file.showPreview ? 'Hide Preview' : 'Preview' }}
                 </button>
-                <button class="btn btn-sm btn-outline-danger" @click="removeFile(file.id)">Remove</button>
+                <button class="btn btn-sm btn-outline-danger" @click="removeFile(file.id)">
+                  Remove
+                </button>
               </div>
             </div>
             <div v-if="file.showPreview" class="bg-light border-top p-3">

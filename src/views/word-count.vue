@@ -43,15 +43,21 @@ const lineCount = computed(() => input.value.split(/\r\n|\r|\n/).length);
           <div class="card-body p-0">
             <div class="row g-0 text-center">
               <div class="col-md-4 border-end py-4">
-                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">Characters</div>
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">
+                  Characters
+                </div>
                 <div class="display-6 fw-bold text-primary">{{ graphemeCount }}</div>
               </div>
               <div class="col-md-4 border-end py-4">
-                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">Words</div>
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">
+                  Words
+                </div>
                 <div class="display-6 fw-bold text-primary">{{ wordCount }}</div>
               </div>
               <div class="col-md-4 py-4">
-                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">Lines</div>
+                <div class="small text-uppercase text-muted mb-1" style="font-size: 0.75rem;">
+                  Lines
+                </div>
                 <div class="display-6 fw-bold text-primary">{{ lineCount }}</div>
               </div>
             </div>
@@ -64,7 +70,12 @@ const lineCount = computed(() => input.value.split(/\r\n|\r|\n/).length);
         <div class="card shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Input Text</div>
           <div class="card-body p-0">
-            <textarea v-model="input" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
+            <textarea
+              v-model="input"
+              class="form-control border-0 font-monospace p-3"
+              rows="20"
+              style="resize: none;"
+            />
           </div>
         </div>
       </div>

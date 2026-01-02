@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import jsonRaw from "../assets/unicode_latex_unicodemath.json";
 
 const json = jsonRaw as [string, string, string][];
-const input = ref("");
+const input = ref("∀x ∈ ℝ, ∃y : x + y = 0\nα + β = γ\n∑ i = n(n+1)/2");
 const copyBtnText = ref("Copy");
 
 function replace(value: string) {

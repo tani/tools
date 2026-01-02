@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-const input = ref("");
+const input = ref("10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 10, 20, 30, 55, 66, 77, 88");
 
 function round(num: number) {
   for (let i = 0; i < 256; i++) {

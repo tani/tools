@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-const input = ref("");
+const input = ref("The quick brown fox jumps over the lazy dog.\n\nVue.js is an approachable, performant, and versatile framework for building web user interfaces.");
 
 const countGraphemeClusters = (text: string) => {
   const segmenter = new Intl.Segmenter("en", {

@@ -5,7 +5,14 @@ const x = ref(300);
 const y = ref(300);
 const svg = ref("");
 const png = ref("");
-const raw = ref("");
+const raw = ref(`<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect x="50" y="50" width="200" height="200" fill="skyblue" rx="20" />
+  <circle cx="150" cy="150" r="80" fill="orange" />
+  <text x="150" y="160" font-size="24" text-anchor="middle" fill="white" font-family="sans-serif">SVG</text>
+</svg>`);
+
+// Initialize preview
+svg.value = `data:image/svg+xml,${encodeURIComponent(raw.value)}`;
 
 const handleClick = async () => {
   const canvas = document.createElement("canvas");

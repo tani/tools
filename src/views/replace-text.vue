@@ -3,9 +3,9 @@ import { computed, ref } from "vue";
 import { DiffModeEnum, DiffView } from "@git-diff-view/vue";
 import { generateDiffFile } from "@git-diff-view/file";
 
-const text = ref("");
-const replaceText = ref("");
-const search = ref("");
+const text = ref("The year is 2025. The next year will be 2026. My favorite numbers are 7 and 42.");
+const replaceText = ref("[year]");
+const search = ref("\\d{4}");
 const copyBtnText = ref("Copy");
 
 const result = computed(() => {

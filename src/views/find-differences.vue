@@ -3,8 +3,8 @@ import { computed, ref } from "vue";
 import { DiffModeEnum, DiffView } from "@git-diff-view/vue";
 import { generateDiffFile } from "@git-diff-view/file";
 
-const oldText = ref("");
-const newText = ref("");
+const oldText = ref("This is the original text.\nIt has several lines.\nOne line will be removed.\nAnother will be changed.");
+const newText = ref("This is the modified text.\nIt has several lines.\nAnother has been changed.\nOne line was added.");
 
 const diffFile = computed(() => {
   let oldValue = (oldText.value || "").replace(/\r\n/g, "\n");

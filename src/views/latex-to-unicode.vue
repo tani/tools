@@ -6,7 +6,7 @@ import subscriptSuperscriptRaw from "../assets/subscript_superscript.json";
 const json = jsonRaw as [string, string, string][];
 const subscript = subscriptSuperscriptRaw.subscript as Record<string, string>;
 const superscript = subscriptSuperscriptRaw.superscript as Record<string, string>;
-const input = ref("");
+const input = ref("E = mc^2\n\\alpha^2 + \\beta^2 = \\gamma^2\nx_{i+1} = x_i + \\Delta x");
 const copyBtnText = ref("Copy");
 
 function replace(value: string) {

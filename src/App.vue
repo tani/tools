@@ -66,6 +66,13 @@
               >
                 Mermaid Editor
               </RouterLink>
+              <RouterLink
+                class="list-group-item list-group-item-action"
+                active-class="active"
+                to="/pomodoro-timer"
+              >
+                Pomodoro Timer
+              </RouterLink>
             </div>
           </div>
           <div class="col-sm-10 pt-3">

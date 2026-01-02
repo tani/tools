@@ -34,6 +34,10 @@ const routes = [
     path: "/mermaid-editor",
     component: () => import("./views/mermaid-editor.vue"),
   },
+  {
+    path: "/pomodoro-timer",
+    component: () => import("./views/pomodoro-timer.vue"),
+  },
 ];
 
 export const router = createRouter({

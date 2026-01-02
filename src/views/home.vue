@@ -45,6 +45,7 @@ const categories = [
       { icon: "📝", name: "Word Count", path: "/word-count", description: "Count words, characters, and reading time." },
       { icon: "📂", name: "Fold Strings", path: "/fold-strings", description: "Wrap long strings or code at your preferred width." },
       { icon: "💡", name: "Code Highlighter", path: "/code-highlight", description: "Highlight syntax for dozens of programming languages." },
+      { icon: "🔡", name: "Encoding Converter", path: "/encoding-converter", description: "Convert uploaded text files between popular character sets." },
     ],
   },
   {

@@ -38,6 +38,10 @@ const routes = [
     path: "/code-highlight",
     component: () => import("./views/code-highlight.vue"),
   },
+  {
+    path: "/encoding-converter",
+    component: () => import("./views/encoding-converter.vue"),
+  },
   // Math & LaTeX
   {
     path: "/unicode-latex",

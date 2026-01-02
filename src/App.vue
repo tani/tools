@@ -83,6 +83,13 @@
                 >
                   💡 Code Highlighter
                 </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/encoding-converter"
+                >
+                  🔡 Encoding Converter
+                </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
                   Math & LaTeX

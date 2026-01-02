@@ -24,20 +24,7 @@
           <div class="col-lg-2 pt-3 border-end sidebar-container">
             <div class="collapse d-lg-block" id="sidebarMenu">
               <div class="list-group list-group-flush mb-3">
-                <RouterLink
-                  class="list-group-item list-group-item-action"
-                  active-class="active"
-                  to="/unicode-to-latex"
-                >
-                  🔣 Unicode to LaTeX
-                </RouterLink>
-                <RouterLink
-                  class="list-group-item list-group-item-action"
-                  active-class="active"
-                  to="/latex-to-unicode"
-                >
-                  🧮 LaTeX to Unicode
-                </RouterLink>
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light">Text & Coding</div>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
@@ -55,16 +42,32 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/svg-to-png"
+                  to="/word-count"
                 >
-                  🖼️ Convert SVG to PNG
+                  📝 Word Count
+                </RouterLink>
+
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Math & LaTeX</div>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/unicode-to-latex"
+                >
+                  🔣 Unicode to LaTeX
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
-                  to="/word-count"
+                  to="/latex-to-unicode"
                 >
-                  📝 Word Count
+                  🧮 LaTeX to Unicode
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/math-preview"
+                >
+                  ♾️ Math Preview
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
@@ -73,6 +76,15 @@
                 >
                   📊 Basic Statistics
                 </RouterLink>
+
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Graphics</div>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/svg-to-png"
+                >
+                  🖼️ Convert SVG to PNG
+                </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
@@ -80,19 +92,14 @@
                 >
                   🧜‍♀️ Mermaid Editor
                 </RouterLink>
+
+                <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Utilities</div>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/pomodoro-timer"
                 >
                   ⏱️ Pomodoro Timer
-                </RouterLink>
-                <RouterLink
-                  class="list-group-item list-group-item-action"
-                  active-class="active"
-                  to="/math-preview"
-                >
-                  ♾️ Math Preview
                 </RouterLink>
               </div>
             </div>

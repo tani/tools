@@ -106,6 +106,13 @@
                 >
                   👁️ OCR Reader
                 </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/image-tools"
+                >
+                  🖼️ Image Resizer
+                </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Utilities</div>
                 <RouterLink
@@ -135,6 +142,13 @@
                   to="/pdf-extract"
                 >
                   ✂️ PDF Extractor
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/pdf-resizer"
+                >
+                  📏 PDF Resizer
                 </RouterLink>
               </div>
             </div>

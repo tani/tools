@@ -51,6 +51,10 @@ const routes = [
     component: () => import("./views/ocr-reader.vue"),
   },
   {
+    path: "/image-tools",
+    component: () => import("./views/image-tools.vue"),
+  },
+  {
     path: "/pdf-viewer",
     component: () => import("./views/pdf-viewer.vue"),
   },
@@ -61,6 +65,10 @@ const routes = [
   {
     path: "/pdf-extract",
     component: () => import("./views/pdf-extract.vue"),
+  },
+  {
+    path: "/pdf-resizer",
+    component: () => import("./views/pdf-resizer.vue"),
   },
 ];
 

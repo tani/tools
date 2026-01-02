@@ -1,7 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
-  { path: "/", redirect: "/replace" },
+  {
+    path: "/",
+    component: () => import("./views/home.vue"),
+  },
   // Text & Coding
   {
     path: "/replace",

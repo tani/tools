@@ -44,6 +44,20 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
+                  to="/text-finder"
+                >
+                  🧭 Text Finder
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/oniguruma-cheat-sheet"
+                >
+                  📚 Oniguruma Cheat Sheet
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
                   to="/word-count"
                 >
                   📝 Word Count

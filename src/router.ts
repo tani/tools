@@ -12,6 +12,14 @@ const routes = [
     component: () => import("./views/find-differences.vue"),
   },
   {
+    path: "/text-finder",
+    component: () => import("./views/text-finder.vue"),
+  },
+  {
+    path: "/oniguruma-cheat-sheet",
+    component: () => import("./views/oniguruma-cheat-sheet.vue"),
+  },
+  {
     path: "/word-count",
     component: () => import("./views/word-count.vue"),
   },

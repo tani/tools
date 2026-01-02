@@ -50,6 +50,10 @@ const routes = [
     path: "/ocr-tool",
     component: () => import("./views/ocr-tool.vue"),
   },
+  {
+    path: "/pdf-viewer",
+    component: () => import("./views/pdf-tool.vue"),
+  },
 ];
 
 export const router = createRouter({

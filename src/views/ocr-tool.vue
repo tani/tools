@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import Tesseract from "tesseract.js";
 import * as mupdf from "mupdf";
+import PdfViewer from "../components/PdfViewer.vue";
 
 const image = ref<string | null>(null);
 const fileData = ref<Uint8Array | null>(null);
@@ -73,7 +74,7 @@ const handleFileChange = (event: Event) => {
       fileData.value = new Uint8Array(arrayBuffer);
       
       if (file.type === "application/pdf") {
-        image.value = null; // Don't show preview for PDF yet or show icon
+        image.value = null;
         status.value = "PDF Loaded. Ready to recognize.";
       } else {
         const blob = new Blob([fileData.value as any], { type: file.type });
@@ -238,12 +239,11 @@ const copyToClipboard = () => {
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
           <div class="card-header fw-bold small text-uppercase text-muted">Source Preview</div>
-          <div class="card-body bg-light overflow-auto p-3 d-flex align-items-center justify-content-center" style="min-height: 400px">
-            <img v-if="image" :src="image" class="img-fluid border shadow-sm" alt="OCR Source" />
-            <div v-else-if="fileType === 'application/pdf'" class="text-center">
-              <i class="bi bi-file-pdf fs-1 text-danger"></i>
-              <div class="text-muted small mt-2">PDF Document Loaded</div>
+          <div class="card-body bg-light overflow-auto p-0 d-flex align-items-center justify-content-center" style="min-height: 400px">
+            <div v-if="image" class="p-3">
+              <img :src="image" class="img-fluid border shadow-sm" alt="OCR Source" />
             </div>
+            <PdfViewer v-else-if="fileType === 'application/pdf'" :data="fileData" />
             <div v-else class="text-muted small">No file uploaded</div>
           </div>
         </div>

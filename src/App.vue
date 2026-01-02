@@ -115,6 +115,13 @@
                 >
                   ⏱️ Pomodoro Timer
                 </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/pdf-viewer"
+                >
+                  📄 PDF Viewer
+                </RouterLink>
               </div>
             </div>
           </div>

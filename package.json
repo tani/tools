@@ -19,6 +19,7 @@
     "bootswatch": "^5.3.8",
     "mathxyjax3": "^0.8.3",
     "mermaid": "^11.12.2",
+    "mupdf": "^1.26.4",
     "tesseract.js": "^7.0.0",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"

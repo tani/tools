@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import VueApexCharts from "vue3-apexcharts";
 
 const input = ref("");
 
@@ -158,10 +157,14 @@ function split(value: string) {
 
 const values = computed(() => split(input.value));
 const histogram = computed(() => hist(values.value));
-const chartOptions = computed(() => ({
-  xaxis: { categories: Object.keys(histogram.value) },
-}));
-const chartSeries = computed(() => [{ name: "Count", data: Object.values(histogram.value) }]);
+const chartData = computed(() => {
+  const keys = Object.keys(histogram.value)
+    .map(Number)
+    .sort((a, b) => a - b);
+  const data = keys.map((k) => ({ label: k.toString(), value: histogram.value[k] }));
+  const maxVal = Math.max(...data.map((d) => d.value), 0);
+  return { data, maxVal };
+});
 </script>
 
 <template>
@@ -207,12 +210,64 @@ const chartSeries = computed(() => [{ name: "Count", data: Object.values(histogr
         </table>
       </div>
     </div>
-    <div class="row">
+    <div class="row mt-3">
       <div class="col-sm-6">
-        <textarea v-model="input" class="form-control mt-3" rows="20" />
+        <textarea
+          v-model="input"
+          class="form-control"
+          rows="20"
+          style="height: 100%; min-height: 400px"
+        />
       </div>
       <div class="col-sm-6">
-        <VueApexCharts :options="chartOptions" :series="chartSeries" type="bar" />
+        <div
+          class="border rounded bg-light p-2 h-100 d-flex flex-column"
+          style="overflow-x: auto; min-height: 400px"
+        >
+          <svg
+            v-if="chartData.data.length > 0"
+            :viewBox="`0 0 ${Math.max(400, chartData.data.length * 40)} 300`"
+            class="flex-grow-1"
+            style="min-width: 100%; height: auto"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <g v-for="(item, index) in chartData.data" :key="item.label">
+              <rect
+                :x="index * (Math.max(400, chartData.data.length * 40) / chartData.data.length) + 5"
+                :y="250 - (item.value / chartData.maxVal) * 220"
+                :width="Math.max(400, chartData.data.length * 40) / chartData.data.length - 10"
+                :height="(item.value / chartData.maxVal) * 220"
+                style="fill: var(--bs-primary)"
+              />
+              <text
+                :x="index * (Math.max(400, chartData.data.length * 40) / chartData.data.length) + (Math.max(400, chartData.data.length * 40) / chartData.data.length) / 2"
+                y="270"
+                text-anchor="middle"
+                font-size="12"
+                fill="currentColor"
+              >
+                {{ item.label }}
+              </text>
+              <text
+                :x="index * (Math.max(400, chartData.data.length * 40) / chartData.data.length) + (Math.max(400, chartData.data.length * 40) / chartData.data.length) / 2"
+                :y="245 - (item.value / chartData.maxVal) * 220"
+                text-anchor="middle"
+                font-size="10"
+                fill="currentColor"
+              >
+                {{ item.value }}
+              </text>
+            </g>
+            <line
+              x1="0"
+              y1="250"
+              :x2="Math.max(400, chartData.data.length * 40)"
+              y2="250"
+              stroke="currentColor"
+              stroke-width="1"
+            />
+          </svg>
+        </div>
       </div>
     </div>
   </div>

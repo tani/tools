@@ -81,20 +81,36 @@
           </div>
           <div class="card-body bg-light">
             <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
-            <div v-else class="code-wrapper font-monospace" :style="wrapperStyle" ref="previewRef">
-              <div v-if="isRendering" class="text-muted small">Rendering highlight...</div>
-              <div v-else v-html="highlightedHtml"></div>
+            <div v-else class="code-wrapper font-monospace preview-surface" :style="wrapperStyle">
+              <LoadingOverlay v-if="isRendering" :loading="true" message="Rendering..." />
+              <img
+                v-else-if="previewImage"
+                :src="previewImage"
+                class="img-fluid rounded"
+                alt="Highlighted code preview"
+              />
+              <div v-else class="text-muted small">Preview will appear here.</div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="render-target" aria-hidden="true">
+      <div
+        class="code-wrapper font-monospace"
+        :style="wrapperStyle"
+        ref="renderRef"
+        v-html="highlightedHtml"
+      ></div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { toPng } from "html-to-image";
+import LoadingOverlay from "../components/LoadingOverlay.vue";
 import {
   BundledLanguage,
   BundledTheme,
@@ -139,12 +155,25 @@ const highlightedHtml = ref("");
 const isRendering = ref(false);
 const isDownloading = ref(false);
 const error = ref("");
-const previewRef = ref<HTMLElement | null>(null);
+const renderRef = ref<HTMLElement | null>(null);
+const previewImage = ref("");
 let renderTimeout: number | undefined;
 
 const wrapperStyle = computed(() => ({
   fontSize: `${fontSize.value}px`,
 }));
+
+const generatePng = async () => {
+  if (!renderRef.value) {
+    throw new Error("Preview target is unavailable.");
+  }
+
+  return toPng(renderRef.value, {
+    pixelRatio: 2,
+    cacheBust: true,
+    skipFonts: true,
+  });
+};
 
 const renderHighlight = async () => {
   error.value = "";
@@ -154,8 +183,12 @@ const renderHighlight = async () => {
       lang: language.value,
       theme: theme.value,
     });
+
+    await nextTick();
+    previewImage.value = await generatePng();
   } catch (renderError) {
     error.value = renderError instanceof Error ? renderError.message : "Failed to render code.";
+    previewImage.value = "";
   } finally {
     isRendering.value = false;
   }
@@ -169,22 +202,17 @@ const scheduleRender = () => {
   renderTimeout = window.setTimeout(renderHighlight, 200);
 };
 
-watch([code, language, theme], scheduleRender, { immediate: true });
+watch([code, language, theme, fontSize], scheduleRender, { immediate: true });
 
 onMounted(() => {
   renderHighlight();
 });
 
 const downloadPng = async () => {
-  if (!previewRef.value) return;
   isDownloading.value = true;
   error.value = "";
   try {
-    const dataUrl = await toPng(previewRef.value, {
-      pixelRatio: 2,
-      cacheBust: true,
-      skipFonts: true,
-    });
+    const dataUrl = previewImage.value || (await generatePng());
     const link = document.createElement("a");
     link.href = dataUrl;
     link.download = `code-highlight-${language.value}.png`;
@@ -199,9 +227,22 @@ const downloadPng = async () => {
 </script>
 
 <style scoped>
+.render-target {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  pointer-events: none;
+}
+
 .code-wrapper {
   min-height: 320px;
   padding: 1rem;
+}
+
+.preview-surface {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .code-wrapper pre {

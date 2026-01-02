@@ -30,23 +30,28 @@ const progress = computed(() => {
   return ((total - timeLeft.value) / total) * 100;
 });
 
-const playAlarm = () => {
+const playAlarm = (count: number = 1) => {
   const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
+  
+  for (let i = 0; i < count; i++) {
+    const startTime = audioCtx.currentTime + i * 0.25;
+    const duration = 0.1;
+    
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
 
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
 
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
-  oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5);
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(880, startTime);
+    
+    gainNode.gain.setValueAtTime(0.1, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
-  gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
-
-  oscillator.start();
-  oscillator.stop(audioCtx.currentTime + 1);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+  }
 };
 
 const startTimer = () => {
@@ -56,8 +61,9 @@ const startTimer = () => {
     if (timeLeft.value > 0) {
       timeLeft.value--;
     } else {
+      const alarmCount = mode.value === "work" ? 6 : 3;
       stopTimer();
-      playAlarm();
+      playAlarm(alarmCount);
       handleSessionEnd();
     }
   }, 1000);
@@ -172,6 +178,9 @@ onUnmounted(() => {
             </button>
             <button class="btn btn-outline-secondary px-4" @click="resetTimer">
               Reset
+            </button>
+            <button class="btn btn-outline-info px-4" @click="playAlarm(mode === 'work' ? 6 : 3)">
+              Test Alarm
             </button>
           </div>
         </div>

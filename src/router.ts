@@ -98,6 +98,10 @@ const routes = [
     path: "/pdf-text",
     component: () => import("./views/pdf-text.vue"),
   },
+  {
+    path: "/pdf-fonts",
+    component: () => import("./views/pdf-fonts.vue"),
+  },
   // Utilities
   {
     path: "/pomodoro",

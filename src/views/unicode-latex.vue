@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import jsonRaw from "../assets/unicode_latex_unicodemath.json";
+import ToolHeader from "../components/ToolHeader.vue";
+import ToolCard from "../components/ToolCard.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
+import CopyButton from "../components/CopyButton.vue";
 
 const json = jsonRaw as [string, string, string][];
 const input = ref("∀x ∈ ℝ, ∃y : x + y = 0\nα + β = γ\n∑ i = n(n+1)/2");
-const copyBtnText = ref("Copy");
 
 function replace(value: string) {
   let val = value;
@@ -17,58 +20,27 @@ function replace(value: string) {
 }
 
 const output = computed(() => replace(input.value));
-
-const copyToClipboard = () => {
-  navigator.clipboard.writeText(output.value).then(() => {
-    copyBtnText.value = "Copied!";
-    setTimeout(() => {
-      copyBtnText.value = "Copy";
-    }, 2000);
-  });
-};
 </script>
 
 <template>
   <div>
-    <h2 class="display-6">Unicode → LaTeX</h2>
-    <p class="text-muted mb-4">
-      Convert Unicode mathematical characters to their corresponding LaTeX commands.
-    </p>
+    <ToolHeader
+      title="Unicode → LaTeX"
+      description="Convert Unicode mathematical characters to their corresponding LaTeX commands."
+    />
     <div class="row">
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header fw-bold small text-uppercase text-muted">Unicode Input</div>
-          <div class="card-body p-0">
-            <textarea
-              v-model="input"
-              class="form-control border-0 font-monospace p-3"
-              rows="20"
-              style="resize: none;"
-            />
-          </div>
-        </div>
+        <ToolCard title="Unicode Input" no-padding>
+          <MonospaceEditor v-model="input" />
+        </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold small text-uppercase text-muted">LaTeX Output</span>
-            <button
-              class="btn btn-sm btn-link p-0 text-decoration-none small"
-              @click="copyToClipboard"
-            >
-              {{ copyBtnText }}
-            </button>
-          </div>
-          <div class="card-body p-0">
-            <textarea
-              class="form-control border-0 font-monospace p-3 bg-light"
-              :value="output"
-              readonly
-              rows="20"
-              style="resize: none;"
-            />
-          </div>
-        </div>
+        <ToolCard title="LaTeX Output" no-padding>
+          <template #header-actions>
+            <CopyButton :content="output" />
+          </template>
+          <MonospaceEditor :model-value="output" readonly bg-light />
+        </ToolCard>
       </div>
     </div>
   </div>

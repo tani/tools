@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import CopyButton from "../components/CopyButton.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 import jsonRaw from "../assets/unicode_latex_unicodemath.json";
 import subscriptSuperscriptRaw from "../assets/subscript_superscript.json";
 
@@ -41,11 +42,9 @@ const output = computed(() => replace(input.value));
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="LaTeX Input" class="h-100" no-padding>
-          <textarea
+          <MonospaceEditor
             v-model="input"
-            class="form-control border-0 font-monospace p-3"
-            rows="20"
-            style="resize: none;"
+            :rows="20"
           />
         </ToolCard>
       </div>
@@ -54,12 +53,11 @@ const output = computed(() => replace(input.value));
           <template #header-actions>
             <CopyButton :content="output" />
           </template>
-          <textarea
-            class="form-control border-0 font-monospace p-3 bg-light"
-            :value="output"
+          <MonospaceEditor
+            :model-value="output"
+            bg-light
             readonly
-            rows="20"
-            style="resize: none;"
+            :rows="20"
           />
         </ToolCard>
       </div>

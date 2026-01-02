@@ -5,6 +5,7 @@ import 'vue-advanced-cropper/dist/style.css';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
+import FilePicker from "../components/FilePicker.vue";
 
 const sourceImageUrl = ref<string | null>(null);
 const resultImageUrl = ref<string | null>(null);
@@ -116,13 +117,7 @@ watch([() => config.format, () => config.quality], applyResize);
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3">
         <div class="col-md-4">
-          <label class="form-label fw-bold small">Upload Image</label>
-          <input
-            class="form-control"
-            type="file"
-            accept="image/png,image/jpeg"
-            @change="handleFileChange"
-          />
+          <FilePicker label="Upload Image" accept="image/png,image/jpeg" @change="handleFileChange" />
         </div>
         <div class="col-md-2">
           <label class="form-label fw-bold small">Width</label>

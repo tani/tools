@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 import {
   round,
   mean,
@@ -122,11 +123,9 @@ const chartData = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Input Numbers" class="h-100" no-padding>
-          <textarea
+          <MonospaceEditor
             v-model="input"
-            class="form-control border-0 font-monospace p-3"
-            rows="15"
-            style="resize: none;"
+            :rows="15"
           />
         </ToolCard>
       </div>

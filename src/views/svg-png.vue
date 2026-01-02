@@ -3,6 +3,8 @@ import { ref, watch } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
+import FilePicker from "../components/FilePicker.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 
 const x = ref(300);
 const y = ref(300);
@@ -77,8 +79,7 @@ const handleChange = async (event: Event) => {
           <input v-model.number="y" class="form-control" type="number" />
         </div>
         <div class="col-md-4">
-          <label class="form-label fw-bold small">Upload SVG</label>
-          <input class="form-control" type="file" accept="image/svg+xml" @change="handleChange" />
+          <FilePicker label="Upload SVG" accept="image/svg+xml" @change="handleChange" />
         </div>
         <div class="col-md-2">
           <button class="btn btn-primary w-100" type="button" @click="handleClick">
@@ -91,11 +92,9 @@ const handleChange = async (event: Event) => {
     <div class="row">
       <div class="col-12 mb-4">
         <ToolCard title="SVG Code" no-padding>
-          <textarea
+          <MonospaceEditor
             v-model="raw"
-            class="form-control border-0 font-monospace p-3"
-            rows="10"
-            style="resize: none;"
+            :rows="10"
             placeholder="Paste or edit SVG code here..."
           />
         </ToolCard>

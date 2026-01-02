@@ -6,6 +6,8 @@ import PdfViewer from "../components/PdfViewer.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import CopyButton from "../components/CopyButton.vue";
+import FilePicker from "../components/FilePicker.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 
 const image = ref<string | null>(null);
 const fileData = ref<Uint8Array | null>(null);
@@ -186,13 +188,7 @@ const recognizeText = async () => {
           </select>
         </div>
         <div class="col-md-5">
-          <label class="form-label fw-bold small">Upload Image or PDF</label>
-          <input
-            class="form-control"
-            type="file"
-            accept="image/*,application/pdf"
-            @change="handleFileChange"
-          />
+          <FilePicker label="Upload Image or PDF" accept="image/*,application/pdf" @change="handleFileChange" />
         </div>
         <div class="col-md-3">
           <button
@@ -246,12 +242,13 @@ const recognizeText = async () => {
             <CopyButton :content="result" />
           </template>
           <div class="d-flex flex-column h-100">
-            <textarea
+            <MonospaceEditor
               v-model="result"
-              class="form-control border-0 font-monospace p-3 bg-light flex-grow-1"
-              style="resize: none; min-height: 400px"
+              bg-light
               readonly
               placeholder="Extracted text will appear here..."
+              style="min-height: 400px"
+              class="flex-grow-1"
             />
           </div>
         </ToolCard>

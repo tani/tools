@@ -4,6 +4,7 @@ import { tex2svgHtml } from "mathxyjax3";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 
 const input = ref(`\\xymatrix{
   A \\ar[r]^f \\ar[d]_g & B \\ar[d]^h \\\\
@@ -117,12 +118,11 @@ onMounted(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="TeX Input" class="h-100" no-padding>
-          <textarea
+          <MonospaceEditor
             v-model="input"
-            class="form-control border-0 font-monospace p-3 math-textarea"
+            :rows="15"
             placeholder="Enter TeX/LaTeX or Xy-pic code here..."
-            rows="15"
-            style="resize: none;"
+            class="math-textarea"
           />
         </ToolCard>
       </div>

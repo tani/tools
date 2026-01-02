@@ -5,6 +5,7 @@ import Sortable from 'sortablejs';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
+import FilePicker from "../components/FilePicker.vue";
 
 interface PageItem {
   id: string;
@@ -132,13 +133,7 @@ const exportPdf = async () => {
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3 align-items-end">
         <div class="col-md-9">
-          <label class="form-label fw-bold small">Upload PDF</label>
-          <input
-            class="form-control"
-            type="file"
-            accept="application/pdf"
-            @change="handleFileChange"
-          />
+          <FilePicker label="Upload PDF" accept="application/pdf" @change="handleFileChange" />
         </div>
         <div class="col-md-3">
           <button

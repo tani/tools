@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import CopyButton from "../components/CopyButton.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 import {
   buildHighlightedHtml,
   compileOnigurumaRegex,
@@ -70,14 +71,13 @@ const compiledPreview = computed(() => {
       <div class="row g-3">
         <div class="col-12">
           <label for="pattern" class="form-label fw-bold small">Oniguruma Pattern</label>
-          <textarea
-            id="pattern"
+          <MonospaceEditor
             v-model="pattern"
-            class="form-control font-monospace"
-            rows="3"
+            :rows="3"
             placeholder="e.g., \\b\\h+\\b"
-          ></textarea>
-          <div class="form-text">
+            class="mb-2"
+          />
+          <div class="form-text mt-0">
             Supports Oniguruma syntax like <span class="font-monospace">\\h</span>,
             <span class="font-monospace">\\R</span>, and inline modifiers.
           </div>
@@ -131,13 +131,10 @@ const compiledPreview = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Input Text" class="h-100" no-padding>
-          <textarea
-            id="text"
+          <MonospaceEditor
             v-model="text"
-            class="form-control border-0 font-monospace p-3"
-            rows="18"
-            style="resize: none;"
-          ></textarea>
+            :rows="18"
+          />
         </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
@@ -156,13 +153,12 @@ const compiledPreview = computed(() => {
           <template #header-actions>
             <CopyButton :content="matchList" />
           </template>
-          <textarea
-            class="form-control border-0 font-monospace p-3 bg-light"
-            :value="matchList"
-            rows="8"
+          <MonospaceEditor
+            :model-value="matchList"
+            bg-light
             readonly
-            style="resize: none;"
-          ></textarea>
+            :rows="8"
+          />
         </ToolCard>
       </div>
     </div>

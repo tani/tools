@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 import { DiffModeEnum, DiffView } from "@git-diff-view/vue";
 import { generateDiffFile } from "@git-diff-view/file";
 
@@ -32,23 +33,17 @@ const diffFile = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Old Version" class="h-100" no-padding>
-          <textarea
-            id="oldText"
+          <MonospaceEditor
             v-model="oldText"
-            class="form-control border-0 font-monospace p-3"
-            rows="10"
-            style="resize: none;"
+            :rows="10"
           />
         </ToolCard>
       </div>
       <div class="col-lg-6 mb-4">
         <ToolCard title="New Version" class="h-100" no-padding>
-          <textarea
-            id="newText"
+          <MonospaceEditor
             v-model="newText"
-            class="form-control border-0 font-monospace p-3"
-            rows="10"
-            style="resize: none;"
+            :rows="10"
           />
         </ToolCard>
       </div>

@@ -4,6 +4,7 @@ import mermaid from "mermaid";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 
 mermaid.initialize({
   startOnLoad: false,
@@ -138,12 +139,11 @@ watch(
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Mermaid Code" class="h-100" no-padding>
-          <textarea
+          <MonospaceEditor
             v-model="code"
-            class="form-control border-0 font-monospace p-3 mermaid-textarea"
+            :rows="15"
             placeholder="graph TD; A-->B;"
-            style="resize: none;"
-            rows="15"
+            class="mermaid-textarea"
           />
         </ToolCard>
       </div>

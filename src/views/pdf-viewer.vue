@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import PdfViewer from '../components/PdfViewer.vue';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
+import FilePicker from "../components/FilePicker.vue";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
@@ -32,13 +33,7 @@ const handleFileChange = (event: Event) => {
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3 align-items-end">
         <div class="col-md-9">
-          <label class="form-label fw-bold small">Upload PDF Document</label>
-          <input
-            class="form-control"
-            type="file"
-            accept="application/pdf"
-            @change="handleFileChange"
-          />
+          <FilePicker label="Upload PDF Document" accept="application/pdf" @change="handleFileChange" />
         </div>
         <div class="col-md-3">
           <div v-if="fileName" class="text-muted small mb-2 text-truncate">

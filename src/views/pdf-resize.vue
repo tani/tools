@@ -5,6 +5,7 @@ import PdfViewer from '../components/PdfViewer.vue';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import DownloadLink from "../components/DownloadLink.vue";
+import FilePicker from "../components/FilePicker.vue";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
@@ -103,13 +104,7 @@ const resizePdf = async () => {
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3 align-items-end">
         <div class="col-md-4">
-          <label class="form-label fw-bold small">Upload PDF</label>
-          <input
-            class="form-control"
-            type="file"
-            accept="application/pdf"
-            @change="handleFileChange"
-          />
+          <FilePicker label="Upload PDF" accept="application/pdf" @change="handleFileChange" />
         </div>
         <div class="col-md-3">
           <label class="form-label fw-bold small">Target Format</label>

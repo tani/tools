@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import CopyButton from "../components/CopyButton.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 import { DiffModeEnum, DiffView } from "@git-diff-view/vue";
 import { generateDiffFile } from "@git-diff-view/file";
 import { compileOnigurumaRegex, replaceMatches } from "../utils/text-finder";
@@ -93,12 +94,9 @@ const diffFile = computed(() => {
     <div class="row">
       <div class="col-lg-6 mb-4">
         <ToolCard title="Input" class="h-100" no-padding>
-          <textarea
-            id="text"
+          <MonospaceEditor
             v-model="text"
-            class="form-control border-0 font-monospace p-3"
-            rows="20"
-            style="resize: none;"
+            :rows="20"
           />
         </ToolCard>
       </div>
@@ -107,13 +105,11 @@ const diffFile = computed(() => {
           <template #header-actions>
             <CopyButton :content="result" />
           </template>
-          <textarea
-            id="result"
-            class="form-control border-0 font-monospace p-3 bg-light"
-            :value="result"
+          <MonospaceEditor
+            :model-value="result"
+            bg-light
             readonly
-            rows="20"
-            style="resize: none;"
+            :rows="20"
           />
         </ToolCard>
       </div>

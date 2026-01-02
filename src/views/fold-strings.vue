@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import ToolHeader from "../components/ToolHeader.vue";
 import ToolCard from "../components/ToolCard.vue";
 import CopyButton from "../components/CopyButton.vue";
+import MonospaceEditor from "../components/MonospaceEditor.vue";
 
 const inputText = ref(`John bought 3 apples for 30 cents with 100 cents. How much is the change?
 Jane bought 1 candy for 5 cents with 50 cents. How much is the change?
@@ -141,14 +142,11 @@ const processedData = computed(() => {
           <template #header-actions>
             <span class="badge bg-secondary opacity-75">{{ lineCount }} lines</span>
           </template>
-          <textarea
-            class="form-control border-0 font-monospace p-3"
-            placeholder="Enter your strings here..."
+          <MonospaceEditor
             v-model="inputText"
-            spellcheck="false"
-            rows="15"
-            style="resize: none;"
-          ></textarea>
+            :rows="15"
+            placeholder="Enter your strings here..."
+          />
         </ToolCard>
       </div>
 

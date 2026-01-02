@@ -72,12 +72,12 @@ const handleFileChange = (event: Event) => {
 
 const pickColor = (event: MouseEvent) => {
   if ((config.mode !== 'magic' && config.mode !== 'global') || !sourceImageUrl.value || !isOpenCvReady.value) return;
-  
+
   const imgElement = event.target as HTMLImageElement;
   const rect = imgElement.getBoundingClientRect();
   const scaleX = imgElement.naturalWidth / rect.width;
   const scaleY = imgElement.naturalHeight / rect.height;
-  
+
   config.lastX = Math.round((event.clientX - rect.left) * scaleX);
   config.lastY = Math.round((event.clientY - rect.top) * scaleY);
   config.hasSelected = true;
@@ -86,7 +86,7 @@ const pickColor = (event: MouseEvent) => {
 
 const processImage = () => {
   if (!sourceImageUrl.value || !isOpenCvReady.value || !worker) return;
-  
+
   isProcessing.value = true;
   errorMessage.value = null;
 
@@ -104,8 +104,8 @@ const processImage = () => {
       const { coordinates } = cropper.value.getResult();
       worker?.postMessage({
         type: 'GRABCUT',
-        data: { 
-          imageData, 
+        data: {
+          imageData,
           rect: {
             left: Math.round(coordinates.left),
             top: Math.round(coordinates.top),
@@ -156,30 +156,53 @@ watch(() => config.tolerance, () => {
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3 align-items-end">
         <div class="col-md-3">
-          <FilePicker label="Upload Image" accept="image/png,image/jpeg" :disabled="!isOpenCvReady" @change="handleFileChange" />
+          <FilePicker
+            label="Upload Image"
+            accept="image/png,image/jpeg"
+            :disabled="!isOpenCvReady"
+            @change="handleFileChange"
+          />
         </div>
         <div class="col-md-3">
           <label class="form-label fw-bold small">Removal Mode</label>
-          <select v-model="config.mode" class="form-select form-select-sm" @change="resultImageUrl = null; config.hasSelected = false">
+          <select
+            v-model="config.mode"
+            class="form-select form-select-sm"
+            @change="resultImageUrl = null; config.hasSelected = false"
+          >
             <option value="grabcut">GrabCut (Area Selection)</option>
             <option value="magic">Magic Wand (Connected Color)</option>
             <option value="global">Global Color (Whole Image)</option>
           </select>
         </div>
-        
+
         <div class="col-md-3" v-if="config.mode === 'magic' || config.mode === 'global'">
           <label class="form-label fw-bold small">Sensitivity ({{ config.tolerance }})</label>
-          <input type="range" class="form-range" min="1" max="150" v-model.number="config.tolerance" />
+          <input
+            type="range"
+            class="form-range"
+            min="1"
+            max="150"
+            v-model.number="config.tolerance"
+          />
         </div>
-        
+
         <div class="col-md-3" v-if="config.mode === 'grabcut'">
-          <button class="btn btn-primary btn-sm w-100" @click="processImage" :disabled="!sourceImageUrl || isProcessing">
+          <button
+            class="btn btn-primary btn-sm w-100"
+            @click="processImage"
+            :disabled="!sourceImageUrl || isProcessing"
+          >
             <i class="bi bi-scissors me-1"></i> Apply GrabCut
           </button>
         </div>
 
         <div class="col-md-3 text-end" v-else>
-           <button class="btn btn-sm btn-outline-secondary" @click="sourceImageUrl = null; resultImageUrl = null; config.hasSelected = false" :disabled="!sourceImageUrl">
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            @click="sourceImageUrl = null; resultImageUrl = null; config.hasSelected = false"
+            :disabled="!sourceImageUrl"
+          >
             Reset
           </button>
         </div>
@@ -189,10 +212,16 @@ watch(() => config.tolerance, () => {
     <div class="row">
       <!-- Workspace -->
       <div class="col-lg-6 mb-4">
-        <ToolCard :title="config.mode === 'magic' ? 'Magic Wand (Click to remove)' : 'GrabCut (Select area)'" class="h-100">
-          <div class="bg-secondary bg-opacity-10 p-0 overflow-auto d-flex align-items-center justify-content-center position-relative" style="min-height: 500px; max-height: 700px;">
+        <ToolCard
+          :title="config.mode === 'magic' ? 'Magic Wand (Click to remove)' : 'GrabCut (Select area)'"
+          class="h-100"
+        >
+          <div
+            class="bg-secondary bg-opacity-10 p-0 overflow-auto d-flex align-items-center justify-content-center position-relative"
+            style="min-height: 500px; max-height: 700px;"
+          >
             <LoadingOverlay :loading="!isOpenCvReady" message="Initializing Engine..." />
-            
+
             <template v-if="sourceImageUrl">
               <Cropper
                 v-if="config.mode === 'grabcut'"
@@ -211,7 +240,9 @@ watch(() => config.tolerance, () => {
               />
             </template>
             <div v-else-if="isOpenCvReady" class="text-muted small">
-              <span v-if="config.mode === 'magic' || config.mode === 'global'">Upload an image and click on the color to remove</span>
+              <span v-if="config.mode === 'magic' || config.mode === 'global'"
+                >Upload an image and click on the color to remove</span
+              >
               <span v-else>Upload an image and draw a box around the object</span>
             </div>
           </div>
@@ -222,14 +253,29 @@ watch(() => config.tolerance, () => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="Transparent Result" class="h-100">
           <template #header-actions>
-            <DownloadLink v-if="resultImageUrl" :href="resultImageUrl" filename="removed_background.png" label="Download PNG" />
+            <DownloadLink
+              v-if="resultImageUrl"
+              :href="resultImageUrl"
+              filename="removed_background.png"
+              label="Download PNG"
+            />
           </template>
-          <div class="checkerboard-bg p-0 overflow-auto d-flex align-items-center justify-content-center position-relative" style="min-height: 500px; max-height: 700px;">
+          <div
+            class="checkerboard-bg p-0 overflow-auto d-flex align-items-center justify-content-center position-relative"
+            style="min-height: 500px; max-height: 700px;"
+          >
             <LoadingOverlay :loading="isProcessing" message="Processing..." />
-            <img v-if="resultImageUrl && !isProcessing" :src="resultImageUrl" class="mw-100 h-auto border shadow-sm" alt="Result" />
+            <img
+              v-if="resultImageUrl && !isProcessing"
+              :src="resultImageUrl"
+              class="mw-100 h-auto border shadow-sm"
+              alt="Result"
+            />
             <div v-else-if="!isProcessing" class="text-muted small">
               <span v-if="!sourceImageUrl">Result will appear here</span>
-              <span v-else-if="config.mode === 'magic' || config.mode === 'global'">Click on the original image</span>
+              <span v-else-if="config.mode === 'magic' || config.mode === 'global'"
+                >Click on the original image</span
+              >
               <span v-else>Adjust the box and click "Apply GrabCut"</span>
             </div>
           </div>

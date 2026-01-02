@@ -8,6 +8,10 @@ const routes = [
     component: () => import("./views/replace.vue"),
   },
   {
+    path: "/prettier",
+    component: () => import("./views/prettier-format.vue"),
+  },
+  {
     path: "/diff",
     component: () => import("./views/diff.vue"),
   },

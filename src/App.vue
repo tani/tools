@@ -37,6 +37,13 @@
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
+                  to="/prettier"
+                >
+                  🎨 Prettier Formatter
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
                   to="/diff"
                 >
                   🔍 Diff

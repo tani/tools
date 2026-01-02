@@ -8,9 +8,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "node:fs": fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
-      "fs": fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
-      "path": fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
-      "crypto": fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
+      fs: fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
+      path: fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
+      crypto: fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
       module: fileURLToPath(new URL("./src/utils/empty.ts", import.meta.url)),
     },
   },

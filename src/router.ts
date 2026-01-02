@@ -27,10 +27,6 @@ const routes = [
     path: "/fold-strings",
     component: () => import("./views/fold-strings.vue"),
   },
-  {
-    path: "/prettier",
-    component: () => import("./views/prettier.vue"),
-  },
   // Math & LaTeX
   {
     path: "/unicode-latex",

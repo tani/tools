@@ -82,6 +82,8 @@ const copyToClipboard = () => {
             <select v-model="language" class="form-select">
               <option value="eng">English</option>
               <option value="jpn">Japanese</option>
+              <option value="chi_sim">Chinese - Simplified</option>
+              <option value="chi_tra">Chinese - Traditional</option>
               <option value="fra">French</option>
               <option value="deu">German</option>
               <option value="spa">Spanish</option>

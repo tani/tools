@@ -133,6 +133,13 @@
                 >
                   🧜‍♀️ Mermaid
                 </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/bg-remover"
+                >
+                  ✂️ BG Remover
+                </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">
                   PDF Tools

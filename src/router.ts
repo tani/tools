@@ -61,6 +61,10 @@ const routes = [
     path: "/mermaid",
     component: () => import("./views/mermaid.vue"),
   },
+  {
+    path: "/bg-remover",
+    component: () => import("./views/bg-remover.vue"),
+  },
   // PDF Tools
   {
     path: "/pdf-viewer",

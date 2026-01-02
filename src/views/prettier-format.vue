@@ -36,13 +36,19 @@
             <input v-model.number="tabWidth" type="number" min="1" max="8" class="form-control" />
             <div class="form-text">Spaces per indentation level.</div>
           </div>
-          <div class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4">
+          <div
+            v-if="visibility.supportsSemicolons"
+            class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4"
+          >
             <div class="form-check">
               <input v-model="useSemi" class="form-check-input" type="checkbox" id="useSemi" />
               <label class="form-check-label" for="useSemi">Semicolons</label>
             </div>
           </div>
-          <div class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4">
+          <div
+            v-if="visibility.supportsSingleQuote"
+            class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4"
+          >
             <div class="form-check">
               <input
                 v-model="singleQuote"
@@ -53,7 +59,7 @@
               <label class="form-check-label" for="singleQuote">Single quotes</label>
             </div>
           </div>
-          <div class="col-lg-3">
+          <div v-if="visibility.supportsTrailingComma" class="col-lg-3">
             <label class="form-label small fw-bold text-muted">Trailing Commas</label>
             <select v-model="trailingComma" class="form-select">
               <option value="es5">ES5</option>
@@ -62,8 +68,8 @@
             </select>
             <div class="form-text">Control where trailing commas are added.</div>
           </div>
-          <div class="col-lg-9 d-flex align-items-end justify-content-end">
-            <button class="btn btn-primary" type="button" @click="formatNow">Format</button>
+          <div class="col-lg-12 text-end">
+            <small class="text-muted">Formatting runs automatically as you edit.</small>
           </div>
         </div>
       </div>
@@ -113,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import prettier from "prettier/standalone";
 import pluginAcorn from "prettier/plugins/acorn";
 import pluginAngular from "prettier/plugins/angular";
@@ -178,10 +184,34 @@ const plugins = [
   pluginYaml,
 ];
 
+const jsLikeParsers = new Set(["babel", "babel-ts", "typescript", "acorn", "flow", "meriyah"]);
+const cssParsers = new Set(["css", "scss", "less"]);
+const singleQuoteFriendly = new Set([
+  ...jsLikeParsers,
+  ...cssParsers,
+  "markdown",
+  "mdx",
+  "yaml",
+]);
+
+const visibility = computed(() => ({
+  supportsSemicolons: jsLikeParsers.has(selectedParser.value),
+  supportsTrailingComma: jsLikeParsers.has(selectedParser.value) || selectedParser.value === "graphql",
+  supportsSingleQuote: singleQuoteFriendly.has(selectedParser.value),
+}));
+
+let formatRunId = 0;
 const formatNow = async () => {
+  const currentRun = ++formatRunId;
   error.value = "";
+
+  if (!input.value) {
+    formatted.value = "";
+    return;
+  }
+
   try {
-    formatted.value = await prettier.format(input.value, {
+    const result = await prettier.format(input.value, {
       parser: selectedParser.value,
       plugins,
       semi: useSemi.value,
@@ -190,8 +220,14 @@ const formatNow = async () => {
       printWidth: printWidth.value,
       trailingComma: trailingComma.value,
     });
+
+    if (currentRun === formatRunId) {
+      formatted.value = result;
+    }
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "Failed to format code.";
+    if (currentRun === formatRunId) {
+      error.value = err instanceof Error ? err.message : "Failed to format code.";
+    }
   }
 };
 
@@ -200,5 +236,11 @@ const copyOutput = async () => {
   await navigator.clipboard.writeText(formatted.value);
 };
 
-formatNow();
+watch(
+  [input, selectedParser, printWidth, tabWidth, useSemi, singleQuote, trailingComma],
+  () => {
+    void formatNow();
+  },
+  { immediate: true },
+);
 </script>

@@ -2,7 +2,10 @@
 import { ref, watch, onMounted } from "vue";
 import { tex2svgHtml } from "mathxyjax3";
 
-const input = ref("\\xymatrix{A \\ar[r]^f \\ar[d]_g & B \\ar[d]^h \\\\ C \\ar[r]_k & D}");
+const input = ref(`\\xymatrix{
+  A \\ar[r]^f \\ar[d]_g & B \\ar[d]^h \\\\
+  C \\ar[r]_k & D
+}`);
 const output = ref("");
 const imageUrl = ref("");
 const error = ref("");

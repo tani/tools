@@ -46,6 +46,10 @@ const routes = [
     path: "/string-folding",
     component: () => import("./views/string-folding.vue"),
   },
+  {
+    path: "/ocr-tool",
+    component: () => import("./views/ocr-tool.vue"),
+  },
 ];
 
 export const router = createRouter({

@@ -90,7 +90,7 @@ const mergePdfs = async () => {
 
 <template>
   <div>
-    <h2 class="display-6">PDF Merge</h2>
+    <h2 class="display-6">PDF Merger</h2>
     <p class="text-muted mb-4">
       Combine multiple PDF documents into a single file. Drag and drop to reorder.
     </p>

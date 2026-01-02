@@ -48,15 +48,19 @@ const routes = [
   },
   {
     path: "/ocr-tool",
-    component: () => import("./views/ocr-tool.vue"),
+    component: () => import("./views/ocr-reader.vue"),
   },
   {
     path: "/pdf-viewer",
-    component: () => import("./views/pdf-tool.vue"),
+    component: () => import("./views/pdf-viewer.vue"),
   },
   {
     path: "/pdf-merge",
     component: () => import("./views/pdf-merge.vue"),
+  },
+  {
+    path: "/pdf-extract",
+    component: () => import("./views/pdf-extract.vue"),
   },
 ];
 

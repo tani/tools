@@ -104,7 +104,7 @@
                   active-class="active"
                   to="/ocr-tool"
                 >
-                  👁️ OCR Tool
+                  👁️ OCR Reader
                 </RouterLink>
 
                 <div class="list-group-item fw-bold text-muted small text-uppercase bg-light mt-2">Utilities</div>
@@ -127,7 +127,14 @@
                   active-class="active"
                   to="/pdf-merge"
                 >
-                  🔗 PDF Merge
+                  🔗 PDF Merger
+                </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/pdf-extract"
+                >
+                  ✂️ PDF Extractor
                 </RouterLink>
               </div>
             </div>

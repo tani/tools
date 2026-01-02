@@ -29,70 +29,70 @@
                   active-class="active"
                   to="/unicode-to-latex"
                 >
-                  Unicode to LaTeX
+                  🔣 Unicode to LaTeX
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/latex-to-unicode"
                 >
-                  LaTeX to Unicode
+                  🧮 LaTeX to Unicode
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/replace-text"
                 >
-                  Replace Text
+                  🔁 Replace Text
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/find-differences"
                 >
-                  Find Differences
+                  🔍 Find Differences
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/svg-to-png"
                 >
-                  Convert SVG to PNG
+                  🖼️ Convert SVG to PNG
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/word-count"
                 >
-                  Word Count
+                  📝 Word Count
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/basic-statistics"
                 >
-                  Basic Statistics
+                  📊 Basic Statistics
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/mermaid-editor"
                 >
-                  Mermaid Editor
+                  🧜‍♀️ Mermaid Editor
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/pomodoro-timer"
                 >
-                  Pomodoro Timer
+                  ⏱️ Pomodoro Timer
                 </RouterLink>
                 <RouterLink
                   class="list-group-item list-group-item-action"
                   active-class="active"
                   to="/math-preview"
                 >
-                  Math Preview
+                  ♾️ Math Preview
                 </RouterLink>
               </div>
             </div>

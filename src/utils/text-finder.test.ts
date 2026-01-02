@@ -42,5 +42,5 @@ test("buildHighlightedHtml escapes HTML and wraps matches", () => {
   assert.ok(result.compiled);
   const matches = findMatches("<a>1</a>", result.compiled!, 10);
   const html = buildHighlightedHtml("<a>1</a>", matches.matches);
-  assert.equal(html, "&lt;a&gt;<mark class=\"text-finder-highlight\">1</mark>&lt;/a&gt;");
+  assert.equal(html, '&lt;a&gt;<mark class="text-finder-highlight">1</mark>&lt;/a&gt;');
 });

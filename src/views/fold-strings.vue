@@ -117,6 +117,7 @@ const copyRegexToClipboard = () => {
     <h2 class="display-6">Fold Strings</h2>
     <p class="text-muted mb-4">
       Compare strings line-by-line using the LCS algorithm and replace differences with "{{ diffChar
+
       }}".
     </p>
 

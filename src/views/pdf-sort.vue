@@ -194,10 +194,11 @@ const exportPdf = async () => {
                   #{{ index + 1 }}
                 </div>
               </div>
-                              <div class="card-footer p-1 bg-white text-center border-0">
-                                <span class="x-small text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">Drag to move</span>
-                              </div>
-              
+              <div class="card-footer p-1 bg-white text-center border-0">
+                <span class="x-small text-muted text-uppercase fw-bold" style="font-size: 0.6rem;"
+                  >Drag to move</span
+                >
+              </div>
             </div>
           </div>
         </div>

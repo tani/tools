@@ -74,8 +74,7 @@ const copyMatches = () => {
   <div>
     <h2 class="display-6">Regex Finder</h2>
     <p class="text-muted mb-4">
-      Highlight Oniguruma-style regex matches with an instant preview, powered by
-      oniguruma-to-es.
+      Highlight Oniguruma-style regex matches with an instant preview, powered by oniguruma-to-es.
     </p>
 
     <div class="card mb-4 shadow-sm">
@@ -104,7 +103,9 @@ const copyMatches = () => {
               class="form-control font-monospace"
               placeholder="i, m, x, D, S, W, y{g}"
             />
-            <div class="form-text">Oniguruma <span class="font-monospace">m</span> = JS dotAll.</div>
+            <div class="form-text">
+              Oniguruma <span class="font-monospace">m</span> = JS dotAll.
+            </div>
           </div>
           <div class="col-md-4">
             <label for="target" class="form-label fw-bold small">Target</label>

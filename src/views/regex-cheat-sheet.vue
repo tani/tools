@@ -120,7 +120,7 @@ const examples = [
     desc: "Ignore whitespace/comments while matching hex words.",
   },
   {
-    title: "Unicode letters", 
+    title: "Unicode letters",
     pattern: String.raw`\p{L}+`,
     desc: "Matches letters in any script.",
   },
@@ -130,7 +130,7 @@ const examples = [
     desc: "Finds repeated words like 'hello hello'.",
   },
   {
-    title: "Atomic group", 
+    title: "Atomic group",
     pattern: String.raw`(?>\d{2})\d`,
     desc: "Prevents backtracking into the first two digits.",
   },
@@ -138,7 +138,7 @@ const examples = [
 
 const caveats = [
   "Oniguruma's flag 'm' means dot-all, unlike JavaScript's multiline.",
-  "Unicode is default for \d, \w, \s unless you enable ASCII flags (D/S/W).",
+  "Unicode is default for \\d, \\w, \\s unless you enable ASCII flags (D/S/W).",
   "Some advanced features depend on target support when transpiled to JavaScript.",
   "Using oniguruma-to-es, patterns may be emulated with a RegExp subclass.",
 ];
@@ -166,7 +166,7 @@ const caveats = [
           <div class="col-lg-6">
             <div class="p-3 bg-light rounded">
               <div class="fw-bold small text-uppercase text-muted mb-2">Inline Modifiers</div>
-              <div class="font-monospace">(?x)  # ignore whitespace</div>
+              <div class="font-monospace">(?x) # ignore whitespace</div>
               <div class="font-monospace">(?i:...)</div>
             </div>
           </div>
@@ -238,11 +238,7 @@ const caveats = [
           >
             Official Oniguruma Syntax Reference
           </a>
-          <a
-            href="https://github.com/slevithan/oniguruma-to-es"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://github.com/slevithan/oniguruma-to-es" target="_blank" rel="noreferrer">
             oniguruma-to-es documentation
           </a>
         </div>

@@ -1,9 +1,4 @@
-import {
-  EmulatedRegExp,
-  toRegExpDetails,
-  type EmulatedRegExpOptions,
-  type ToRegExpOptions,
-} from "oniguruma-to-es";
+import { EmulatedRegExp, toRegExpDetails, type ToRegExpOptions } from "oniguruma-to-es";
 
 export type OnigurumaTarget = "auto" | "ES2018" | "ES2024" | "ES2025";
 
@@ -12,11 +7,7 @@ export type CompileResult = {
   error: string | null;
 };
 
-export type CompiledOniguruma = {
-  pattern: string;
-  flags: string;
-  options?: EmulatedRegExpOptions;
-};
+export type CompiledOniguruma = ReturnType<typeof toRegExpDetails>;
 
 export type MatchSegment = {
   start: number;
@@ -49,14 +40,7 @@ export function compileOnigurumaRegex(
 
   try {
     const details = toRegExpDetails(pattern, toRegExpOptions);
-    return {
-      compiled: {
-        pattern: details.pattern,
-        flags: details.flags,
-        options: details.options,
-      },
-      error: null,
-    };
+    return { compiled: details, error: null };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return { compiled: null, error: message };

@@ -51,48 +51,57 @@ const handleChange = async (event: Event) => {
 <template>
   <div>
     <h2 class="display-6">SVG to PNG</h2>
-    <p class="text-muted">
+    <p class="text-muted mb-4">
       Convert SVG images to PNG format with custom dimensions.
     </p>
-    <div class="row">
-      <div class="col-sm-3">
-        <input v-model.number="x" name="x" class="form-control" type="number" />
-      </div>
-      <div class="col-sm-3">
-        <input v-model.number="y" name="y" class="form-control" type="number" />
-      </div>
-      <div class="col-sm-3">
-        <input
-          name="file"
-          class="form-control"
-          type="file"
-          accept="image/svg+xml"
-          @change="handleChange"
-        />
-      </div>
-      <div class="col-sm-3">
-        <button class="btn btn-primary" type="button" @click="handleClick">Convert</button>
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">SVG Preview</div>
-          <div class="card-body bg-light overflow-auto p-3" style="min-height: 500px">
-            <div v-html="svg" />
-            <div v-if="!svg" class="text-center text-muted py-5">SVG preview will appear here</div>
+
+    <div class="card mb-4">
+      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label fw-bold small">Width (px)</label>
+            <input v-model.number="x" class="form-control" type="number" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold small">Height (px)</label>
+            <input v-model.number="y" class="form-control" type="number" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold small">Upload SVG</label>
+            <input
+              class="form-control"
+              type="file"
+              accept="image/svg+xml"
+              @change="handleChange"
+            />
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" type="button" @click="handleClick">Convert</button>
           </div>
         </div>
       </div>
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span>PNG Preview</span>
-            <a v-if="png" :href="png" download="converted.png" class="btn btn-sm btn-link p-0 text-decoration-none">Download</a>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">SVG Preview</div>
+          <div class="card-body bg-light overflow-auto p-3 d-flex align-items-center justify-content-center" style="min-height: 400px">
+            <div v-if="svg" v-html="svg" class="img-fluid" />
+            <div v-else class="text-muted small">SVG preview will appear here</div>
           </div>
-          <div class="card-body bg-light text-center p-3" style="min-height: 500px">
+        </div>
+      </div>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-bold small text-uppercase text-muted">PNG Preview</span>
+            <a v-if="png" :href="png" download="converted.png" class="btn btn-sm btn-link p-0 text-decoration-none small">Download</a>
+          </div>
+          <div class="card-body bg-light text-center p-3 d-flex align-items-center justify-content-center" style="min-height: 400px">
             <img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
-            <div v-else class="text-center text-muted py-5">PNG preview will appear here</div>
+            <div v-else class="text-muted small">PNG preview will appear here</div>
           </div>
         </div>
       </div>

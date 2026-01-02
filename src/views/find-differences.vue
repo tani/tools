@@ -23,33 +23,33 @@ const diffFile = computed(() => {
 <template>
   <div>
     <h2 class="display-6">Diff Text</h2>
-    <p class="text-muted">
+    <p class="text-muted mb-4">
       Compare two text blocks and visualize the differences using a unified diff view.
     </p>
     <div class="row">
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">Old</div>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Old Version</div>
           <div class="card-body p-0">
             <textarea id="oldText" v-model="oldText" class="form-control border-0 font-monospace p-3" rows="10" style="resize: none;" />
           </div>
         </div>
       </div>
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">New</div>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">New Version</div>
           <div class="card-body p-0">
             <textarea id="newText" v-model="newText" class="form-control border-0 font-monospace p-3" rows="10" style="resize: none;" />
           </div>
         </div>
       </div>
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header">Diff</div>
+      <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Visual Diff</div>
           <div class="card-body p-0">
-            <div id="diffText" class="diff-container border-0">
+            <div id="diffText" class="diff-container border-0 rounded-0">
               <DiffView v-if="diffFile" :diff-file="diffFile" :diff-view-mode="DiffModeEnum.Unified" />
-              <div v-else class="p-3 text-center text-muted">No differences found</div>
+              <div v-else class="p-5 text-center text-muted">No differences found between the two versions</div>
             </div>
           </div>
         </div>

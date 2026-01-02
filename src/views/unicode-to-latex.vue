@@ -31,23 +31,23 @@ const copyToClipboard = () => {
 <template>
   <div>
     <h2 class="display-6">Unicode To LaTeX</h2>
-    <p class="text-muted">
+    <p class="text-muted mb-4">
       Convert Unicode mathematical characters to their corresponding LaTeX commands.
     </p>
     <div class="row">
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">Input</div>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Unicode Input</div>
           <div class="card-body p-0">
             <textarea v-model="input" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
           </div>
         </div>
       </div>
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Output</span>
-            <button class="btn btn-sm btn-link p-0 text-decoration-none" @click="copyToClipboard">
+            <span class="fw-bold small text-uppercase text-muted">LaTeX Output</span>
+            <button class="btn btn-sm btn-link p-0 text-decoration-none small" @click="copyToClipboard">
               {{ copyBtnText }}
             </button>
           </div>

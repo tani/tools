@@ -104,49 +104,46 @@ onMounted(() => {
 <template>
   <div>
     <h2 class="display-6">Math Preview</h2>
-    <p class="text-muted">
+    <p class="text-muted mb-4">
       Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a PNG.
     </p>
     <div class="row">
-      <div class="col-sm-12 mb-4">
-        <div class="card">
-          <div class="card-header">TeX Input</div>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">TeX Input</div>
           <div class="card-body p-0">
             <textarea
               v-model="input"
               class="form-control border-0 font-monospace p-3 math-textarea"
               placeholder="Enter TeX/LaTeX or Xy-pic code here..."
-              rows="10"
+              rows="15"
               style="resize: none;"
             />
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="card">
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Preview</span>
+            <span class="fw-bold small text-uppercase text-muted">Preview</span>
             <a
               :href="imageUrl || '#'"
-              class="btn btn-sm btn-link p-0 text-decoration-none"
+              class="btn btn-sm btn-link p-0 text-decoration-none small"
               :class="{ disabled: !imageUrl || error }"
               download="math-expression.png"
             >
               Download PNG
             </a>
           </div>
-          <div class="card-body p-0">
-            <div v-if="error" class="alert alert-danger m-3">
+          <div class="card-body p-0 bg-light">
+            <div v-if="error" class="alert alert-danger m-3 small">
               <strong>Error:</strong> {{ error }}
             </div>
-            <div class="preview-container border-0 rounded-0 p-4 bg-white text-center">
-              <div v-if="!input.trim()" class="text-muted">
+            <div class="preview-container border-0 rounded-0 p-4 text-center d-flex align-items-center justify-content-center" style="min-height: 382px;">
+              <div v-if="!input.trim()" class="text-muted small">
                 Enter some TeX to see the preview
               </div>
-              <div v-else-if="isRendering" class="text-muted">
+              <div v-else-if="isRendering" class="text-muted small">
                 <output class="spinner-border text-primary spinner-border-sm me-2">
                   <span class="visually-hidden">Loading...</span>
                 </output>

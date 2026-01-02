@@ -43,37 +43,38 @@ const copyToClipboard = () => {
 <template>
   <div>
     <h2 class="display-6">Replace Text</h2>
-    <p class="text-muted">
+    <p class="text-muted mb-4">
       Search and replace text using regular expressions with a side-by-side diff preview.
     </p>
-    <div class="card mb-3">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
       <div class="card-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="search" class="form-label fw-bold">Search</label>
-            <input id="search" v-model="search" class="form-control" placeholder="Regex pattern" />
+            <label for="search" class="form-label fw-bold small">Search Pattern (Regex)</label>
+            <input id="search" v-model="search" class="form-control" placeholder="e.g., \d+" />
           </div>
           <div class="col-md-6">
-            <label for="replace" class="form-label fw-bold">Replace</label>
-            <input id="replace" v-model="replaceText" class="form-control" placeholder="Replacement text" />
+            <label for="replace" class="form-label fw-bold small">Replacement Text</label>
+            <input id="replace" v-model="replaceText" class="form-control" placeholder="e.g., [number]" />
           </div>
         </div>
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">Input</div>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Input</div>
           <div class="card-body p-0">
             <textarea id="text" v-model="text" class="form-control border-0 font-monospace p-3" rows="20" style="resize: none;" />
           </div>
         </div>
       </div>
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Output</span>
-            <button class="btn btn-sm btn-link p-0 text-decoration-none" @click="copyToClipboard">
+            <span class="fw-bold small text-uppercase text-muted">Output</span>
+            <button class="btn btn-sm btn-link p-0 text-decoration-none small" @click="copyToClipboard">
               {{ copyBtnText }}
             </button>
           </div>

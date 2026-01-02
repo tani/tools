@@ -170,69 +170,66 @@ const chartData = computed(() => {
 <template>
   <div>
     <h2 class="display-6">Basic Statistics</h2>
-    <p class="text-muted">
+    <p class="text-muted mb-4">
       Calculate mean, variance, standard deviation, and other basic statistical measures from a list of numbers.
     </p>
     <div class="row">
-      <div class="col-sm-12">
-        <table class="table">
-          <tbody>
-            <tr>
-              <th>Mean</th>
-              <td>{{ round(mean(values))?.toString() }}</td>
-              <th>Variance</th>
-              <td>{{ round(variance(values))?.toString() }}</td>
-              <th>Standard deviation</th>
-              <td>{{ round(standardDeviation(values))?.toString() }}</td>
-            </tr>
-            <tr>
-              <th>First quartile</th>
-              <td>{{ firstQuartile(values)?.toString() }}</td>
-              <th>Median/ Second quartile</th>
-              <td>{{ median(values)?.toString() }}</td>
-              <th>Third quartile</th>
-              <td>{{ thirdQuartile(values)?.toString() }}</td>
-            </tr>
-            <tr>
-              <th>Mode</th>
-              <td>{{ modes(values)?.join(", ") }}</td>
-              <th>Max</th>
-              <td>{{ max(values)?.toString() }}</td>
-              <th>Min</th>
-              <td>{{ min(values)?.toString() }}</td>
-            </tr>
-            <tr>
-              <th>Mid-range</th>
-              <td>{{ midRange(values)?.toString() }}</td>
-              <th>Range</th>
-              <td>{{ range(values)?.toString() }}</td>
-              <th>Count</th>
-              <td>{{ values.length }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Statistics Summary</div>
+          <div class="card-body p-0">
+            <table class="table table-sm table-bordered mb-0">
+              <tbody>
+                <tr>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Mean</th>
+                  <td class="fw-bold py-2">{{ round(mean(values))?.toString() }}</td>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Variance</th>
+                  <td class="fw-bold py-2">{{ round(variance(values))?.toString() }}</td>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Std Dev</th>
+                  <td class="fw-bold py-2 pe-3">{{ round(standardDeviation(values))?.toString() }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Q1</th>
+                  <td class="fw-bold py-2">{{ firstQuartile(values)?.toString() }}</td>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Median</th>
+                  <td class="fw-bold py-2">{{ median(values)?.toString() }}</td>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Q3</th>
+                  <td class="fw-bold py-2 pe-3">{{ thirdQuartile(values)?.toString() }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Mode</th>
+                  <td class="fw-bold py-2">{{ modes(values)?.join(", ") }}</td>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Max</th>
+                  <td class="fw-bold py-2">{{ max(values)?.toString() }}</td>
+                  <th class="ps-3 small text-uppercase text-muted py-2">Min</th>
+                  <td class="fw-bold py-2 pe-3">{{ min(values)?.toString() }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row mt-3">
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">Input</div>
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Input Numbers</div>
           <div class="card-body p-0">
             <textarea
               v-model="input"
               class="form-control border-0 font-monospace p-3"
-              rows="20"
-              style="height: 100%; min-height: 400px; resize: none;"
+              rows="15"
+              style="resize: none;"
             />
           </div>
         </div>
       </div>
-      <div class="col-sm-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">Histogram</div>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header fw-bold small text-uppercase text-muted">Histogram View</div>
           <div
-            class="card-body p-2 d-flex flex-column bg-light"
-            style="overflow-x: auto; min-height: 400px"
+            class="card-body p-3 d-flex flex-column bg-light"
+            style="overflow-x: auto; min-height: 300px"
           >
           <svg
             v-if="chartData.data.length > 0"

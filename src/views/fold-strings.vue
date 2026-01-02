@@ -99,8 +99,8 @@ const processedData = computed(() => {
 <template>
   <div>
     <ToolHeader
-      title="Fold Strings"
-      :description="`Compare strings line-by-line using the LCS algorithm and replace differences with '${diffChar}'.`"
+      title="String Pattern Folding"
+      :description="`Extract common patterns from multiple lines by replacing variations with '${diffChar}'.`"
     />
 
     <ToolCard title="Configuration" class="mb-4">

@@ -114,6 +114,10 @@ const routes = [
     path: "/pomodoro",
     component: () => import("./views/pomodoro.vue"),
   },
+  {
+    path: "/whois-rdap",
+    component: () => import("./views/whois-rdap.vue"),
+  },
 ];
 
 export const router = createRouter({

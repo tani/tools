@@ -225,6 +225,13 @@
                 >
                   ⏱️ Pomodoro
                 </RouterLink>
+                <RouterLink
+                  class="list-group-item list-group-item-action"
+                  active-class="active"
+                  to="/whois-rdap"
+                >
+                  🌐 WHOIS / RDAP
+                </RouterLink>
               </div>
             </div>
           </div>

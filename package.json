@@ -9,7 +9,11 @@
 		"preview": "vite preview",
 		"check": "tsc && vue-tsc && biome check",
 		"check!": "tsc && vue-tsc && biome check --write",
-		"test": "node --test src/utils/*.test.ts"
+		"test": "node --test src/utils/*.test.ts",
+		"prepare": "simple-git-hooks"
+	},
+	"simple-git-hooks": {
+		"pre-commit": "npm run check && npm test"
 	},
 	"dependencies": {
 		"@biomejs/biome": "^2.3.11",
@@ -43,5 +47,8 @@
 		"vue-router": "^4.6.4",
 		"vue-tsc": "^3.2.2",
 		"workbox-build": "^7.4.0"
+	},
+	"devDependencies": {
+		"simple-git-hooks": "^2.11.1"
 	}
 }

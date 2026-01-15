@@ -25,6 +25,7 @@ const pdfWorker = {
 
 		// Load document
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
+		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access requires casting due to incomplete types
 		(pdfium as any).HEAP8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
@@ -81,6 +82,7 @@ const pdfWorker = {
 
 				const length = stride * renderHeight;
 				const rawData = new Uint8Array(
+					// biome-ignore lint/suspicious/noExplicitAny: used for buffer access
 					(pdfium as any).HEAPU8.buffer,
 					buffer,
 					length,
@@ -115,6 +117,7 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
+		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
 		(pdfium as any).HEAP8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
@@ -136,6 +139,7 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
+		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
 		(pdfium as any).HEAP8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
@@ -184,6 +188,7 @@ const pdfWorker = {
 					const length = stride * renderHeight;
 
 					const rawData = new Uint8Array(
+						// biome-ignore lint/suspicious/noExplicitAny: used for buffer access
 						(pdfium as any).HEAPU8.buffer,
 						buffer,
 						length,
@@ -224,6 +229,7 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
+		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
 		(pdfium as any).HEAP8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
@@ -250,6 +256,7 @@ const pdfWorker = {
 				const length = stride * height;
 
 				const rawData = new Uint8Array(
+					// biome-ignore lint/suspicious/noExplicitAny: used for buffer access
 					(pdfium as any).HEAPU8.buffer,
 					buffer,
 					length,
@@ -280,6 +287,7 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
+		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
 		(pdfium as any).HEAP8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
@@ -338,6 +346,7 @@ const pdfWorker = {
 		try {
 			for (const buffer of pdfBuffers) {
 				const dataPtr = pdfium.wasmExports.malloc(buffer.length);
+				// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
 				(pdfium as any).HEAP8.set(buffer, dataPtr);
 				const srcDoc = mod.FPDF_LoadMemDocument(dataPtr, buffer.length, "");
 
@@ -363,6 +372,7 @@ const pdfWorker = {
 			const bufferPtr = pdfium.wasmExports.malloc(size);
 			mod.PDFiumExt_GetFileWriterData(writer, bufferPtr, size);
 			const resultBuffer = new Uint8Array(
+				// biome-ignore lint/suspicious/noExplicitAny: buffer access
 				(pdfium as any).HEAPU8.slice(bufferPtr, bufferPtr + size),
 			);
 			pdfium.wasmExports.free(bufferPtr);
@@ -382,6 +392,7 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
+		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
 		(pdfium as any).HEAP8.set(pdfData, dataPtr);
 		const srcDoc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
 		if (!srcDoc) {
@@ -402,6 +413,7 @@ const pdfWorker = {
 			const bufferPtr = pdfium.wasmExports.malloc(size);
 			mod.PDFiumExt_GetFileWriterData(writer, bufferPtr, size);
 			const resultBuffer = new Uint8Array(
+				// biome-ignore lint/suspicious/noExplicitAny: buffer access
 				(pdfium as any).HEAPU8.slice(bufferPtr, bufferPtr + size),
 			);
 			pdfium.wasmExports.free(bufferPtr);
@@ -423,6 +435,7 @@ const pdfWorker = {
 		throw new Error("resizePdf is not yet implemented with PDFium.");
 	},
 
+	// biome-ignore lint/suspicious/noExplicitAny: return type
 	async getFonts(_pdfData: Uint8Array): Promise<any[]> {
 		throw new Error("getFonts is not yet implemented with PDFium.");
 	},

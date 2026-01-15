@@ -1,13 +1,34 @@
-import { init, type WrappedPdfiumModule } from "@embedpdf/pdfium";
+import {
+	init,
+	type PdfiumModule,
+	type PdfiumRuntimeMethods,
+	type WrappedPdfiumModule,
+} from "@embedpdf/pdfium";
 import pdfiumWasm from "@embedpdf/pdfium/pdfium.wasm";
 import * as Comlink from "comlink";
 
-let pdfiumModule: WrappedPdfiumModule | null = null;
+// Define the extensions on the internal Emscripten module (mod.pdfium)
+// We need to ensure HEAP8 and HEAPU8 are strictly typed
+interface PdfiumModuleExtended extends PdfiumModule, PdfiumRuntimeMethods {
+	HEAP8: Int8Array;
+	HEAP32: Int32Array;
+	HEAPU8: Uint8Array;
+}
 
-async function ensurePdfium() {
+const FPDFBitmap_BGRA = 4;
+
+// Define the full wrapped module type
+// We override the 'pdfium' property to use our extended type
+type WrappedPdfiumModuleExtended = WrappedPdfiumModule & {
+	pdfium: PdfiumModuleExtended;
+};
+
+let pdfiumModule: WrappedPdfiumModuleExtended | null = null;
+
+async function ensurePdfium(): Promise<WrappedPdfiumModuleExtended> {
 	if (pdfiumModule) return pdfiumModule;
 
-	pdfiumModule = await init({
+	const mod = await init({
 		locateFile: (path: string) => {
 			if (path.endsWith(".wasm")) {
 				return pdfiumWasm;
@@ -15,18 +36,78 @@ async function ensurePdfium() {
 			return path;
 		},
 	});
+
+	// Cast the module to our extended type
+	// The library returns a wrapper where `mod.pdfium` is the actual Emscripten module
+	pdfiumModule = mod as unknown as WrappedPdfiumModuleExtended;
+
+	// Initialize the library
+	pdfiumModule.FPDF_InitLibrary();
+
 	return pdfiumModule;
 }
 
-const pdfWorker = {
+// Helper to save PDF document to Uint8Array using FPDF_SaveAsCopy and a custom callback writer
+// This avoids using PDFiumExt which seems unstable in some environments
+function savePdf(mod: WrappedPdfiumModuleExtended, doc: number): Uint8Array {
+	const { pdfium } = mod;
+	const chunkData: Uint8Array[] = [];
+
+	// Callback: int (*WriteBlock)(struct FPDF_FILEWRITE* pThis, const void* pData, unsigned long size);
+	const writeBlock = (_pThis: number, pData: number, size: number) => {
+		// Create a copy of the chunk
+		const data = pdfium.HEAPU8.slice(pData, pData + size);
+		chunkData.push(data);
+		return 1; // Success
+	};
+
+	let funcPtr = 0;
+	let fileWritePtr = 0;
+
+	try {
+		// Register the callback function in WASM table
+		// Signature 'iiii' -> return int, args: int, int, int
+		funcPtr = pdfium.addFunction(writeBlock, "iiii");
+
+		// Allocate FPDF_FILEWRITE structure
+		// struct FPDF_FILEWRITE { int version; int (*WriteBlock)(...); };
+		// 32-bit WASM: 4 + 4 = 8 bytes
+		fileWritePtr = pdfium.wasmExports.malloc(8);
+		if (!fileWritePtr) throw new Error("Failed to allocate FPDF_FILEWRITE");
+
+		// Initialize structure: version=1, WriteBlock=funcPtr
+		pdfium.HEAP32.set([1, funcPtr], fileWritePtr >> 2);
+
+		// Flag 0 = Valid PDF
+		const success = mod.FPDF_SaveAsCopy(doc, fileWritePtr, 0);
+		if (!success) throw new Error("FPDF_SaveAsCopy failed to save document");
+	} finally {
+		if (fileWritePtr) pdfium.wasmExports.free(fileWritePtr);
+		if (funcPtr) pdfium.removeFunction(funcPtr);
+	}
+
+	// Combine chunks
+	const totalLength = chunkData.reduce((acc, c) => acc + c.length, 0);
+	const result = new Uint8Array(totalLength);
+	let offset = 0;
+	for (const chunk of chunkData) {
+		result.set(chunk, offset);
+		offset += chunk.length;
+	}
+	return result;
+}
+
+export const pdfWorker = {
 	async rasterizePdf(pdfData: Uint8Array): Promise<Uint8Array> {
 		const mod = await ensurePdfium();
+		// Use the inner module for direct memory access
 		const { pdfium } = mod;
 
 		// Load document
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access requires casting due to incomplete types
-		(pdfium as any).HEAP8.set(pdfData, dataPtr);
+		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+
+		pdfium.HEAPU8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
 		if (!doc) {
@@ -51,7 +132,12 @@ const pdfWorker = {
 				const renderHeight = Math.ceil(height * scale);
 
 				// 4 bytes per pixel (BGRA or RGBA depending on platform, usually BGRA for PDFium)
-				const bitmap = mod.FPDFBitmap_Create(renderWidth, renderHeight, 0);
+				const bitmap = mod.FPDFBitmap_Create(
+					renderWidth,
+					renderHeight,
+					FPDFBitmap_BGRA,
+				);
+				if (!bitmap) throw new Error("Failed to create bitmap");
 				// Fill with white
 				mod.FPDFBitmap_FillRect(
 					bitmap,
@@ -81,12 +167,8 @@ const pdfWorker = {
 				if (!ctx) throw new Error("Failed to create OffscreenCanvas context");
 
 				const length = stride * renderHeight;
-				const rawData = new Uint8Array(
-					// biome-ignore lint/suspicious/noExplicitAny: used for buffer access
-					(pdfium as any).HEAPU8.buffer,
-					buffer,
-					length,
-				);
+				// Create a copy of the data to avoid issues with WASM memory resizing or out-of-bounds views
+				const rawData = pdfium.HEAPU8.slice(buffer, buffer + length);
 				const imageData = ctx.createImageData(renderWidth, renderHeight);
 
 				for (let i = 0; i < rawData.length; i += 4) {
@@ -117,8 +199,9 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
-		(pdfium as any).HEAP8.set(pdfData, dataPtr);
+		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+
+		pdfium.HEAPU8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
 		if (!doc) {
@@ -139,8 +222,9 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
-		(pdfium as any).HEAP8.set(pdfData, dataPtr);
+		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+
+		pdfium.HEAPU8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
 		if (!doc) {
@@ -162,7 +246,12 @@ const pdfWorker = {
 					const renderWidth = Math.ceil(width * scale);
 					const renderHeight = Math.ceil(height * scale);
 
-					const bitmap = mod.FPDFBitmap_Create(renderWidth, renderHeight, 1);
+					const bitmap = mod.FPDFBitmap_Create(
+						renderWidth,
+						renderHeight,
+						FPDFBitmap_BGRA,
+					);
+					if (!bitmap) continue;
 					mod.FPDFBitmap_FillRect(
 						bitmap,
 						0,
@@ -186,13 +275,8 @@ const pdfWorker = {
 					const buffer = mod.FPDFBitmap_GetBuffer(bitmap);
 					const stride = mod.FPDFBitmap_GetStride(bitmap);
 					const length = stride * renderHeight;
-
-					const rawData = new Uint8Array(
-						// biome-ignore lint/suspicious/noExplicitAny: used for buffer access
-						(pdfium as any).HEAPU8.buffer,
-						buffer,
-						length,
-					);
+					// Create a copy of the data to avoid issues with WASM memory resizing or out-of-bounds views
+					const rawData = pdfium.HEAPU8.slice(buffer, buffer + length);
 					const pixels = new Uint8ClampedArray(rawData.length);
 
 					for (let j = 0; j < rawData.length; j += 4) {
@@ -229,8 +313,9 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
-		(pdfium as any).HEAP8.set(pdfData, dataPtr);
+		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+
+		pdfium.HEAPU8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
 		if (!doc) {
@@ -246,7 +331,8 @@ const pdfWorker = {
 				const width = Math.ceil(mod.FPDF_GetPageWidth(page));
 				const height = Math.ceil(mod.FPDF_GetPageHeight(page));
 
-				const bitmap = mod.FPDFBitmap_Create(width, height, 1);
+				const bitmap = mod.FPDFBitmap_Create(width, height, FPDFBitmap_BGRA);
+				if (!bitmap) throw new Error("Failed to create bitmap");
 				mod.FPDFBitmap_FillRect(bitmap, 0, 0, width, height, 0x00000000); // Transparent fill
 
 				mod.FPDF_RenderPageBitmap(bitmap, page, 0, 0, width, height, 0, 0);
@@ -254,13 +340,8 @@ const pdfWorker = {
 				const buffer = mod.FPDFBitmap_GetBuffer(bitmap);
 				const stride = mod.FPDFBitmap_GetStride(bitmap);
 				const length = stride * height;
-
-				const rawData = new Uint8Array(
-					// biome-ignore lint/suspicious/noExplicitAny: used for buffer access
-					(pdfium as any).HEAPU8.buffer,
-					buffer,
-					length,
-				);
+				// Create a copy of the data to avoid issues with WASM memory resizing or out-of-bounds views
+				const rawData = pdfium.HEAPU8.slice(buffer, buffer + length);
 				const pixels = new Uint8ClampedArray(rawData.length);
 
 				// BGRA -> RGBA
@@ -287,8 +368,9 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
-		(pdfium as any).HEAP8.set(pdfData, dataPtr);
+		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+
+		pdfium.HEAPU8.set(pdfData, dataPtr);
 
 		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
 		if (!doc) {
@@ -346,39 +428,47 @@ const pdfWorker = {
 		try {
 			for (const buffer of pdfBuffers) {
 				const dataPtr = pdfium.wasmExports.malloc(buffer.length);
-				// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
-				(pdfium as any).HEAP8.set(buffer, dataPtr);
+				if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+
+				pdfium.HEAPU8.set(buffer, dataPtr);
 				const srcDoc = mod.FPDF_LoadMemDocument(dataPtr, buffer.length, "");
 
 				if (srcDoc) {
-					const srcPageCount = mod.FPDF_GetPageCount(srcDoc);
-					if (srcPageCount > 0) {
-						const range = `1-${srcPageCount}`;
-						mod.FPDF_ImportPages(
-							newDoc,
-							srcDoc,
-							range,
-							mod.FPDF_GetPageCount(newDoc),
-						);
+					try {
+						const srcPageCount = mod.FPDF_GetPageCount(srcDoc);
+						if (srcPageCount > 0) {
+							// Prepare indices array [0, 1, ..., srcPageCount-1]
+							const indicesPtr = pdfium.wasmExports.malloc(srcPageCount * 4); // 4 bytes per int
+							if (indicesPtr) {
+								try {
+									const indices32 = new Int32Array(srcPageCount);
+									for (let i = 0; i < srcPageCount; i++) indices32[i] = i;
+
+									// HEAP32 is Int32Array view of memory.
+									// We need to set it at the correct offset.
+									// indicesPtr is byte offset. Divide by 4 for Int32 index.
+									pdfium.HEAP32.set(indices32, indicesPtr >> 2);
+
+									mod.FPDF_ImportPagesByIndex(
+										newDoc,
+										srcDoc,
+										indicesPtr,
+										srcPageCount,
+										mod.FPDF_GetPageCount(newDoc),
+									);
+								} finally {
+									pdfium.wasmExports.free(indicesPtr);
+								}
+							}
+						}
+					} finally {
+						mod.FPDF_CloseDocument(srcDoc);
 					}
-					mod.FPDF_CloseDocument(srcDoc);
 				}
 				pdfium.wasmExports.free(dataPtr);
 			}
 
-			const writer = mod.PDFiumExt_OpenFileWriter();
-			mod.PDFiumExt_SaveAsCopy(writer, newDoc);
-			const size = mod.PDFiumExt_GetFileWriterSize(writer);
-			const bufferPtr = pdfium.wasmExports.malloc(size);
-			mod.PDFiumExt_GetFileWriterData(writer, bufferPtr, size);
-			const resultBuffer = new Uint8Array(
-				// biome-ignore lint/suspicious/noExplicitAny: buffer access
-				(pdfium as any).HEAPU8.slice(bufferPtr, bufferPtr + size),
-			);
-			pdfium.wasmExports.free(bufferPtr);
-			mod.PDFiumExt_CloseFileWriter(writer);
-
-			return resultBuffer;
+			return savePdf(mod, newDoc);
 		} finally {
 			mod.FPDF_CloseDocument(newDoc);
 		}
@@ -392,34 +482,44 @@ const pdfWorker = {
 		const { pdfium } = mod;
 
 		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		// biome-ignore lint/suspicious/noExplicitAny: PDFium HEAP access
-		(pdfium as any).HEAP8.set(pdfData, dataPtr);
+		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+
+		pdfium.HEAPU8.set(pdfData, dataPtr);
 		const srcDoc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
 		if (!srcDoc) {
 			pdfium.wasmExports.free(dataPtr);
 			throw new Error("Failed to load source PDF");
 		}
 
+		console.log("extractPages: loaded doc", srcDoc);
+
 		const newDoc = mod.FPDF_CreateNewDocument();
 
 		try {
-			// range logic
-			const range = pageIndices.map((i) => i + 1).join(",");
-			mod.FPDF_ImportPages(newDoc, srcDoc, range, 0);
+			// Prepare indices array
+			const count = pageIndices.length;
+			const indicesPtr = pdfium.wasmExports.malloc(count * 4);
+			if (!indicesPtr)
+				throw new Error("Failed to allocate memory for page indices");
 
-			const writer = mod.PDFiumExt_OpenFileWriter();
-			mod.PDFiumExt_SaveAsCopy(writer, newDoc);
-			const size = mod.PDFiumExt_GetFileWriterSize(writer);
-			const bufferPtr = pdfium.wasmExports.malloc(size);
-			mod.PDFiumExt_GetFileWriterData(writer, bufferPtr, size);
-			const resultBuffer = new Uint8Array(
-				// biome-ignore lint/suspicious/noExplicitAny: buffer access
-				(pdfium as any).HEAPU8.slice(bufferPtr, bufferPtr + size),
-			);
-			pdfium.wasmExports.free(bufferPtr);
-			mod.PDFiumExt_CloseFileWriter(writer);
+			try {
+				const indices32 = new Int32Array(pageIndices);
+				pdfium.HEAP32.set(indices32, indicesPtr >> 2);
 
-			return resultBuffer;
+				console.log("extractPages: importing pages by index");
+				const success = mod.FPDF_ImportPagesByIndex(
+					newDoc,
+					srcDoc,
+					indicesPtr,
+					count,
+					0,
+				);
+				if (!success) throw new Error("Failed to import pages");
+
+				return savePdf(mod, newDoc);
+			} finally {
+				pdfium.wasmExports.free(indicesPtr);
+			}
 		} finally {
 			mod.FPDF_CloseDocument(newDoc);
 			mod.FPDF_CloseDocument(srcDoc);
@@ -435,8 +535,7 @@ const pdfWorker = {
 		throw new Error("resizePdf is not yet implemented with PDFium.");
 	},
 
-	// biome-ignore lint/suspicious/noExplicitAny: return type
-	async getFonts(_pdfData: Uint8Array): Promise<any[]> {
+	async getFonts(_pdfData: Uint8Array): Promise<unknown[]> {
 		throw new Error("getFonts is not yet implemented with PDFium.");
 	},
 };

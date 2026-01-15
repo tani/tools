@@ -59,7 +59,9 @@ const analyzeFonts = async () => {
 
 	try {
 		const result = await api.getFonts(fileData.value);
-		fontUsages.value = result.sort((a, b) => a.name.localeCompare(b.name));
+		fontUsages.value = (result as FontUsage[]).sort((a, b) =>
+			a.name.localeCompare(b.name),
+		);
 	} catch (error) {
 		console.error("PDF Font Analysis Error:", error);
 		alert("An error occurred while reading fonts from the PDF.");

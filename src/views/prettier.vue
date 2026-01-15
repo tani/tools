@@ -119,6 +119,7 @@
 import * as Comlink from "comlink";
 import { computed, onMounted, ref, watch } from "vue";
 import CopyButton from "../components/CopyButton.vue";
+import LoadingOverlay from "../components/LoadingOverlay.vue";
 import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";

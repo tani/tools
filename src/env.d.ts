@@ -11,7 +11,7 @@ declare module "prismjs/components/*" {
 	export default module;
 }
 
-declare module "vscode-oniguruma/release/onig.wasm?url" {
+declare module "vscode-oniguruma/release/onig.wasm" {
 	const url: string;
 	export default url;
 }

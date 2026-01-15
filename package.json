@@ -6,6 +6,7 @@
 		"build": "bun scripts/build.mjs",
 		"check": "bunx tsc && bunx vue-tsc && bunx biome check",
 		"check!": "bunx tsc && bunx vue-tsc && bunx biome check --write",
+		"preview": "bunx serve dist",
 		"prepare": "simple-git-hooks"
 	},
 	"simple-git-hooks": {
@@ -45,6 +46,7 @@
 		"workbox-build": "^7.4.0"
 	},
 	"devDependencies": {
+		"serve": "^14.2.5",
 		"simple-git-hooks": "^2.11.1"
 	}
 }

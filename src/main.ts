@@ -1,4 +1,5 @@
 import { Buffer } from "buffer";
+import Prism from "prismjs";
 import process from "process";
 import { createApp } from "vue";
 import App from "./App.vue";
@@ -9,6 +10,7 @@ import { registerSW } from "./pwa-register";
 
 globalThis.Buffer = Buffer;
 globalThis.process = process;
+globalThis.Prism = Prism;
 
 registerSW({ immediate: true });
 

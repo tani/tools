@@ -16,10 +16,10 @@ import pluginYaml from "prettier/plugins/yaml";
 import prettier from "prettier/standalone";
 
 const plugins = [
+	pluginEstree,
 	pluginAcorn,
 	pluginAngular,
 	pluginBabel,
-	pluginEstree,
 	pluginFlow,
 	pluginGlimmer,
 	pluginGraphql,

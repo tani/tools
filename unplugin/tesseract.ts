@@ -81,7 +81,9 @@ export default createUnplugin(() => {
 			// Download languages
 			const ocrPath = path.resolve(projectRoot, "src/views/ocr.vue");
 			let languages = ["eng", "jpn"];
-			if (fs.existsSync(ocrPath)) {
+			if (process.env.NODE_ENV !== "production") {
+				languages = ["eng"];
+			} else if (fs.existsSync(ocrPath)) {
 				const content = fs.readFileSync(ocrPath, "utf-8");
 				const matches = [...content.matchAll(/code: "([a-z_]+)"/g)];
 				if (matches.length > 0) {

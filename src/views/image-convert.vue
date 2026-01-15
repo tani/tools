@@ -7,7 +7,7 @@ import LoadingOverlay from "../components/LoadingOverlay.vue";
 import PdfViewer from "../components/PdfViewer.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
-import type { MupdfWorker } from "../workers/mupdf-worker";
+import type { PdfWorker } from "../workers/pdf-worker";
 
 export type FormatOption = {
 	label: string;
@@ -46,12 +46,12 @@ const result = ref<{
 const conversionError = ref("");
 
 let muWorker: Worker | null = null;
-let muApi: Comlink.Remote<MupdfWorker> | null = null;
-const mupdfWorkerUrl = new URL("../workers/mupdf-worker.ts", import.meta.url);
+let muApi: Comlink.Remote<PdfWorker> | null = null;
+const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
 
 onMounted(async () => {
-	muWorker = new Worker(mupdfWorkerUrl, { type: "module" });
-	muApi = Comlink.wrap<MupdfWorker>(muWorker);
+	muWorker = new Worker(pdfWorkerUrl, { type: "module" });
+	muApi = Comlink.wrap<PdfWorker>(muWorker);
 });
 
 const readFile = async (event: Event) => {

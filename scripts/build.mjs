@@ -125,7 +125,7 @@ const bundle = async () => {
 	console.log("Starting Bun.build...");
 	const vuePluginFactory = await resolveVuePlugin();
 	const workerEntrypoints = [
-		path.resolve(projectRoot, "src/workers/mupdf-worker.ts"),
+		path.resolve(projectRoot, "src/workers/pdf-worker.ts"),
 		path.resolve(projectRoot, "src/workers/oniguruma-worker.ts"),
 		path.resolve(projectRoot, "src/workers/opencv-worker.ts"),
 		path.resolve(projectRoot, "src/workers/prettier-worker.ts"),
@@ -235,17 +235,19 @@ const genSW = async () => {
 	});
 };
 
-const copyMuPdfWasm = async () => {
-	// Copy MuPDF WASM to assets directory
-	const mupdfUrl = await import.meta.resolve("mupdf");
-	const mupdfWasmSrc = fileURLToPath(new URL("./mupdf-wasm.wasm", mupdfUrl));
+const copyPdfiumWasm = async () => {
+	// Copy PDFium WASM to assets directory
+	const pdfiumUrl = await import.meta.resolve("@embedpdf/pdfium");
+	const pdfiumWasmSrc = fileURLToPath(new URL("./pdfium.wasm", pdfiumUrl));
 
-	if (await fs.stat(mupdfWasmSrc).catch(() => null)) {
+	if (await fs.stat(pdfiumWasmSrc).catch(() => null)) {
 		await fs.copyFile(
-			mupdfWasmSrc,
-			path.resolve(distDir, "assets/mupdf-wasm.wasm"),
+			pdfiumWasmSrc,
+			path.resolve(distDir, "assets/pdfium.wasm"),
 		);
-		console.log("Copied MuPDF WASM to assets.");
+		console.log("Copied PDFium WASM to assets.");
+	} else {
+		console.warn("Could not find PDFium WASM at", pdfiumWasmSrc);
 	}
 };
 
@@ -259,7 +261,7 @@ const build = async () => {
 		const result = await bundle();
 		await postProcess(result);
 		await genSW();
-		await copyMuPdfWasm();
+		await copyPdfiumWasm();
 		console.log("Build finished successfully!");
 	} finally {
 		for (const tempAsset of tempAssets) {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as Comlink from "comlink";
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import type { MupdfWorker } from "../workers/mupdf-worker";
+import type { PdfWorker } from "../workers/pdf-worker";
 import LoadingOverlay from "./LoadingOverlay.vue";
 
 const props = defineProps<{
@@ -13,12 +13,12 @@ const isRendering = ref(false);
 const error = ref<string | null>(null);
 
 let worker: Worker | null = null;
-let api: Comlink.Remote<MupdfWorker> | null = null;
-const mupdfWorkerUrl = new URL("../workers/mupdf-worker.ts", import.meta.url);
+let api: Comlink.Remote<PdfWorker> | null = null;
+const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
 
 onMounted(() => {
-	worker = new Worker(mupdfWorkerUrl, { type: "module" });
-	api = Comlink.wrap<MupdfWorker>(worker);
+	worker = new Worker(pdfWorkerUrl, { type: "module" });
+	api = Comlink.wrap<PdfWorker>(worker);
 	if (props.data) renderPdf();
 });
 

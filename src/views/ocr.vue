@@ -7,7 +7,7 @@ import MonospaceEditor from "../components/MonospaceEditor.vue";
 import PdfViewer from "../components/PdfViewer.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
-import type { MupdfWorker } from "../workers/mupdf-worker";
+import type { PdfWorker } from "../workers/pdf-worker";
 import type { TesseractWorker } from "../workers/tesseract-worker";
 
 const image = ref<string | null>(null);
@@ -70,18 +70,18 @@ const supportedLanguages = [
 let tWorker: Worker | null = null;
 let tApi: Comlink.Remote<TesseractWorker> | null = null;
 let mWorker: Worker | null = null;
-let mApi: Comlink.Remote<MupdfWorker> | null = null;
+let mApi: Comlink.Remote<PdfWorker> | null = null;
 const tesseractWorkerUrl = new URL(
 	"../workers/tesseract-worker.ts",
 	import.meta.url,
 );
-const mupdfWorkerUrl = new URL("../workers/mupdf-worker.ts", import.meta.url);
+const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
 
 onMounted(() => {
 	tWorker = new Worker(tesseractWorkerUrl, { type: "module" });
 	tApi = Comlink.wrap<TesseractWorker>(tWorker);
-	mWorker = new Worker(mupdfWorkerUrl, { type: "module" });
-	mApi = Comlink.wrap<MupdfWorker>(mWorker);
+	mWorker = new Worker(pdfWorkerUrl, { type: "module" });
+	mApi = Comlink.wrap<PdfWorker>(mWorker);
 });
 
 onUnmounted(() => {

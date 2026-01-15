@@ -97,6 +97,7 @@ import LoadingOverlay from "../components/LoadingOverlay.vue";
 import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
+import { PRISM_LANGUAGES, PRISM_THEMES } from "../generated/prism-assets";
 
 // --- Constants ---
 
@@ -133,34 +134,8 @@ interface AppStatus {
 
 // --- Data & Resources ---
 
-const idFromPath = (path: string, regex: RegExp) => path.match(regex)?.[1];
-
-const importGlob = (
-	glob: Record<string, () => Promise<unknown>>,
-	regex: RegExp,
-) =>
-	Object.entries(glob)
-		.map(([path, module]) => ({ id: idFromPath(path, regex), path, module }))
-		.filter(
-			(l): l is { id: string; path: string; module: () => Promise<unknown> } =>
-				!!l.id,
-		);
-
-const LANGUAGES = importGlob(
-	import.meta.glob("../../node_modules/prismjs/components/prism-*.js"),
-	/prism-([\w-]+)\.js$/,
-);
-
-const THEMES = Object.entries(
-	import.meta.glob("../../node_modules/prismjs/themes/*.css", {
-		query: "?raw",
-		import: "default",
-	}),
-).map(([path, module]) => ({
-	id: idFromPath(path, /prism-(.*)\.css$/) || "default",
-	path,
-	module,
-}));
+const LANGUAGES = PRISM_LANGUAGES;
+const THEMES = PRISM_THEMES;
 
 // --- State ---
 
@@ -357,7 +332,7 @@ const ensureThemeParsed = async (themeId: string): Promise<ParsedTheme> => {
 		return cached;
 	}
 	const entry = THEMES.find((t) => t.id === themeId);
-	const css = entry ? ((await entry.module()) as string) : "";
+	const css = entry ? entry.css : "";
 	const parsed = parseThemeCss(css);
 	themeCache.set(themeId, parsed);
 	return parsed;

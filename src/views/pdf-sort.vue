@@ -8,7 +8,6 @@ import LoadingOverlay from "../components/LoadingOverlay.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { MupdfWorker } from "../workers/mupdf-worker";
-import MupdfWorkerClass from "../workers/mupdf-worker?worker";
 
 interface PageItem {
 	id: string;
@@ -26,9 +25,10 @@ let sortableInstance: Sortable | null = null;
 
 let worker: Worker | null = null;
 let api: Comlink.Remote<MupdfWorker> | null = null;
+const mupdfWorkerUrl = new URL("../workers/mupdf-worker.ts", import.meta.url);
 
 onMounted(() => {
-	worker = new MupdfWorkerClass();
+	worker = new Worker(mupdfWorkerUrl, { type: "module" });
 	api = Comlink.wrap<MupdfWorker>(worker);
 });
 

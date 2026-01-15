@@ -1,11 +1,11 @@
-import { Buffer } from "node:buffer";
-import process from "node:process";
+import { Buffer } from "buffer";
+import process from "process";
 import { createApp } from "vue";
 import App from "./App.vue";
 import { router } from "./router";
 import "bootswatch/dist/lumen/bootstrap.min.css";
 import "bootstrap/js/dist/collapse";
-import { registerSW } from "virtual:pwa-register";
+import { registerSW } from "./pwa-register";
 
 globalThis.Buffer = Buffer;
 globalThis.process = process;

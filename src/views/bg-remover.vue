@@ -8,7 +8,6 @@ import LoadingOverlay from "../components/LoadingOverlay.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { OpencvWorker } from "../workers/opencv-worker";
-import OpencvWorkerClass from "../workers/opencv-worker?worker";
 
 const sourceImageUrl = ref<string | null>(null);
 const resultImageUrl = ref<string | null>(null);
@@ -27,9 +26,10 @@ const config = reactive({
 
 let worker: Worker | null = null;
 let api: Comlink.Remote<OpencvWorker> | null = null;
+const opencvWorkerUrl = new URL("../workers/opencv-worker.ts", import.meta.url);
 
 onMounted(() => {
-	worker = new OpencvWorkerClass();
+	worker = new Worker(opencvWorkerUrl, { type: "module" });
 	api = Comlink.wrap<OpencvWorker>(worker);
 	isOpenCvReady.value = true;
 });

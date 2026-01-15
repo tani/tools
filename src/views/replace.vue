@@ -7,14 +7,17 @@ import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { OnigurumaWorker } from "../workers/oniguruma-worker";
-import OnigurumaWorkerClass from "../workers/oniguruma-worker?worker";
 
 const worker = ref<Comlink.Remote<OnigurumaWorker> | null>(null);
 const isWorkerReady = ref(false);
 let bash: Bash | null = null;
+const onigurumaWorkerUrl = new URL(
+	"../workers/oniguruma-worker.ts",
+	import.meta.url,
+);
 
 onMounted(() => {
-	const w = new OnigurumaWorkerClass();
+	const w = new Worker(onigurumaWorkerUrl, { type: "module" });
 	worker.value = Comlink.wrap<OnigurumaWorker>(w);
 	isWorkerReady.value = true;
 	bash = new Bash();

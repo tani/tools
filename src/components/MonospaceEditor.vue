@@ -4,6 +4,7 @@ import Prism from "prismjs";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import "prismjs/themes/prism.css"; // Default theme
 import "prismjs/components/prism-markup-templating"; // Core dependency for templating languages
+import { PRISM_LANGUAGES } from "../generated/prism-assets";
 
 const props = defineProps<{
 	modelValue: string;
@@ -24,23 +25,7 @@ const loadedLanguages = new Set<string>();
 
 // --- Dynamic Resource Loading ---
 
-const idFromPath = (path: string, regex: RegExp) => path.match(regex)?.[1];
-
-const importGlob = (
-	glob: Record<string, () => Promise<unknown>>,
-	regex: RegExp,
-) =>
-	Object.entries(glob)
-		.map(([path, module]) => ({ id: idFromPath(path, regex), path, module }))
-		.filter(
-			(l): l is { id: string; path: string; module: () => Promise<unknown> } =>
-				!!l.id,
-		);
-
-const LANGUAGES = importGlob(
-	import.meta.glob("../../node_modules/prismjs/components/prism-*.js"),
-	/prism-([\w-]+)\.js$/,
-);
+const LANGUAGES = PRISM_LANGUAGES;
 
 const ensureLanguageLoaded = async (lang: string) => {
 	if (loadedLanguages.has(lang)) return;

@@ -8,10 +8,9 @@ This project, "Taniguchi's Tools," is a comprehensive, web-based suite of develo
 
 - **Framework:** Vue 3 (Composition API with `<script setup>`)
 - **Language:** TypeScript
-- **Build Tool:** Vite
+- **Build Tool:** Bun (`bun build`) with `@eckidevs/bun-plugin-vue`
 - **Styling:** Bootstrap 5 with Bootswatch "Lumen" theme
 - **Routing:** Vue Router
-- **Testing:** Node.js native test runner (`node:test`)
 - **Linting/Formatting:** Biome
 
 ### Architecture
@@ -19,38 +18,22 @@ This project, "Taniguchi's Tools," is a comprehensive, web-based suite of develo
 - **`src/tools.ts`**: **[CRITICAL]** The single source of truth for tool definitions. Contains path, component import, metadata, and category for every tool.
 - **`src/views/`**: Contains the individual tool components (e.g., `pattern.vue`, `regex.vue`). New tools must be registered in `src/tools.ts`.
 - **`src/worker/`**: Houses shared logic and pure functions with Web Worker support.
-- **`unplugin/`**: Custom build plugins that work for both Vite and Bun.
+- **`scripts/`**: Build pipeline scripts (Bun build, PWA, Prism assets, Tesseract assets).
 
 ## Building and Running
-
-### Development
-
-```bash
-npm run dev
-```
-
-Starts the Vite development server.
 
 ### Build
 
 ```bash
-npm run build
+bun run build
 ```
 
-Compiles the application for production into the `dist/` directory.
-
-### Testing
-
-```bash
-npm test
-```
-
-Runs unit tests for utility logic using the Node.js test runner.
+Compiles the application for production into the `dist/` directory (HTML entry point).
 
 ### Code Quality
 
-- **Check Everything:** `npm run check` (Runs TypeScript check + Vue check + Biome check)
-- **Fix Formatting:** `npm run check!` (Runs checks + Biome formatting/fixing)
+- **Check Everything:** `bun run check` (Runs TypeScript check + Vue check + Biome check)
+- **Fix Formatting:** `bun run check!` (Runs checks + Biome formatting/fixing)
 
 ## Development Conventions
 
@@ -75,4 +58,4 @@ All tools must adhere to the established consistent design language:
 
 - **Language:** The user interface and all documentation/comments must be in **English**.
 - **Reactivity:** Leverage Vue's `computed` properties for real-time data processing to ensure a responsive "instant-feedback" feel.
-- **Safety:** You MUST run `npm run check`, `npm test`, and `npm run build` before finishing any task to ensure code quality and prevent regressions.
+- **Safety:** You MUST run `bun run check` and `bun run build` before finishing any task to ensure code quality and prevent regressions.

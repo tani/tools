@@ -123,7 +123,6 @@ import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { PrettierWorker } from "../workers/prettier-worker";
-import PrettierWorkerClass from "../workers/prettier-worker?worker";
 
 const parserOptions = [
 	{ value: "babel", label: "JavaScript (Babel)" },
@@ -160,9 +159,13 @@ const error = ref("");
 const isProcessing = ref(false);
 
 const worker = ref<Comlink.Remote<PrettierWorker> | null>(null);
+const prettierWorkerUrl = new URL(
+	"../workers/prettier-worker.ts",
+	import.meta.url,
+);
 
 onMounted(() => {
-	const w = new PrettierWorkerClass();
+	const w = new Worker(prettierWorkerUrl, { type: "module" });
 	worker.value = Comlink.wrap<PrettierWorker>(w);
 });
 

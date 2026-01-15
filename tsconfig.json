@@ -14,8 +14,8 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"noEmit": true,
-		"types": ["vite/client", "node"]
+		"types": ["node"]
 	},
 	"include": ["**/*.ts", "**/*.vue", "**/*.json"],
-	"exclude": ["vite.config.ts"]
+	"exclude": ["dist"]
 }

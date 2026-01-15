@@ -7,7 +7,6 @@ import PdfViewer from "../components/PdfViewer.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { MupdfWorker } from "../workers/mupdf-worker";
-import MupdfWorkerClass from "../workers/mupdf-worker?worker";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
@@ -17,9 +16,10 @@ const downloadUrl = ref<string | null>(null);
 
 let worker: Worker | null = null;
 let api: Comlink.Remote<MupdfWorker> | null = null;
+const mupdfWorkerUrl = new URL("../workers/mupdf-worker.ts", import.meta.url);
 
 onMounted(() => {
-	worker = new MupdfWorkerClass();
+	worker = new Worker(mupdfWorkerUrl, { type: "module" });
 	api = Comlink.wrap<MupdfWorker>(worker);
 });
 

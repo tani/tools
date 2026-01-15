@@ -16,4 +16,9 @@ declare module "vscode-oniguruma/release/onig.wasm" {
 	export default url;
 }
 
+declare module "@embedpdf/pdfium/pdfium.wasm" {
+	const url: string;
+	export default url;
+}
+
 declare module "gifenc";

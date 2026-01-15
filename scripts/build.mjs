@@ -235,22 +235,6 @@ const genSW = async () => {
 	});
 };
 
-const copyPdfiumWasm = async () => {
-	// Copy PDFium WASM to assets directory
-	const pdfiumUrl = await import.meta.resolve("@embedpdf/pdfium");
-	const pdfiumWasmSrc = fileURLToPath(new URL("./pdfium.wasm", pdfiumUrl));
-
-	if (await fs.stat(pdfiumWasmSrc).catch(() => null)) {
-		await fs.copyFile(
-			pdfiumWasmSrc,
-			path.resolve(distDir, "assets/pdfium.wasm"),
-		);
-		console.log("Copied PDFium WASM to assets.");
-	} else {
-		console.warn("Could not find PDFium WASM at", pdfiumWasmSrc);
-	}
-};
-
 const build = async () => {
 	process.env.NODE_ENV = "production";
 
@@ -261,7 +245,6 @@ const build = async () => {
 		const result = await bundle();
 		await postProcess(result);
 		await genSW();
-		await copyPdfiumWasm();
 		console.log("Build finished successfully!");
 	} finally {
 		for (const tempAsset of tempAssets) {

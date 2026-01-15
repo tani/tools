@@ -1,4 +1,5 @@
 import { init, type WrappedPdfiumModule } from "@embedpdf/pdfium";
+import pdfiumWasm from "@embedpdf/pdfium/pdfium.wasm";
 import * as Comlink from "comlink";
 
 let pdfiumModule: WrappedPdfiumModule | null = null;
@@ -9,7 +10,7 @@ async function ensurePdfium() {
 	pdfiumModule = await init({
 		locateFile: (path: string) => {
 			if (path.endsWith(".wasm")) {
-				return new URL("./pdfium.wasm", import.meta.url).href;
+				return pdfiumWasm;
 			}
 			return path;
 		},

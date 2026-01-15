@@ -101,6 +101,9 @@ export default createUnplugin((options: PWAOptions = {}) => {
 					skipWaiting: true,
 					clientsClaim: true,
 					...options.workbox,
+					// Avoid Workbox's internal terser minification to keep builds stable.
+					mode: "development",
+					disableDevLogs: true,
 				});
 			},
 			transformIndexHtml(html) {

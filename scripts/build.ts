@@ -12,6 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 const require = createRequire(import.meta.url);
 const distDir = path.resolve(projectRoot, "dist");
+const assetsDir = path.resolve(distDir, "assets");
 const publicDir = path.resolve(projectRoot, "public");
 const emptyModulePath = path.resolve(projectRoot, "scripts/empty.cjs");
 
@@ -123,16 +124,16 @@ const bundle = async () => {
 			path.resolve(projectRoot, "index.html"),
 			...workerEntrypoints,
 		],
-		outdir: distDir,
+		outdir: assetsDir,
 		target: "browser",
 		splitting: true,
 		minify: true,
 		sourcemap: "none",
-		publicPath: "/",
+		publicPath: "./",
 		naming: {
-			entry: "assets/[name]-[hash].[ext]",
-			chunk: "assets/[name]-[hash].[ext]",
-			asset: "assets/[name]-[hash].[ext]",
+			entry: "[name]-[hash].[ext]",
+			chunk: "[name]-[hash].[ext]",
+			asset: "[name]-[hash].[ext]",
 		},
 		plugins: [bunPluginVue(), nodePolyfillPlugin],
 		loader: {
@@ -195,8 +196,14 @@ const postProcess = async (result: import("bun").BuildOutput) => {
 	if (htmlOutput) {
 		const htmlPath = htmlOutput.path;
 		let htmlContent = await fs.readFile(htmlPath, "utf-8");
-		htmlContent = htmlContent.replace(/href="\/..\//g, 'href="/');
-		htmlContent = htmlContent.replace(/src="\/..\//g, 'src="/');
+
+		// Bun with publicPath: "./" generates relative paths.
+		// When we move index.html from assets/ to root, we need to prefix these paths with assets/
+		htmlContent = htmlContent.replace(
+			/(href|src)="\.\/((?!(assets\/|tesseract\/|https?:\/\/|data:))[^"]+)"/g,
+			'$1="./assets/$2"',
+		);
+
 		await fs.writeFile(path.resolve(distDir, "index.html"), htmlContent);
 		console.log("Moved index.html to root and adjusted paths.");
 	}

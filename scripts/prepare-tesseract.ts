@@ -6,8 +6,8 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 
-const downloadFile = (url, dest) =>
-	new Promise((resolve, reject) => {
+const downloadFile = (url: string, dest: string) =>
+	new Promise<void>((resolve, reject) => {
 		if (fs.existsSync(dest)) {
 			resolve();
 			return;

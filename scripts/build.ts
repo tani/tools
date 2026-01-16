@@ -2,9 +2,11 @@ import fs from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import bunPluginVue from "@eckidevs/bun-plugin-vue";
+import type { OnResolveArgs, PluginBuilder } from "bun";
 import { generateSW } from "workbox-build";
-import { generatePrismAssets } from "./generate-prism-assets.mjs";
-import { prepareTesseractAssets } from "./prepare-tesseract.mjs";
+import { generatePrismAssets } from "./generate-prism-assets.ts";
+import { prepareTesseractAssets } from "./prepare-tesseract.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -47,24 +49,9 @@ const rootAssetSources = [
 	},
 ];
 
-const resolveVuePlugin = async () => {
-	const mod = await import("@eckidevs/bun-plugin-vue");
-	return (
-		mod.default ||
-		mod.bunPluginVue ||
-		mod.vue ||
-		mod.pluginVue ||
-		(() => {
-			throw new Error(
-				"Unable to resolve Vue plugin from @eckidevs/bun-plugin-vue",
-			);
-		})
-	);
-};
-
 const nodePolyfillPlugin = {
 	name: "node-polyfills",
-	setup(build) {
+	setup(build: PluginBuilder) {
 		build.onResolve({ filter: /^(node:)?buffer$/ }, () => ({
 			path: require.resolve("buffer/"),
 		}));
@@ -82,7 +69,7 @@ const nodePolyfillPlugin = {
 				filter:
 					/^(node:)?(fs|path|stream|util|url|events|os|http|https|assert|console|constants|readline|timers|tty|string_decoder)\/?$/,
 			},
-			(args) => {
+			(args: OnResolveArgs) => {
 				if (args.importer.includes("@jspm/core")) {
 					return;
 				}
@@ -123,7 +110,6 @@ const prepareAssets = async () => {
 
 const bundle = async () => {
 	console.log("Starting Bun.build...");
-	const vuePluginFactory = await resolveVuePlugin();
 	const workerEntrypoints = [
 		path.resolve(projectRoot, "src/workers/pdf-worker.ts"),
 		path.resolve(projectRoot, "src/workers/oniguruma-worker.ts"),
@@ -144,8 +130,7 @@ const bundle = async () => {
 		sourcemap: "none",
 		publicPath: "/",
 		naming: "assets/[name]-[hash].[ext]",
-		assetNaming: "assets/[name]-[hash].[ext]",
-		plugins: [vuePluginFactory(), nodePolyfillPlugin],
+		plugins: [bunPluginVue(), nodePolyfillPlugin],
 		loader: {
 			".wasm": "file",
 			".png": "file",
@@ -166,9 +151,9 @@ const bundle = async () => {
 	return result;
 };
 
-const postProcess = async (result) => {
+const postProcess = async (result: import("bun").BuildOutput) => {
 	// Fix worker URLs in the bundled chunks
-	const workerMap = {};
+	const workerMap: Record<string, string> = {};
 	for (const output of result.outputs) {
 		const fileName = path.basename(output.path);
 		if (fileName.includes("-worker-") && fileName.endsWith(".js")) {

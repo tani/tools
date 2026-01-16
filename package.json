@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"source": "index.html",
 	"scripts": {
-		"build": "bun scripts/build.mjs",
+		"build": "bun scripts/build.ts",
 		"check": "bunx tsc && bunx vue-tsc && bunx biome check",
 		"check!": "bunx tsc && bunx vue-tsc && bunx biome check --write",
 		"preview": "bunx serve dist",

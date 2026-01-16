@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
+import process from "node:process";
 import Prism from "prismjs";
-import process from "process";
 import { createApp } from "vue";
 import App from "./App.vue";
 import { router } from "./router";

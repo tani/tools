@@ -3,7 +3,6 @@ import { CodeJar } from "codejar";
 import Prism from "prismjs";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import "prismjs/themes/prism.css"; // Default theme
-import "prismjs/components/prism-markup-templating"; // Core dependency for templating languages
 import { PRISM_LANGUAGES } from "../generated/prism-assets";
 
 const props = defineProps<{

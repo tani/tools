@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"source": "index.html",
 	"scripts": {
-		"build": "bun scripts/prepare-assets.ts && vite build && bun scripts/post-build.ts",
-		"dev": "bun scripts/prepare-assets.ts && vite",
+		"build": "vite build",
+		"dev": "vite",
 		"check": "bunx tsc && bunx vue-tsc && bunx biome check",
 		"check!": "bunx tsc && bunx vue-tsc && bunx biome check --write",
 		"preview": "vite preview",
@@ -54,6 +54,8 @@
 		"serve": "^14.2.5",
 		"simple-git-hooks": "^2.11.1",
 		"stream-browserify": "^3.0.0",
+		"unplugin": "^2.3.11",
+		"unplugin-vue": "^7.1.0",
 		"util": "^0.12.5",
 		"vite": "^7.3.1"
 	}

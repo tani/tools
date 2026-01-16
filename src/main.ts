@@ -6,7 +6,7 @@ import App from "./App.vue";
 import { router } from "./router";
 import "bootswatch/dist/lumen/bootstrap.min.css";
 import "bootstrap/js/dist/collapse";
-import { registerSW } from "./pwa-register";
+import { registerSW } from "virtual:pwa-register";
 
 globalThis.Buffer = Buffer;
 globalThis.process = process;

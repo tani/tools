@@ -36,6 +36,7 @@ const handleFileChange = (event: Event) => {
 			const arrayBuffer = e.target?.result as ArrayBuffer;
 			fileData.value = new Uint8Array(arrayBuffer);
 			fontUsages.value = [];
+			analyzeFonts();
 		};
 		reader.readAsArrayBuffer(file);
 	}
@@ -68,18 +69,17 @@ const analyzeFonts = async () => {
 
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3 align-items-end">
-        <div class="col-md-8">
-          <FilePicker label="Upload PDF" accept="application/pdf" @change="handleFileChange" />
-        </div>
-        <div class="col-md-4">
-          <button
-            class="btn btn-primary w-100"
-            @click="analyzeFonts"
-            :disabled="!fileData || isProcessing"
-          >
-            <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-            List Fonts
-          </button>
+        <div class="col-12">
+          <div class="d-flex align-items-center gap-3">
+            <div class="flex-grow-1">
+              <FilePicker label="Upload PDF" accept="application/pdf" @change="handleFileChange" />
+            </div>
+            <div v-if="isProcessing" class="flex-shrink-0 pt-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </ToolCard>
@@ -102,7 +102,7 @@ const analyzeFonts = async () => {
       <div class="col-lg-6 mb-4">
         <ToolCard title="Embedded Fonts" class="h-100">
           <div v-if="fontUsages.length === 0" class="alert alert-info mb-0">
-            Upload a PDF and click <strong>List Fonts</strong> to inspect embedded font data.
+            Upload a PDF to automatically inspect embedded font data.
           </div>
           <div v-else class="table-responsive">
             <table class="table table-hover align-middle mb-0">

@@ -15,7 +15,7 @@
 		"isolatedModules": true,
 		"noEmit": true,
 		"allowImportingTsExtensions": true,
-		"types": ["bun", "node"]
+		"types": ["node", "bun"]
 	},
 	"include": ["**/*.ts", "**/*.vue", "**/*.json"],
 	"exclude": ["dist"]

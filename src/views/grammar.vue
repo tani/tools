@@ -25,13 +25,11 @@ const epsilonTokens = new Set(["ε", "epsilon", "eps", "EPS", "lambda", "Λ"]);
 
 const worker = ref<Comlink.Remote<OnigurumaWorker> | null>(null);
 const isWorkerReady = ref(false);
-const onigurumaWorkerUrl = new URL(
-	"../workers/oniguruma-worker.ts",
-	import.meta.url,
-);
+
+import OnigurumaWorkerConstructor from "../workers/oniguruma-worker?worker";
 
 onMounted(() => {
-	const w = new Worker(onigurumaWorkerUrl, { type: "module" });
+	const w = new OnigurumaWorkerConstructor();
 	worker.value = Comlink.wrap<OnigurumaWorker>(w);
 	isWorkerReady.value = true;
 });

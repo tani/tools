@@ -9,6 +9,8 @@ import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { PdfWorker } from "../workers/pdf-worker";
 
+import PdfWorkerConstructor from "../workers/pdf-worker?worker";
+
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
 const resultText = ref("");
@@ -16,10 +18,9 @@ const isProcessing = ref(false);
 
 let worker: Worker | null = null;
 let api: Comlink.Remote<PdfWorker> | null = null;
-const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
 
 onMounted(() => {
-	worker = new Worker(pdfWorkerUrl, { type: "module" });
+	worker = new PdfWorkerConstructor();
 	api = Comlink.wrap<PdfWorker>(worker);
 });
 

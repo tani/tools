@@ -47,10 +47,11 @@ const conversionError = ref("");
 
 let muWorker: Worker | null = null;
 let muApi: Comlink.Remote<PdfWorker> | null = null;
-const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
+
+import PdfWorkerConstructor from "../workers/pdf-worker?worker";
 
 onMounted(async () => {
-	muWorker = new Worker(pdfWorkerUrl, { type: "module" });
+	muWorker = new PdfWorkerConstructor();
 	muApi = Comlink.wrap<PdfWorker>(muWorker);
 });
 

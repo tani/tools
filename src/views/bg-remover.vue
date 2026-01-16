@@ -26,10 +26,11 @@ const config = reactive({
 
 let worker: Worker | null = null;
 let api: Comlink.Remote<OpencvWorker> | null = null;
-const opencvWorkerUrl = new URL("../workers/opencv-worker.ts", import.meta.url);
+
+import OpencvWorkerConstructor from "../workers/opencv-worker?worker";
 
 onMounted(() => {
-	worker = new Worker(opencvWorkerUrl, { type: "module" });
+	worker = new OpencvWorkerConstructor();
 	api = Comlink.wrap<OpencvWorker>(worker);
 	isOpenCvReady.value = true;
 });

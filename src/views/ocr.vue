@@ -71,16 +71,14 @@ let tWorker: Worker | null = null;
 let tApi: Comlink.Remote<TesseractWorker> | null = null;
 let mWorker: Worker | null = null;
 let mApi: Comlink.Remote<PdfWorker> | null = null;
-const tesseractWorkerUrl = new URL(
-	"../workers/tesseract-worker.ts",
-	import.meta.url,
-);
-const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
+
+import PdfWorkerConstructor from "../workers/pdf-worker?worker";
+import TesseractWorkerConstructor from "../workers/tesseract-worker?worker";
 
 onMounted(() => {
-	tWorker = new Worker(tesseractWorkerUrl, { type: "module" });
+	tWorker = new TesseractWorkerConstructor();
 	tApi = Comlink.wrap<TesseractWorker>(tWorker);
-	mWorker = new Worker(pdfWorkerUrl, { type: "module" });
+	mWorker = new PdfWorkerConstructor();
 	mApi = Comlink.wrap<PdfWorker>(mWorker);
 });
 

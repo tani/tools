@@ -2,6 +2,7 @@
 import * as Comlink from "comlink";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import type { PdfWorker } from "../workers/pdf-worker";
+import PdfWorkerConstructor from "../workers/pdf-worker?worker";
 import LoadingOverlay from "./LoadingOverlay.vue";
 
 const props = defineProps<{
@@ -14,10 +15,9 @@ const error = ref<string | null>(null);
 
 let worker: Worker | null = null;
 let api: Comlink.Remote<PdfWorker> | null = null;
-const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
 
 onMounted(() => {
-	worker = new Worker(pdfWorkerUrl, { type: "module" });
+	worker = new PdfWorkerConstructor();
 	api = Comlink.wrap<PdfWorker>(worker);
 	if (props.data) renderPdf();
 });

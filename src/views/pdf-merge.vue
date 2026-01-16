@@ -21,10 +21,11 @@ const downloadUrl = ref<string | null>(null);
 
 let worker: Worker | null = null;
 let api: Comlink.Remote<PdfWorker> | null = null;
-const pdfWorkerUrl = new URL("../workers/pdf-worker.ts", import.meta.url);
+
+import PdfWorkerConstructor from "../workers/pdf-worker?worker";
 
 onMounted(() => {
-	worker = new Worker(pdfWorkerUrl, { type: "module" });
+	worker = new PdfWorkerConstructor();
 	api = Comlink.wrap<PdfWorker>(worker);
 });
 

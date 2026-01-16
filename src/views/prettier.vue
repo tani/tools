@@ -125,6 +125,8 @@ import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { PrettierWorker } from "../workers/prettier-worker";
 
+import PrettierWorkerConstructor from "../workers/prettier-worker?worker";
+
 const parserOptions = [
 	{ value: "babel", label: "JavaScript (Babel)" },
 	{ value: "babel-ts", label: "TypeScript (via Babel)" },
@@ -160,13 +162,9 @@ const error = ref("");
 const isProcessing = ref(false);
 
 const worker = ref<Comlink.Remote<PrettierWorker> | null>(null);
-const prettierWorkerUrl = new URL(
-	"../workers/prettier-worker.ts",
-	import.meta.url,
-);
 
 onMounted(() => {
-	const w = new Worker(prettierWorkerUrl, { type: "module" });
+	const w = new PrettierWorkerConstructor();
 	worker.value = Comlink.wrap<PrettierWorker>(w);
 });
 

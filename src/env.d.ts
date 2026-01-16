@@ -16,6 +16,11 @@ declare module "*.wasm" {
 	export default url;
 }
 
+declare module "*.wasm?url" {
+	const url: string;
+	export default url;
+}
+
 declare module "gifenc";
 
 declare module "virtual:pwa-register" {

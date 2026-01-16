@@ -4,7 +4,7 @@ import {
 	type PdfiumRuntimeMethods,
 	type WrappedPdfiumModule,
 } from "@embedpdf/pdfium";
-import pdfiumWasm from "@embedpdf/pdfium/pdfium.wasm";
+import pdfiumWasm from "@embedpdf/pdfium/pdfium.wasm?url";
 import * as Comlink from "comlink";
 
 // Define the extensions on the internal Emscripten module (mod.pdfium)

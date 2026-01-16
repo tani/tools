@@ -1,6 +1,6 @@
 import * as Comlink from "comlink";
 import { loadWASM, OnigScanner, OnigString } from "vscode-oniguruma";
-import onigWasm from "vscode-oniguruma/release/onig.wasm";
+import onigWasm from "vscode-oniguruma/release/onig.wasm?url";
 
 let wasmPromise: Promise<void> | null = null;
 

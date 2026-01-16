@@ -125,11 +125,15 @@ const bundle = async () => {
 		],
 		outdir: distDir,
 		target: "browser",
-		splitting: false,
+		splitting: true,
 		minify: true,
 		sourcemap: "none",
 		publicPath: "/",
-		naming: "assets/[name]-[hash].[ext]",
+		naming: {
+			entry: "assets/[name]-[hash].[ext]",
+			chunk: "assets/[name]-[hash].[ext]",
+			asset: "assets/[name]-[hash].[ext]",
+		},
 		plugins: [bunPluginVue(), nodePolyfillPlugin],
 		loader: {
 			".wasm": "file",

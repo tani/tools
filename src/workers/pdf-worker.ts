@@ -44,7 +44,7 @@ export interface PDFFont {
 
 let pdfiumModule: WrappedPdfiumModuleExtended | null = null;
 
-async function ensurePdfium(): Promise<WrappedPdfiumModuleExtended> {
+export async function ensurePdfium(): Promise<WrappedPdfiumModuleExtended> {
 	if (pdfiumModule) return pdfiumModule;
 
 	const mod = await init({
@@ -68,7 +68,10 @@ async function ensurePdfium(): Promise<WrappedPdfiumModuleExtended> {
 
 // Helper to save PDF document to Uint8Array using FPDF_SaveAsCopy and a custom callback writer
 // This avoids using PDFiumExt which seems unstable in some environments
-function savePdf(mod: WrappedPdfiumModuleExtended, doc: number): Uint8Array {
+export function savePdf(
+	mod: WrappedPdfiumModuleExtended,
+	doc: number,
+): Uint8Array {
 	const { pdfium } = mod;
 	const chunkData: Uint8Array[] = [];
 
@@ -701,6 +704,7 @@ export const pdfWorker = {
 		}
 	},
 
+	// Helper to extract fonts from a PDF document
 	async getFonts(pdfData: Uint8Array): Promise<PDFFont[]> {
 		const mod = await ensurePdfium();
 		const { pdfium } = mod;
@@ -719,19 +723,29 @@ export const pdfWorker = {
 		try {
 			const fontsMap = new Map<string, PDFFont>();
 			const pageCount = mod.FPDF_GetPageCount(doc);
+			console.log(`PDF loaded. Page count: ${pageCount}`);
 
-			for (let i = 0; i < pageCount; i++) {
-				const page = mod.FPDF_LoadPage(doc, i);
-				if (!page) continue;
+			const processObjects = async (
+				container: number,
+				isPage: boolean,
+				currentPageIndex: number,
+			) => {
+				const objCount = isPage
+					? mod.FPDFPage_CountObjects(container)
+					: mod.FPDFFormObj_CountObjects(container);
 
-				const objCount = mod.FPDFPage_CountObjects(page);
 				for (let j = 0; j < objCount; j++) {
-					const obj = mod.FPDFPage_GetObject(page, j);
-					// FPDF_PAGEOBJ_TEXT = 1
-					if (mod.FPDFPageObj_GetType(obj) === 1) {
+					const obj = isPage
+						? mod.FPDFPage_GetObject(container, j)
+						: mod.FPDFFormObj_GetObject(container, j);
+
+					if (!obj) continue;
+
+					const type = mod.FPDFPageObj_GetType(obj);
+					if (type === 1) {
+						// FPDF_PAGEOBJ_TEXT
 						const font = mod.FPDFTextObj_GetFont(obj);
 						if (font) {
-							// Extract font name
 							const bufferSize = 256;
 							const bufferPtr = pdfium.wasmExports.malloc(bufferSize);
 							const length = mod.FPDFFont_GetBaseFontName(
@@ -739,20 +753,22 @@ export const pdfWorker = {
 								bufferPtr,
 								bufferSize,
 							);
-							// FPDFFont_GetBaseFontName returns bytes. For safety, Use UTF8ToString if it's ASCII/UTF8.
-							// Note: Some PDF fonts might have non-ASCII names, but usually they are ASCII.
-							const name = pdfium.UTF8ToString(bufferPtr, length);
+							let name = "";
+							if (length > 0) {
+								name = pdfium.UTF8ToString(bufferPtr);
+							}
 							pdfium.wasmExports.free(bufferPtr);
+
+							if (!name) name = "Unnamed-Font";
 
 							const existing = fontsMap.get(name);
 							if (existing) {
 								existing.count++;
-								if (!existing.pages.includes(i + 1)) {
-									existing.pages.push(i + 1);
+								if (!existing.pages.includes(currentPageIndex + 1)) {
+									existing.pages.push(currentPageIndex + 1);
 								}
 							} else {
 								const embedded = mod.FPDFFont_GetIsEmbedded(font) !== 0;
-								// Heuristics for style if flags are not directly exposed in the wrapper
 								const lowerName = name.toLowerCase();
 								fontsMap.set(name, {
 									name,
@@ -769,15 +785,69 @@ export const pdfWorker = {
 										lowerName.includes("courier") ||
 										lowerName.includes("fixed"),
 									count: 1,
+									pages: [currentPageIndex + 1],
+								});
+							}
+						}
+					} else if (type === 5) {
+						// FPDF_PAGEOBJ_FORM
+						await processObjects(obj, false, currentPageIndex);
+					}
+				}
+			};
+
+			for (let i = 0; i < pageCount; i++) {
+				const page = mod.FPDF_LoadPage(doc, i);
+				if (!page) {
+					console.warn(`Could not load page ${i}`);
+					continue;
+				}
+
+				await processObjects(page, true, i);
+
+				// Fallback: Check if there's text on the page but no text objects identified (rare but possible in some PDF structures)
+				const textPage = mod.FPDFText_LoadPage(page);
+				if (textPage) {
+					const charCount = mod.FPDFText_CountChars(textPage);
+					if (charCount > 0 && fontsMap.size === 0) {
+						// If we have characters but found no fonts via objects, try to get font info from first character as a last resort
+						const bufferSize = 256;
+						const bufferPtr = pdfium.wasmExports.malloc(bufferSize);
+						// FPDFText_GetFontInfo(textPage, char_index, buffer, bufsiz, flags)
+						const length = mod.FPDFText_GetFontInfo(
+							textPage,
+							0,
+							bufferPtr,
+							bufferSize,
+							0,
+						);
+						if (length > 0) {
+							const name = pdfium.UTF8ToString(bufferPtr);
+							if (name && !fontsMap.has(name)) {
+								fontsMap.set(name, {
+									name,
+									type: "Unknown",
+									embedded: true, // Assume true if we can't check
+									isBold: name.toLowerCase().includes("bold"),
+									isItalic: name.toLowerCase().includes("italic"),
+									isSerif: false,
+									isMono: false,
+									count: charCount,
 									pages: [i + 1],
 								});
 							}
 						}
+						pdfium.wasmExports.free(bufferPtr);
 					}
+					mod.FPDFText_ClosePage(textPage);
 				}
+
 				mod.FPDF_ClosePage(page);
 			}
-			return Array.from(fontsMap.values());
+
+			const results = Array.from(fontsMap.values());
+			console.log(`Font analysis complete. Found ${results.length} fonts.`);
+			return results;
 		} finally {
 			mod.FPDF_CloseDocument(doc);
 			pdfium.wasmExports.free(dataPtr);

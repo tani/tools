@@ -116,6 +116,59 @@ describe("PDF Worker with Toy PDF", () => {
 		expect(fonts.length).toBe(0);
 	});
 
+	it("should get fonts from a PDF with multiple fonts", async () => {
+		const { ensurePdfium, savePdf } = await import("../src/workers/pdf-worker");
+		const mod = await ensurePdfium();
+		const { pdfium } = mod;
+
+		const doc = mod.FPDF_CreateNewDocument();
+		const page = mod.FPDFPage_New(doc, 0, 612, 792);
+
+		const addText = (fontName: string, text: string, y: number) => {
+			const font = mod.FPDFText_LoadStandardFont(doc, fontName);
+			const textObj = mod.FPDFPageObj_CreateTextObj(doc, font, 12);
+
+			// Set position via matrix
+			const matrixPtr = pdfium.wasmExports.malloc(24);
+			pdfium.setValue(matrixPtr, 1, "float"); // a
+			pdfium.setValue(matrixPtr + 4, 0, "float"); // b
+			pdfium.setValue(matrixPtr + 8, 0, "float"); // c
+			pdfium.setValue(matrixPtr + 12, 1, "float"); // d
+			pdfium.setValue(matrixPtr + 16, 100, "float"); // e (x)
+			pdfium.setValue(matrixPtr + 20, y, "float"); // f (y)
+			mod.FPDFPageObj_SetMatrix(textObj, matrixPtr);
+			pdfium.wasmExports.free(matrixPtr);
+
+			// Set text (WideString)
+			const textPtr = pdfium.wasmExports.malloc((text.length + 1) * 2);
+			pdfium.stringToUTF16(text, textPtr, (text.length + 1) * 2);
+			mod.FPDFText_SetText(textObj, textPtr);
+			pdfium.wasmExports.free(textPtr);
+
+			mod.FPDFPage_InsertObject(page, textObj);
+		};
+
+		addText("Helvetica", "Hello Helvetica", 700);
+		addText("Times-Roman", "Hello Times", 650);
+
+		mod.FPDFPage_GenerateContent(page);
+		const complexPdfData = savePdf(mod, doc);
+
+		mod.FPDF_ClosePage(page);
+		mod.FPDF_CloseDocument(doc);
+
+		const fonts = await pdfWorker.getFonts(complexPdfData);
+		expect(fonts.length).toBeGreaterThanOrEqual(2);
+
+		const fontNames = fonts.map((f) => f.name);
+		expect(
+			fontNames.some((n) => n.includes("Helvetica") || n.includes("Arial")),
+		).toBe(true);
+		expect(
+			fontNames.some((n) => n.includes("Times") || n.includes("Roman")),
+		).toBe(true);
+	});
+
 	it("should resize PDF", async () => {
 		// Minimal PDF is 612x792 (PostScript points)
 		const newWidth = 306;

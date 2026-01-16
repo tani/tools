@@ -5,8 +5,8 @@
 	"scripts": {
 		"build": "vite build",
 		"dev": "vite",
-		"check": "bunx tsc && bunx vue-tsc && bunx biome check",
-		"check!": "bunx tsc && bunx vue-tsc && bunx biome check --write",
+		"check": "tsc && vue-tsc && biome check",
+		"check!": "tsc && vue-tsc && biome check --write",
 		"preview": "vite preview",
 		"prepare": "simple-git-hooks"
 	},

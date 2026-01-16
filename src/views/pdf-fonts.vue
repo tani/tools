@@ -5,21 +5,11 @@ import FilePicker from "../components/FilePicker.vue";
 import PdfViewer from "../components/PdfViewer.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
-import type { PdfWorker } from "../workers/pdf-worker";
-
-interface FontUsage {
-	name: string;
-	isBold: boolean;
-	isItalic: boolean;
-	isSerif: boolean;
-	isMono: boolean;
-	count: number;
-	pages: number[];
-}
+import type { PDFFont, PdfWorker } from "../workers/pdf-worker";
 
 const fileData = ref<Uint8Array | null>(null);
 const fileName = ref<string | null>(null);
-const fontUsages = ref<FontUsage[]>([]);
+const fontUsages = ref<PDFFont[]>([]);
 const isProcessing = ref(false);
 
 let worker: Worker | null = null;
@@ -59,9 +49,7 @@ const analyzeFonts = async () => {
 
 	try {
 		const result = await api.getFonts(fileData.value);
-		fontUsages.value = (result as FontUsage[]).sort((a, b) =>
-			a.name.localeCompare(b.name),
-		);
+		fontUsages.value = [...result].sort((a, b) => a.name.localeCompare(b.name));
 	} catch (error) {
 		console.error("PDF Font Analysis Error:", error);
 		alert("An error occurred while reading fonts from the PDF.");

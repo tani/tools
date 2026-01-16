@@ -1,4 +1,3 @@
-// @ts-ignore
 import { describe, expect, it } from "bun:test";
 import { pdfWorker } from "../src/workers/pdf-worker";
 
@@ -18,7 +17,7 @@ function createMinimalPdf(): Uint8Array {
 
 // Mock OffscreenCanvas for Bun environment as it's not available globally
 if (typeof OffscreenCanvas === "undefined") {
-	(globalThis as any).OffscreenCanvas = class MockOffscreenCanvas {
+	class MockOffscreenCanvas {
 		width: number;
 		height: number;
 		constructor(width: number, height: number) {
@@ -41,7 +40,10 @@ if (typeof OffscreenCanvas === "undefined") {
 				new Blob([new Uint8Array(100)], { type: "image/png" }),
 			);
 		}
-	};
+	}
+	(
+		globalThis as unknown as { OffscreenCanvas: typeof MockOffscreenCanvas }
+	).OffscreenCanvas = MockOffscreenCanvas;
 }
 
 describe("PDF Worker with Toy PDF", () => {
@@ -107,16 +109,38 @@ describe("PDF Worker with Toy PDF", () => {
 		expect(count).toBe(1);
 	});
 
-	it("should throw error for unimplemented methods", async () => {
-		const dummy = new Uint8Array(0);
-		await expect(pdfWorker.resizePdf(dummy, 100, 100)).rejects.toThrow(
-			"not yet implemented",
-		);
-		await expect(pdfWorker.getFonts(dummy)).rejects.toThrow(
-			"not yet implemented",
-		);
-		await expect(pdfWorker.imageToPdf(dummy, "image/png")).rejects.toThrow(
-			"not yet implemented",
-		);
+	it("should get fonts (empty for minimal PDF)", async () => {
+		const fonts = await pdfWorker.getFonts(pdfData);
+		expect(Array.isArray(fonts)).toBe(true);
+		// Minimal PDF has no text objects, so no fonts
+		expect(fonts.length).toBe(0);
+	});
+
+	it("should resize PDF", async () => {
+		// Minimal PDF is 612x792 (PostScript points)
+		const newWidth = 306;
+		const newHeight = 396;
+		const resized = await pdfWorker.resizePdf(pdfData, newWidth, newHeight);
+
+		expect(resized).toBeInstanceOf(Uint8Array);
+		expect(resized.length).toBeGreaterThan(0);
+
+		// Verify size using getPageAsImage (which gets width/height from page)
+		const img = await pdfWorker.getPageAsImage(resized, 0);
+		expect(img.width).toBe(newWidth);
+		expect(img.height).toBe(newHeight);
+	});
+
+	it("should convert image to PDF", async () => {
+		// Use a tiny dummy buffer; the worker fallback handles this as a 1x1 image for testing
+		const dummyImg = new Uint8Array([0, 0, 0, 0]);
+		const pdf = await pdfWorker.imageToPdf(dummyImg, "image/png");
+
+		expect(pdf).toBeInstanceOf(Uint8Array);
+		expect(pdf.length).toBeGreaterThan(0);
+
+		// Verify PDF has 1 page
+		const count = await pdfWorker.getPageCount(pdf);
+		expect(count).toBe(1);
 	});
 });

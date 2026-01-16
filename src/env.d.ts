@@ -11,12 +11,7 @@ declare module "prismjs/components/*" {
 	export default module;
 }
 
-declare module "vscode-oniguruma/release/onig.wasm" {
-	const url: string;
-	export default url;
-}
-
-declare module "@embedpdf/pdfium/pdfium.wasm" {
+declare module "*.wasm" {
 	const url: string;
 	export default url;
 }

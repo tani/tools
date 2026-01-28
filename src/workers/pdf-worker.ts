@@ -1,27 +1,10 @@
-import {
-	init,
-	type PdfiumModule,
-	type PdfiumRuntimeMethods,
-	type WrappedPdfiumModule,
-} from "@embedpdf/pdfium";
-import pdfiumWasm from "@embedpdf/pdfium/pdfium.wasm?url";
 import * as Comlink from "comlink";
+import { PDFDocument, type PDFImage, rgb } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist";
+import workerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 
-// Define the extensions on the internal Emscripten module (mod.pdfium)
-// We need to ensure HEAP8 and HEAPU8 are strictly typed
-interface PdfiumModuleExtended extends PdfiumModule, PdfiumRuntimeMethods {
-	HEAP8: Int8Array;
-	HEAP32: Int32Array;
-	HEAPU8: Uint8Array;
-}
-
-const FPDFBitmap_BGRA = 4;
-
-// Define the full wrapped module type
-// We override the 'pdfium' property to use our extended type
-type WrappedPdfiumModuleExtended = WrappedPdfiumModule & {
-	pdfium: PdfiumModuleExtended;
-};
+// Configure PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
 export interface PDFThumbnail {
 	index: number;
@@ -42,597 +25,213 @@ export interface PDFFont {
 	pages: number[];
 }
 
-let pdfiumModule: WrappedPdfiumModuleExtended | null = null;
-
-export async function ensurePdfium(): Promise<WrappedPdfiumModuleExtended> {
-	if (pdfiumModule) return pdfiumModule;
-
-	const mod = await init({
-		locateFile: (path: string) => {
-			if (path.endsWith(".wasm")) {
-				return pdfiumWasm;
-			}
-			return path;
-		},
-	});
-
-	// Cast the module to our extended type
-	// The library returns a wrapper where `mod.pdfium` is the actual Emscripten module
-	pdfiumModule = mod as unknown as WrappedPdfiumModuleExtended;
-
-	// Initialize the library
-	pdfiumModule.FPDF_InitLibrary();
-
-	return pdfiumModule;
-}
-
-// Helper to save PDF document to Uint8Array using FPDF_SaveAsCopy and a custom callback writer
-// This avoids using PDFiumExt which seems unstable in some environments
-export function savePdf(
-	mod: WrappedPdfiumModuleExtended,
-	doc: number,
-): Uint8Array {
-	const { pdfium } = mod;
-	const chunkData: Uint8Array[] = [];
-
-	// Callback: int (*WriteBlock)(struct FPDF_FILEWRITE* pThis, const void* pData, unsigned long size);
-	const writeBlock = (_pThis: number, pData: number, size: number) => {
-		// Create a copy of the chunk
-		const data = pdfium.HEAPU8.slice(pData, pData + size);
-		chunkData.push(data);
-		return 1; // Success
-	};
-
-	let funcPtr = 0;
-	let fileWritePtr = 0;
-
-	try {
-		// Register the callback function in WASM table
-		// Signature 'iiii' -> return int, args: int, int, int
-		funcPtr = pdfium.addFunction(writeBlock, "iiii");
-
-		// Allocate FPDF_FILEWRITE structure
-		// struct FPDF_FILEWRITE { int version; int (*WriteBlock)(...); };
-		// 32-bit WASM: 4 + 4 = 8 bytes
-		fileWritePtr = pdfium.wasmExports.malloc(8);
-		if (!fileWritePtr) throw new Error("Failed to allocate FPDF_FILEWRITE");
-
-		// Initialize structure: version=1, WriteBlock=funcPtr
-		pdfium.HEAP32.set([1, funcPtr], fileWritePtr >> 2);
-
-		// Flag 0 = Valid PDF
-		const success = mod.FPDF_SaveAsCopy(doc, fileWritePtr, 0);
-		if (!success) throw new Error("FPDF_SaveAsCopy failed to save document");
-	} finally {
-		if (fileWritePtr) pdfium.wasmExports.free(fileWritePtr);
-		if (funcPtr) pdfium.removeFunction(funcPtr);
-	}
-
-	// Combine chunks
-	const totalLength = chunkData.reduce((acc, c) => acc + c.length, 0);
-	const result = new Uint8Array(totalLength);
-	let offset = 0;
-	for (const chunk of chunkData) {
-		result.set(chunk, offset);
-		offset += chunk.length;
-	}
-	return result;
-}
-
 export const pdfWorker = {
 	async rasterizePdf(pdfData: Uint8Array): Promise<Uint8Array> {
-		const mod = await ensurePdfium();
-		// Use the inner module for direct memory access
-		const { pdfium } = mod;
+		const loadingTask = pdfjsLib.getDocument({
+			data: pdfData,
+			cMapUrl: "https://unpkg.com/pdfjs-dist@5.4.530/cmaps/",
+			cMapPacked: true,
+		});
+		const doc = await loadingTask.promise;
 
-		// Load document
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+		if (doc.numPages === 0) throw new Error("PDF has no pages");
 
-		pdfium.HEAPU8.set(pdfData, dataPtr);
+		const page = await doc.getPage(1);
+		const viewport = page.getViewport({ scale: 1.0 });
 
-		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!doc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load PDF document");
-		}
+		const canvas = new OffscreenCanvas(viewport.width, viewport.height);
+		const context = canvas.getContext("2d");
+		if (!context) throw new Error("Failed to create OffscreenCanvas context");
 
-		try {
-			const pageCount = mod.FPDF_GetPageCount(doc);
-			if (pageCount === 0) throw new Error("PDF has no pages");
+		await page.render({
+			canvasContext: context as unknown as CanvasRenderingContext2D,
+			viewport,
+			canvas: undefined as unknown as HTMLCanvasElement,
+		}).promise;
 
-			// Render first page
-			const pageIndex = 0;
-			const page = mod.FPDF_LoadPage(doc, pageIndex);
-			if (!page) throw new Error("Failed to load page 0");
-
-			try {
-				const width = Math.ceil(mod.FPDF_GetPageWidth(page));
-				const height = Math.ceil(mod.FPDF_GetPageHeight(page));
-				const scale = 1.0;
-				const renderWidth = Math.ceil(width * scale);
-				const renderHeight = Math.ceil(height * scale);
-
-				// 4 bytes per pixel (BGRA or RGBA depending on platform, usually BGRA for PDFium)
-				const bitmap = mod.FPDFBitmap_Create(
-					renderWidth,
-					renderHeight,
-					FPDFBitmap_BGRA,
-				);
-				if (!bitmap) throw new Error("Failed to create bitmap");
-				// Fill with white
-				mod.FPDFBitmap_FillRect(
-					bitmap,
-					0,
-					0,
-					renderWidth,
-					renderHeight,
-					0xffffffff,
-				);
-
-				mod.FPDF_RenderPageBitmap(
-					bitmap,
-					page,
-					0,
-					0,
-					renderWidth,
-					renderHeight,
-					0,
-					0, // Flags
-				);
-
-				const buffer = mod.FPDFBitmap_GetBuffer(bitmap);
-				const stride = mod.FPDFBitmap_GetStride(bitmap); // Bytes per row
-
-				const canvas = new OffscreenCanvas(renderWidth, renderHeight);
-				const ctx = canvas.getContext("2d");
-				if (!ctx) throw new Error("Failed to create OffscreenCanvas context");
-
-				const length = stride * renderHeight;
-				// Create a copy of the data to avoid issues with WASM memory resizing or out-of-bounds views
-				const rawData = pdfium.HEAPU8.slice(buffer, buffer + length);
-				const imageData = ctx.createImageData(renderWidth, renderHeight);
-
-				for (let i = 0; i < rawData.length; i += 4) {
-					// BGRA -> RGBA
-					imageData.data[i] = rawData[i + 2]; // R
-					imageData.data[i + 1] = rawData[i + 1]; // G
-					imageData.data[i + 2] = rawData[i]; // B
-					imageData.data[i + 3] = 255; // A (force opaque)
-				}
-
-				ctx.putImageData(imageData, 0, 0);
-				const blob = await canvas.convertToBlob({ type: "image/png" });
-				const arrayBuffer = await blob.arrayBuffer();
-
-				mod.FPDFBitmap_Destroy(bitmap);
-				return new Uint8Array(arrayBuffer);
-			} finally {
-				mod.FPDF_ClosePage(page);
-			}
-		} finally {
-			mod.FPDF_CloseDocument(doc);
-			pdfium.wasmExports.free(dataPtr);
-		}
+		const blob = await canvas.convertToBlob({ type: "image/png" });
+		return new Uint8Array(await blob.arrayBuffer());
 	},
 
 	async getPageCount(pdfData: Uint8Array): Promise<number> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
-
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
-
-		pdfium.HEAPU8.set(pdfData, dataPtr);
-
-		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!doc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load PDF document");
-		}
-
-		try {
-			return mod.FPDF_GetPageCount(doc);
-		} finally {
-			mod.FPDF_CloseDocument(doc);
-			pdfium.wasmExports.free(dataPtr);
-		}
+		const loadingTask = pdfjsLib.getDocument({
+			data: pdfData,
+			cMapUrl: "https://unpkg.com/pdfjs-dist@5.4.530/cmaps/",
+			cMapPacked: true,
+		});
+		const doc = await loadingTask.promise;
+		return doc.numPages;
 	},
 
 	async renderThumbnails(
 		pdfData: Uint8Array,
 		scale: number = 0.5,
 	): Promise<PDFThumbnail[]> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const loadingTask = pdfjsLib.getDocument({
+			data: pdfData,
+			cMapUrl: "https://unpkg.com/pdfjs-dist@5.4.530/cmaps/",
+			cMapPacked: true,
+		});
+		const doc = await loadingTask.promise;
+		const thumbnails: PDFThumbnail[] = [];
 
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+		for (let i = 1; i <= doc.numPages; i++) {
+			const page = await doc.getPage(i);
+			const viewport = page.getViewport({ scale });
 
-		pdfium.HEAPU8.set(pdfData, dataPtr);
+			const canvas = new OffscreenCanvas(viewport.width, viewport.height);
+			const context = canvas.getContext("2d");
+			if (!context) continue;
 
-		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!doc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load PDF document");
+			await page.render({
+				canvasContext: context as unknown as CanvasRenderingContext2D,
+				viewport,
+				canvas: undefined as unknown as HTMLCanvasElement,
+			}).promise;
+
+			const imageData = context.getImageData(
+				0,
+				0,
+				viewport.width,
+				viewport.height,
+			);
+			thumbnails.push({
+				index: i - 1, // 0-based index
+				width: viewport.width,
+				height: viewport.height,
+				pixels: imageData.data,
+			});
 		}
 
-		try {
-			const count = mod.FPDF_GetPageCount(doc);
-			const thumbnails = [];
-
-			for (let i = 0; i < count; i++) {
-				const page = mod.FPDF_LoadPage(doc, i);
-				if (!page) continue;
-
-				try {
-					const width = mod.FPDF_GetPageWidth(page);
-					const height = mod.FPDF_GetPageHeight(page);
-					const renderWidth = Math.ceil(width * scale);
-					const renderHeight = Math.ceil(height * scale);
-
-					const bitmap = mod.FPDFBitmap_Create(
-						renderWidth,
-						renderHeight,
-						FPDFBitmap_BGRA,
-					);
-					if (!bitmap) continue;
-					mod.FPDFBitmap_FillRect(
-						bitmap,
-						0,
-						0,
-						renderWidth,
-						renderHeight,
-						0x00000000,
-					); // Transparent fill
-
-					mod.FPDF_RenderPageBitmap(
-						bitmap,
-						page,
-						0,
-						0,
-						renderWidth,
-						renderHeight,
-						0,
-						0,
-					);
-
-					const buffer = mod.FPDFBitmap_GetBuffer(bitmap);
-					const stride = mod.FPDFBitmap_GetStride(bitmap);
-					const length = stride * renderHeight;
-					// Create a copy of the data to avoid issues with WASM memory resizing or out-of-bounds views
-					const rawData = pdfium.HEAPU8.slice(buffer, buffer + length);
-					const pixels = new Uint8ClampedArray(rawData.length);
-
-					for (let j = 0; j < rawData.length; j += 4) {
-						pixels[j] = rawData[j + 2]; // R
-						pixels[j + 1] = rawData[j + 1]; // G
-						pixels[j + 2] = rawData[j]; // B
-						pixels[j + 3] = rawData[j + 3]; // A
-					}
-
-					thumbnails.push({
-						index: i,
-						width: renderWidth,
-						height: renderHeight,
-						pixels: pixels,
-					});
-
-					mod.FPDFBitmap_Destroy(bitmap);
-				} finally {
-					mod.FPDF_ClosePage(page);
-				}
-			}
-			return thumbnails;
-		} finally {
-			mod.FPDF_CloseDocument(doc);
-			pdfium.wasmExports.free(dataPtr);
-		}
+		return thumbnails;
 	},
 
 	async getPageAsImage(
 		pdfData: Uint8Array,
 		pageIndex: number,
 	): Promise<{ width: number; height: number; pixels: Uint8ClampedArray }> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const loadingTask = pdfjsLib.getDocument({
+			data: pdfData,
+			cMapUrl: "https://unpkg.com/pdfjs-dist@5.4.530/cmaps/",
+			cMapPacked: true,
+		});
+		const doc = await loadingTask.promise;
 
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+		// pdfjs uses 1-based index
+		const page = await doc.getPage(pageIndex + 1);
+		const viewport = page.getViewport({ scale: 1.0 });
 
-		pdfium.HEAPU8.set(pdfData, dataPtr);
+		const canvas = new OffscreenCanvas(viewport.width, viewport.height);
+		const context = canvas.getContext("2d");
+		if (!context) throw new Error("Failed to create OffscreenCanvas context");
 
-		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!doc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load PDF document");
-		}
+		await page.render({
+			canvasContext: context as unknown as CanvasRenderingContext2D,
+			viewport,
+			canvas: undefined as unknown as HTMLCanvasElement,
+		}).promise;
 
-		try {
-			const page = mod.FPDF_LoadPage(doc, pageIndex);
-			if (!page) throw new Error(`Failed to load page ${pageIndex}`);
+		const imageData = context.getImageData(
+			0,
+			0,
+			viewport.width,
+			viewport.height,
+		);
 
-			try {
-				const width = Math.ceil(mod.FPDF_GetPageWidth(page));
-				const height = Math.ceil(mod.FPDF_GetPageHeight(page));
-
-				const bitmap = mod.FPDFBitmap_Create(width, height, FPDFBitmap_BGRA);
-				if (!bitmap) throw new Error("Failed to create bitmap");
-				mod.FPDFBitmap_FillRect(bitmap, 0, 0, width, height, 0x00000000); // Transparent fill
-
-				mod.FPDF_RenderPageBitmap(bitmap, page, 0, 0, width, height, 0, 0);
-
-				const buffer = mod.FPDFBitmap_GetBuffer(bitmap);
-				const stride = mod.FPDFBitmap_GetStride(bitmap);
-				const length = stride * height;
-				// Create a copy of the data to avoid issues with WASM memory resizing or out-of-bounds views
-				const rawData = pdfium.HEAPU8.slice(buffer, buffer + length);
-				const pixels = new Uint8ClampedArray(rawData.length);
-
-				// BGRA -> RGBA
-				for (let j = 0; j < rawData.length; j += 4) {
-					pixels[j] = rawData[j + 2]; // R
-					pixels[j + 1] = rawData[j + 1]; // G
-					pixels[j + 2] = rawData[j]; // B
-					pixels[j + 3] = rawData[j + 3]; // A
-				}
-
-				mod.FPDFBitmap_Destroy(bitmap);
-				return { width, height, pixels };
-			} finally {
-				mod.FPDF_ClosePage(page);
-			}
-		} finally {
-			mod.FPDF_CloseDocument(doc);
-			pdfium.wasmExports.free(dataPtr);
-		}
+		return {
+			width: viewport.width,
+			height: viewport.height,
+			pixels: imageData.data,
+		};
 	},
 
 	async extractText(pdfData: Uint8Array): Promise<string> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const loadingTask = pdfjsLib.getDocument({
+			data: pdfData,
+			cMapUrl: "https://unpkg.com/pdfjs-dist@5.4.530/cmaps/",
+			cMapPacked: true,
+		});
+		const doc = await loadingTask.promise;
+		let combinedText = "";
 
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+		for (let i = 1; i <= doc.numPages; i++) {
+			const page = await doc.getPage(i);
+			const textContent = await page.getTextContent();
 
-		pdfium.HEAPU8.set(pdfData, dataPtr);
-
-		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!doc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load PDF document");
-		}
-
-		try {
-			const pageCount = mod.FPDF_GetPageCount(doc);
-			let combinedText = "";
-
-			for (let i = 0; i < pageCount; i++) {
-				const page = mod.FPDF_LoadPage(doc, i);
-				if (!page) continue;
-
-				// Load text page
-				const textPage = mod.FPDFText_LoadPage(page);
-				if (textPage) {
-					const charCount = mod.FPDFText_CountChars(textPage);
-					let pageText = "";
-					if (charCount > 0) {
-						for (let c = 0; c < charCount; c++) {
-							const unicode = mod.FPDFText_GetUnicode(textPage, c);
-							if (unicode !== 0) {
-								pageText += String.fromCharCode(unicode);
-							}
-						}
-					}
-					combinedText += `--- Page ${i + 1} --\n${pageText}\n\n`;
-					mod.FPDFText_ClosePage(textPage);
+			let pageText = "";
+			// Basic text extraction joining items with space
+			// pdfjs returns items with transform info, we just want strings
+			for (const item of textContent.items) {
+				if ("str" in item) {
+					pageText += `${item.str} `;
 				}
-				mod.FPDF_ClosePage(page);
 			}
-			return combinedText;
-		} finally {
-			mod.FPDF_CloseDocument(doc);
-			pdfium.wasmExports.free(dataPtr);
+
+			combinedText += `--- Page ${i} --\n${pageText}\n\n`;
 		}
+
+		return combinedText;
 	},
 
 	async imageToPdf(
 		imageData: Uint8Array,
 		mimeType: string,
 	): Promise<Uint8Array> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const pdfDoc = await PDFDocument.create();
 
-		let width: number;
-		let height: number;
-		let bgra: Uint8Array;
-
-		// Decode image using available browser APIs
-		if (
-			typeof createImageBitmap !== "undefined" &&
-			typeof OffscreenCanvas !== "undefined"
-		) {
-			const blob = new Blob([imageData as BlobPart], { type: mimeType });
-			const imgBitmap = await createImageBitmap(blob);
-			width = imgBitmap.width;
-			height = imgBitmap.height;
-
-			const canvas = new OffscreenCanvas(width, height);
-			const ctx = canvas.getContext("2d");
-			if (!ctx) throw new Error("Failed to create canvas context");
-			ctx.drawImage(imgBitmap, 0, 0);
-			const imgData = ctx.getImageData(0, 0, width, height);
-
-			bgra = new Uint8Array(width * height * 4);
-			for (let i = 0; i < imgData.data.length; i += 4) {
-				bgra[i] = imgData.data[i + 2]; // B
-				bgra[i + 1] = imgData.data[i + 1]; // G
-				bgra[i + 2] = imgData.data[i]; // R
-				bgra[i + 3] = imgData.data[i + 3]; // A
-			}
+		let image: PDFImage;
+		if (mimeType === "image/png") {
+			image = await pdfDoc.embedPng(imageData);
+		} else if (mimeType === "image/jpeg" || mimeType === "image/jpg") {
+			image = await pdfDoc.embedJpg(imageData);
 		} else {
-			// Fallback placeholder or specific handling for tests/node
-			// In production browser, this branch is unlikely.
-			// For tests, we assume a 1x1 dummy if it matches a specific small size.
-			if (imageData.length < 100) {
-				width = 1;
-				height = 1;
-				bgra = new Uint8Array([0, 0, 0, 255]);
-			} else {
-				throw new Error(
-					"createImageBitmap/OffscreenCanvas not available for image decoding",
-				);
-			}
-		}
-
-		const doc = mod.FPDF_CreateNewDocument();
-		if (!doc) throw new Error("Failed to create PDF document");
-
-		try {
-			// Create a new page with image dimensions
-			const page = mod.FPDFPage_New(doc, 0, width, height);
-			if (!page) throw new Error("Failed to create PDF page");
-
+			// Try to detect or assume
+			// For minimal support, fallback to png if unknown or try catching error
 			try {
-				const imageObj = mod.FPDFPageObj_NewImageObj(doc);
-				if (!imageObj) throw new Error("Failed to create image object");
-
-				// Create PDFium bitmap from decoded pixels
-				const bitmap = mod.FPDFBitmap_Create(width, height, FPDFBitmap_BGRA);
-				if (!bitmap) throw new Error("Failed to create PDFium bitmap");
-
-				const bufferPtr = mod.FPDFBitmap_GetBuffer(bitmap);
-				pdfium.HEAPU8.set(bgra, bufferPtr);
-
-				// Set bitmap to image object
-				// FPDFImageObj_SetBitmap(pages, count, image_object, bitmap)
-				mod.FPDFImageObj_SetBitmap(0, 0, imageObj, bitmap);
-
-				// Scale image object to fit the page
-				// FPDFImageObj_SetMatrix(image_object, a, b, c, d, e, f)
-				mod.FPDFImageObj_SetMatrix(imageObj, width, 0, 0, height, 0, 0);
-
-				mod.FPDFPage_InsertObject(page, imageObj);
-				mod.FPDFPage_GenerateContent(page);
-
-				mod.FPDFBitmap_Destroy(bitmap);
-			} finally {
-				mod.FPDF_ClosePage(page);
+				image = await pdfDoc.embedPng(imageData);
+			} catch {
+				image = await pdfDoc.embedJpg(imageData);
 			}
-
-			return savePdf(mod, doc);
-		} finally {
-			mod.FPDF_CloseDocument(doc);
 		}
+
+		const page = pdfDoc.addPage([image.width, image.height]);
+		page.drawImage(image, {
+			x: 0,
+			y: 0,
+			width: image.width,
+			height: image.height,
+		});
+
+		return await pdfDoc.save();
 	},
 
 	async mergePdfs(pdfBuffers: Uint8Array[]): Promise<Uint8Array> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const mergedPdf = await PDFDocument.create();
 
-		const newDoc = mod.FPDF_CreateNewDocument();
-		if (!newDoc) throw new Error("Failed to create new PDF document");
-
-		try {
-			for (const buffer of pdfBuffers) {
-				const dataPtr = pdfium.wasmExports.malloc(buffer.length);
-				if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
-
-				pdfium.HEAPU8.set(buffer, dataPtr);
-				const srcDoc = mod.FPDF_LoadMemDocument(dataPtr, buffer.length, "");
-
-				if (srcDoc) {
-					try {
-						const srcPageCount = mod.FPDF_GetPageCount(srcDoc);
-						if (srcPageCount > 0) {
-							// Prepare indices array [0, 1, ..., srcPageCount-1]
-							const indicesPtr = pdfium.wasmExports.malloc(srcPageCount * 4); // 4 bytes per int
-							if (indicesPtr) {
-								try {
-									const indices32 = new Int32Array(srcPageCount);
-									for (let i = 0; i < srcPageCount; i++) indices32[i] = i;
-
-									// HEAP32 is Int32Array view of memory.
-									// We need to set it at the correct offset.
-									// indicesPtr is byte offset. Divide by 4 for Int32 index.
-									pdfium.HEAP32.set(indices32, indicesPtr >> 2);
-
-									mod.FPDF_ImportPagesByIndex(
-										newDoc,
-										srcDoc,
-										indicesPtr,
-										srcPageCount,
-										mod.FPDF_GetPageCount(newDoc),
-									);
-								} finally {
-									pdfium.wasmExports.free(indicesPtr);
-								}
-							}
-						}
-					} finally {
-						mod.FPDF_CloseDocument(srcDoc);
-					}
-				}
-				pdfium.wasmExports.free(dataPtr);
+		for (const pdfBuffer of pdfBuffers) {
+			const pdf = await PDFDocument.load(pdfBuffer);
+			const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+			for (const page of copiedPages) {
+				mergedPdf.addPage(page);
 			}
-
-			return savePdf(mod, newDoc);
-		} finally {
-			mod.FPDF_CloseDocument(newDoc);
 		}
+
+		return await mergedPdf.save();
 	},
 
 	async extractPages(
 		pdfData: Uint8Array,
 		pageIndices: number[],
 	): Promise<Uint8Array> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const srcPdf = await PDFDocument.load(pdfData);
+		const newPdf = await PDFDocument.create();
 
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
-
-		pdfium.HEAPU8.set(pdfData, dataPtr);
-		const srcDoc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!srcDoc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load source PDF");
+		const copiedPages = await newPdf.copyPages(srcPdf, pageIndices);
+		for (const page of copiedPages) {
+			newPdf.addPage(page);
 		}
 
-		console.log("extractPages: loaded doc", srcDoc);
-
-		const newDoc = mod.FPDF_CreateNewDocument();
-
-		try {
-			// Prepare indices array
-			const count = pageIndices.length;
-			const indicesPtr = pdfium.wasmExports.malloc(count * 4);
-			if (!indicesPtr)
-				throw new Error("Failed to allocate memory for page indices");
-
-			try {
-				const indices32 = new Int32Array(pageIndices);
-				pdfium.HEAP32.set(indices32, indicesPtr >> 2);
-
-				console.log("extractPages: importing pages by index");
-				const success = mod.FPDF_ImportPagesByIndex(
-					newDoc,
-					srcDoc,
-					indicesPtr,
-					count,
-					0,
-				);
-				if (!success) throw new Error("Failed to import pages");
-
-				return savePdf(mod, newDoc);
-			} finally {
-				pdfium.wasmExports.free(indicesPtr);
-			}
-		} finally {
-			mod.FPDF_CloseDocument(newDoc);
-			mod.FPDF_CloseDocument(srcDoc);
-			pdfium.wasmExports.free(dataPtr);
-		}
+		return await newPdf.save();
 	},
 
 	async resizePdf(
@@ -640,140 +239,102 @@ export const pdfWorker = {
 		width: number,
 		height: number,
 	): Promise<Uint8Array> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const pdfDoc = await PDFDocument.load(pdfData);
+		const pages = pdfDoc.getPages();
 
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+		for (const page of pages) {
+			const { width: oldWidth, height: oldHeight } = page.getSize();
 
-		pdfium.HEAPU8.set(pdfData, dataPtr);
+			// Simple scaling to fit new dimensions? Or just resize media box?
+			// The original implementation used a transform matrix to scale content.
+			// FPDFPage_TransFormWithClip + SetMediaBox.
 
-		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!doc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load PDF document");
+			// In pdf-lib, we can scale the content and set the page size.
+			const scaleX = width / oldWidth;
+			const scaleY = height / oldHeight;
+
+			page.scale(scaleX, scaleY);
+			page.setSize(width, height);
 		}
 
-		try {
-			const pageCount = mod.FPDF_GetPageCount(doc);
-			for (let i = 0; i < pageCount; i++) {
-				const page = mod.FPDF_LoadPage(doc, i);
-				if (!page) continue;
-
-				try {
-					const currentWidth = mod.FPDF_GetPageWidth(page);
-					const currentHeight = mod.FPDF_GetPageHeight(page);
-
-					const scaleX = width / currentWidth;
-					const scaleY = height / currentHeight;
-
-					// Transformation matrix: [a, b, c, d, e, f]
-					// In PDFium: FS_MATRIX { float a, b, c, d, e, f; }
-					const matrixPtr = pdfium.wasmExports.malloc(24); // 6 * 4 bytes
-					if (matrixPtr) {
-						try {
-							// Use setValue to populate the float matrix
-							pdfium.setValue(matrixPtr, scaleX, "float");
-							pdfium.setValue(matrixPtr + 4, 0, "float");
-							pdfium.setValue(matrixPtr + 8, 0, "float");
-							pdfium.setValue(matrixPtr + 12, scaleY, "float");
-							pdfium.setValue(matrixPtr + 16, 0, "float");
-							pdfium.setValue(matrixPtr + 20, 0, "float");
-
-							// FPDFPage_TransFormWithClip(page, matrixPtr, clipRectPtr)
-							mod.FPDFPage_TransFormWithClip(page, matrixPtr, 0);
-						} finally {
-							pdfium.wasmExports.free(matrixPtr);
-						}
-					}
-
-					// Set new page size (MediaBox)
-					mod.FPDFPage_SetMediaBox(page, 0, 0, width, height);
-
-					// Also update other boxes if necessary for consistency
-					mod.FPDFPage_SetCropBox(page, 0, 0, width, height);
-				} finally {
-					mod.FPDF_ClosePage(page);
-				}
-			}
-
-			return savePdf(mod, doc);
-		} finally {
-			mod.FPDF_CloseDocument(doc);
-			pdfium.wasmExports.free(dataPtr);
-		}
+		return await pdfDoc.save();
 	},
 
-	// Helper to extract fonts from a PDF document
 	async getFonts(pdfData: Uint8Array): Promise<PDFFont[]> {
-		const mod = await ensurePdfium();
-		const { pdfium } = mod;
+		const loadingTask = pdfjsLib.getDocument({
+			data: pdfData,
+			cMapUrl: "https://unpkg.com/pdfjs-dist@5.4.530/cmaps/",
+			cMapPacked: true,
+		});
+		const doc = await loadingTask.promise;
+		const fontsMap = new Map<string, PDFFont>();
 
-		const dataPtr = pdfium.wasmExports.malloc(pdfData.length);
-		if (!dataPtr) throw new Error("Failed to allocate memory for PDF data");
+		for (let i = 1; i <= doc.numPages; i++) {
+			const page = await doc.getPage(i);
 
-		pdfium.HEAPU8.set(pdfData, dataPtr);
+			// Access commonObjs (internal API but commonly used)
+			// or we can loop through operations in getOperatorList
+			// But that's heavy.
+			// Let's see if we can get fonts via commonObjs
+			const commonObjs = page.commonObjs;
 
-		const doc = mod.FPDF_LoadMemDocument(dataPtr, pdfData.length, "");
-		if (!doc) {
-			pdfium.wasmExports.free(dataPtr);
-			throw new Error("Failed to load PDF document");
-		}
+			// We need to trigger parsing. getTextContent triggers it usually.
+			await page.getTextContent();
 
-		try {
-			const fontsMap = new Map<string, PDFFont>();
-			const pageCount = mod.FPDF_GetPageCount(doc);
-			console.log(`PDF loaded. Page count: ${pageCount}`);
+			// commonObjs has a map of objects. We need to iterate it.
+			// The internal structure is not officially documented but stable enough?
+			// commonObjs.objs is where objects are stored.
 
-			const processObjects = async (
-				container: number,
-				isPage: boolean,
-				currentPageIndex: number,
-			) => {
-				const objCount = isPage
-					? mod.FPDFPage_CountObjects(container)
-					: mod.FPDFFormObj_CountObjects(container);
+			// Alternative: Use doc.getStats() in newer pdf.js? No.
 
-				for (let j = 0; j < objCount; j++) {
-					const obj = isPage
-						? mod.FPDFPage_GetObject(container, j)
-						: mod.FPDFFormObj_GetObject(container, j);
+			// Let's iterate over commonObjs if accessible.
+			// Note: pdfjs-dist 3/4/5 changed how commonObjs works. It might be async or require `ensureObj`.
 
-					if (!obj) continue;
+			// A reliable way is to inspect `page.getOperatorList()`.
+			const opList = await page.getOperatorList();
+			const fontDependencies = opList.argsArray;
+			const fnArray = opList.fnArray;
 
-					const type = mod.FPDFPageObj_GetType(obj);
-					if (type === 1) {
-						// FPDF_PAGEOBJ_TEXT
-						const font = mod.FPDFTextObj_GetFont(obj);
-						if (font) {
-							const bufferSize = 256;
-							const bufferPtr = pdfium.wasmExports.malloc(bufferSize);
-							const length = mod.FPDFFont_GetBaseFontName(
-								font,
-								bufferPtr,
-								bufferSize,
-							);
-							let name = "";
-							if (length > 0) {
-								name = pdfium.UTF8ToString(bufferPtr);
-							}
-							pdfium.wasmExports.free(bufferPtr);
+			// ops.setFont is usually where font is set.
+			// But we need the Font object details.
 
-							if (!name) name = "Unnamed-Font";
+			// Actually, let's try to access `commonObjs`.
+			// In pdf.js v3+, commonObjs is a Proxy or similar.
+			// But we can use `page.objs.get(name)`.
 
+			// The safest public API way: there isn't really one for "list all fonts with details".
+			// We have to inspect the internal font objects loaded by the page.
+
+			// For now, I'll attempt a best effort extraction.
+			// If we can't reliably get it, we might return basic info.
+
+			// But wait, `commonObjs` is populated after `getOperatorList`.
+			// `commonObjs.get(key)` returns the object.
+
+			// Let's look at `opList` to find `setFont` calls.
+			const ops = pdfjsLib.OPS;
+
+			for (let j = 0; j < fnArray.length; j++) {
+				if (fnArray[j] === ops.setFont) {
+					const fontName = fontDependencies[j][0];
+					// Get the font object
+					if (page.commonObjs.has(fontName)) {
+						const fontObj = await page.commonObjs.get(fontName);
+
+						if (fontObj) {
+							const name = fontObj.name || fontObj.loadedName || "Unknown";
 							const existing = fontsMap.get(name);
 							if (existing) {
-								existing.count++;
-								if (!existing.pages.includes(currentPageIndex + 1)) {
-									existing.pages.push(currentPageIndex + 1);
+								if (!existing.pages.includes(i)) {
+									existing.pages.push(i);
+									existing.count++; // Rough count of occurrences (pages)
 								}
 							} else {
-								const embedded = mod.FPDFFont_GetIsEmbedded(font) !== 0;
 								const lowerName = name.toLowerCase();
 								fontsMap.set(name, {
 									name,
-									type: "Unknown",
-									embedded,
+									type: fontObj.type || "Unknown",
+									embedded: fontObj.composite || false, // approximation
 									isBold: lowerName.includes("bold"),
 									isItalic:
 										lowerName.includes("italic") ||
@@ -781,77 +342,18 @@ export const pdfWorker = {
 									isSerif:
 										lowerName.includes("serif") || lowerName.includes("times"),
 									isMono:
-										lowerName.includes("mono") ||
-										lowerName.includes("courier") ||
-										lowerName.includes("fixed"),
+										lowerName.includes("mono") || lowerName.includes("courier"),
 									count: 1,
-									pages: [currentPageIndex + 1],
+									pages: [i],
 								});
 							}
 						}
-					} else if (type === 5) {
-						// FPDF_PAGEOBJ_FORM
-						await processObjects(obj, false, currentPageIndex);
 					}
 				}
-			};
-
-			for (let i = 0; i < pageCount; i++) {
-				const page = mod.FPDF_LoadPage(doc, i);
-				if (!page) {
-					console.warn(`Could not load page ${i}`);
-					continue;
-				}
-
-				await processObjects(page, true, i);
-
-				// Fallback: Check if there's text on the page but no text objects identified (rare but possible in some PDF structures)
-				const textPage = mod.FPDFText_LoadPage(page);
-				if (textPage) {
-					const charCount = mod.FPDFText_CountChars(textPage);
-					if (charCount > 0 && fontsMap.size === 0) {
-						// If we have characters but found no fonts via objects, try to get font info from first character as a last resort
-						const bufferSize = 256;
-						const bufferPtr = pdfium.wasmExports.malloc(bufferSize);
-						// FPDFText_GetFontInfo(textPage, char_index, buffer, bufsiz, flags)
-						const length = mod.FPDFText_GetFontInfo(
-							textPage,
-							0,
-							bufferPtr,
-							bufferSize,
-							0,
-						);
-						if (length > 0) {
-							const name = pdfium.UTF8ToString(bufferPtr);
-							if (name && !fontsMap.has(name)) {
-								fontsMap.set(name, {
-									name,
-									type: "Unknown",
-									embedded: true, // Assume true if we can't check
-									isBold: name.toLowerCase().includes("bold"),
-									isItalic: name.toLowerCase().includes("italic"),
-									isSerif: false,
-									isMono: false,
-									count: charCount,
-									pages: [i + 1],
-								});
-							}
-						}
-						pdfium.wasmExports.free(bufferPtr);
-					}
-					mod.FPDFText_ClosePage(textPage);
-				}
-
-				mod.FPDF_ClosePage(page);
 			}
-
-			const results = Array.from(fontsMap.values());
-			console.log(`Font analysis complete. Found ${results.length} fonts.`);
-			return results;
-		} finally {
-			mod.FPDF_CloseDocument(doc);
-			pdfium.wasmExports.free(dataPtr);
 		}
+
+		return Array.from(fontsMap.values());
 	},
 };
 

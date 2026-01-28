@@ -14,7 +14,6 @@
 		"pre-commit": "bun run check && bun run build"
 	},
 	"dependencies": {
-		"@embedpdf/pdfium": "^2.2.0",
 		"@hpcc-js/wasm-graphviz": "^1.18.0",
 		"@jspm/core": "^2.1.0",
 		"@techstark/opencv-js": "^4.12.0-release.1",
@@ -28,6 +27,8 @@
 		"mathxyjax3": "^0.8.3",
 		"mermaid": "^11.12.2",
 		"mp4box": "^2.3.0",
+		"pdf-lib": "^1.17.1",
+		"pdfjs-dist": "^5.4.530",
 		"prettier": "^3.7.4",
 		"prismjs": "^1.30.0",
 		"process": "^0.11.10",

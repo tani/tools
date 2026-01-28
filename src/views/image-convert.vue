@@ -19,12 +19,14 @@ const availableFormats: FormatOption[] = [
 	{ label: "PNG", extension: "png", mimeType: "image/png" },
 	{ label: "JPEG", extension: "jpg", mimeType: "image/jpeg" },
 	{ label: "WebP", extension: "webp", mimeType: "image/webp" },
+	{ label: "PDF", extension: "pdf", mimeType: "application/pdf" },
 ];
 
 const targetFormat = ref<string>("image/png");
 const quality = ref<number>(0.9);
 
 const sourceBytes = ref<Uint8Array | null>(null);
+const sourceMimeType = ref<string>("image/png");
 const sourcePdfBytes = ref<Uint8Array | null>(null);
 const sourcePreview = ref<string>("");
 const sourceName = ref<string>("");
@@ -73,6 +75,7 @@ const readFile = async (event: Event) => {
 		file.type === "application/pdf" ||
 		file.name.toLowerCase().endsWith(".pdf")
 	) {
+		sourceMimeType.value = "image/png";
 		sourcePdfBytes.value = buffer;
 		try {
 			processBuffer = await muApi.rasterizePdf(buffer);
@@ -82,12 +85,14 @@ const readFile = async (event: Event) => {
 				(error instanceof Error ? error.message : String(error));
 			return;
 		}
+	} else {
+		sourceMimeType.value = file.type || "image/png";
 	}
 	sourceBytes.value = processBuffer;
 
 	if (sourcePreview.value) URL.revokeObjectURL(sourcePreview.value);
 	sourcePreview.value = URL.createObjectURL(
-		new Blob([processBuffer as BlobPart], { type: file.type || "image/png" }),
+		new Blob([processBuffer as BlobPart], { type: sourceMimeType.value }),
 	);
 
 	const img = new Image();
@@ -118,6 +123,28 @@ const convert = async () => {
 	}
 
 	try {
+		if (targetFormat.value === "application/pdf") {
+			if (!muApi || !sourceBytes.value) return;
+			const pdfBytes = await muApi.imageToPdf(
+				sourceBytes.value,
+				sourceMimeType.value,
+			);
+
+			if (result.value?.blobUrl) URL.revokeObjectURL(result.value.blobUrl);
+
+			result.value = {
+				option,
+				blobUrl: URL.createObjectURL(
+					new Blob([pdfBytes as BlobPart], { type: "application/pdf" }),
+				),
+				bytes: pdfBytes,
+				width: sourceDetails.value?.width || 0,
+				height: sourceDetails.value?.height || 0,
+				size: pdfBytes.length,
+			};
+			return;
+		}
+
 		const img = new Image();
 		await new Promise((resolve, reject) => {
 			img.onload = resolve;
@@ -267,7 +294,12 @@ const formatSize = (bytes: number) => {
             style="min-height: 300px"
           >
             <div v-if="result" class="w-100">
+              <PdfViewer
+                v-if="result.option.mimeType === 'application/pdf'"
+                :data="result.bytes"
+              />
               <img
+                v-else
                 :src="result.blobUrl"
                 class="img-fluid mb-2 rounded shadow-sm"
                 style="max-height: 400px"

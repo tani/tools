@@ -237,6 +237,15 @@ export const tools: Tool[] = [
 		component: () => import("./views/bg-remover.vue"),
 		category: "Graphics & Images",
 	},
+	{
+		path: "/image-process-pipeline",
+		name: "Image Process Pipeline",
+		icon: "🧪",
+		description:
+			"Build and run sequential image pipelines with resize, convert, background removal, and OCR.",
+		component: () => import("./views/image-process-pipeline.vue"),
+		category: "Graphics & Images",
+	},
 	// PDF Tools
 	{
 		path: "/pdf-viewer",

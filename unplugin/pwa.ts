@@ -76,7 +76,7 @@ export default createUnplugin((options: PWAOptions = {}) => {
 			},
 			async closeBundle() {
 				// Only run in production build
-				if (process.env.NODE_ENV === "development") return;
+				if (isDev) return;
 
 				// Ensure outDir exists
 				try {
@@ -95,13 +95,28 @@ export default createUnplugin((options: PWAOptions = {}) => {
 				}
 
 				// Generate Service Worker
-				await generateSW({
-					swDest: path.resolve(outDir, "sw.js"),
-					globDirectory: outDir,
-					skipWaiting: true,
-					clientsClaim: true,
-					...options.workbox,
-				});
+				const swDest = path.resolve(outDir, "sw.js");
+				try {
+					await generateSW({
+						swDest,
+						globDirectory: outDir,
+						skipWaiting: true,
+						clientsClaim: true,
+						// Work around intermittent terser crashes in workbox-build.
+						mode: "development",
+						...options.workbox,
+					});
+				} catch (error) {
+					console.error(
+						"[custom-pwa] Workbox generation failed; writing fallback SW.",
+						error,
+					);
+					await fs.writeFile(
+						swDest,
+						`self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));`,
+					);
+				}
 			},
 			transformIndexHtml(html) {
 				if (isDev) return html;

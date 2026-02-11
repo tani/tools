@@ -312,4 +312,13 @@ export const tools: Tool[] = [
 		component: () => import("./views/pomodoro.vue"),
 		category: "Utilities",
 	},
+	{
+		path: "/world-time-map",
+		name: "World Time Map",
+		icon: "🌍",
+		description:
+			"Hover or tap countries on the world map to see local time by ISO code.",
+		component: () => import("./views/world-time-map.vue"),
+		category: "Utilities",
+	},
 ];

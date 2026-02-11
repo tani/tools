@@ -75,47 +75,51 @@ export default createUnplugin((options: PWAOptions = {}) => {
 				isDev = config.command === "serve";
 			},
 			async closeBundle() {
-				// Only run in production build
-				if (isDev) return;
-
-				// Ensure outDir exists
 				try {
-					await fs.access(outDir);
-				} catch {
-					return;
-				}
+					// Only run in production build
+					if (isDev) return;
 
-				// Write manifest
-				if (options.manifest) {
-					const manifestPath = path.resolve(outDir, "manifest.webmanifest");
-					await fs.writeFile(
-						manifestPath,
-						JSON.stringify(options.manifest, null, 2),
-					);
-				}
+					// Ensure outDir exists
+					try {
+						await fs.access(outDir);
+					} catch {
+						return;
+					}
 
-				// Generate Service Worker
-				const swDest = path.resolve(outDir, "sw.js");
-				try {
-					await generateSW({
-						swDest,
-						globDirectory: outDir,
-						skipWaiting: true,
-						clientsClaim: true,
-						// Work around intermittent terser crashes in workbox-build.
-						mode: "development",
-						...options.workbox,
-					});
-				} catch (error) {
-					console.error(
-						"[custom-pwa] Workbox generation failed; writing fallback SW.",
-						error,
-					);
-					await fs.writeFile(
-						swDest,
-						`self.addEventListener("install", () => self.skipWaiting());
+					// Write manifest
+					if (options.manifest) {
+						const manifestPath = path.resolve(outDir, "manifest.webmanifest");
+						await fs.writeFile(
+							manifestPath,
+							JSON.stringify(options.manifest, null, 2),
+						);
+					}
+
+					// Generate Service Worker
+					const swDest = path.resolve(outDir, "sw.js");
+					try {
+						await generateSW({
+							swDest,
+							globDirectory: outDir,
+							skipWaiting: true,
+							clientsClaim: true,
+							// Work around intermittent terser crashes in workbox-build.
+							mode: "development",
+							...options.workbox,
+						});
+					} catch (error) {
+						console.error(
+							"[custom-pwa] Workbox generation failed; writing fallback SW.",
+							error,
+						);
+						await fs.writeFile(
+							swDest,
+							`self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));`,
-					);
+						);
+					}
+				} catch (error) {
+					console.error("[custom-pwa] closeBundle failed:", error);
 				}
 			},
 			transformIndexHtml(html) {

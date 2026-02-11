@@ -34,6 +34,9 @@ export default defineConfig({
 			},
 		}),
 	],
+	build: {
+		emptyOutDir: false,
+	},
 	worker: {
 		format: "es",
 	},

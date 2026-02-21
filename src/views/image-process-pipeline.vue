@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import WebSR from "@websr/websr";
 import cnn2xLarge3D from "@websr/websr/weights/anime4k/cnn-2x-l-3d.json";
 import cnn2xLargeAnime from "@websr/websr/weights/anime4k/cnn-2x-l-an.json";
 import cnn2xLargeRealLife from "@websr/websr/weights/anime4k/cnn-2x-l-rl.json";
@@ -17,6 +16,7 @@ import ImageCropper from "../components/ImageCropper.vue";
 import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
+import { loadWebSR } from "../websr";
 import type { OpencvWorker } from "../workers/opencv-worker";
 import OpencvWorkerConstructor from "../workers/opencv-worker?worker";
 import type { TesseractWorker } from "../workers/tesseract-worker";
@@ -165,6 +165,7 @@ const networkNameMap: Record<"s" | "m" | "l", string> = {
 
 const initWebGPU = async () => {
 	try {
+		const WebSR = await loadWebSR();
 		gpu = await WebSR.initWebGPU();
 		isWebGPUAvailable.value = Boolean(gpu);
 	} catch {
@@ -354,6 +355,7 @@ const upscaleImageData = async (
 	const dstCanvas = document.createElement("canvas");
 	dstCanvas.width = imageBitmap.width * 2;
 	dstCanvas.height = imageBitmap.height * 2;
+	const WebSR = await loadWebSR();
 
 	const websr = new WebSR({
 		// biome-ignore lint/suspicious/noExplicitAny: WebSR network type is not exported

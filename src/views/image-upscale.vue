@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import * as Comlink from "comlink";
+import WebSR from "@websr/websr";
+import cnn2xLarge3D from "@websr/websr/weights/anime4k/cnn-2x-l-3d.json";
+import cnn2xLargeAnime from "@websr/websr/weights/anime4k/cnn-2x-l-an.json";
+import cnn2xLargeRealLife from "@websr/websr/weights/anime4k/cnn-2x-l-rl.json";
+import cnn2xMedium3D from "@websr/websr/weights/anime4k/cnn-2x-m-3d.json";
+import cnn2xMediumAnime from "@websr/websr/weights/anime4k/cnn-2x-m-an.json";
+import cnn2xMediumRealLife from "@websr/websr/weights/anime4k/cnn-2x-m-rl.json";
+import cnn2xSmall3D from "@websr/websr/weights/anime4k/cnn-2x-s-3d.json";
+import cnn2xSmallAnime from "@websr/websr/weights/anime4k/cnn-2x-s-an.json";
+import cnn2xSmallRealLife from "@websr/websr/weights/anime4k/cnn-2x-s-rl.json";
 import { onMounted, onUnmounted, reactive, ref } from "vue";
 import DownloadLink from "../components/DownloadLink.vue";
 import FilePicker from "../components/FilePicker.vue";
 import LoadingOverlay from "../components/LoadingOverlay.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
-import type { WebsrWorker } from "../workers/websr-worker";
-
-import WebsrWorkerConstructor from "../workers/websr-worker?worker";
 
 const sourceImageUrl = ref<string | null>(null);
 const resultImageUrl = ref<string | null>(null);
@@ -16,32 +22,50 @@ const isProcessing = ref(false);
 const isWebGPUAvailable = ref(true);
 const errorMessage = ref<string | null>(null);
 
+const weightsMap: Record<string, unknown> = {
+	"s-an": cnn2xSmallAnime,
+	"m-an": cnn2xMediumAnime,
+	"l-an": cnn2xLargeAnime,
+	"s-rl": cnn2xSmallRealLife,
+	"m-rl": cnn2xMediumRealLife,
+	"l-rl": cnn2xLargeRealLife,
+	"s-3d": cnn2xSmall3D,
+	"m-3d": cnn2xMedium3D,
+	"l-3d": cnn2xLarge3D,
+};
+
+const networkNameMap: Record<"s" | "m" | "l", string> = {
+	s: "anime4k/cnn-2x-s",
+	m: "anime4k/cnn-2x-m",
+	l: "anime4k/cnn-2x-l",
+};
+
 const config = reactive({
 	size: "s" as "s" | "m" | "l",
 	type: "an" as "an" | "rl" | "3d",
 	format: "image/png" as "image/png" | "image/jpeg" | "image/webp",
 });
 
-let worker: Worker | null = null;
-let api: Comlink.Remote<WebsrWorker> | null = null;
+// biome-ignore lint/suspicious/noExplicitAny: GPUDevice is not available in this project type context
+let gpu: any = null;
 
-onMounted(async () => {
-	worker = new WebsrWorkerConstructor();
-	api = Comlink.wrap<WebsrWorker>(worker);
-
+const initWebGPU = async () => {
 	try {
-		const available = await api.init();
-		if (!available) {
-			isWebGPUAvailable.value = false;
-		}
+		gpu = await WebSR.initWebGPU();
+		isWebGPUAvailable.value = Boolean(gpu);
 	} catch (e) {
 		console.error(e);
 		isWebGPUAvailable.value = false;
+		gpu = null;
 	}
+};
+
+onMounted(async () => {
+	await initWebGPU();
 });
 
 onUnmounted(() => {
-	worker?.terminate();
+	gpu = null;
 });
 
 const handleFileChange = (event: Event) => {
@@ -59,33 +83,39 @@ const handleFileChange = (event: Event) => {
 };
 
 const upscaleImage = async () => {
-	if (!sourceImageUrl.value || !api) return;
+	if (!sourceImageUrl.value) return;
 
 	isProcessing.value = true;
 	errorMessage.value = null;
 
 	try {
+		if (!gpu) {
+			await initWebGPU();
+			if (!gpu) {
+				throw new Error("WebGPU initialization failed");
+			}
+		}
+
 		const img = new Image();
 		img.src = sourceImageUrl.value;
 		await img.decode();
 
 		const imageBitmap = await createImageBitmap(img);
-
-		const resultBitmap = await api.upscale(
-			Comlink.transfer(imageBitmap, [imageBitmap]),
-			config.size,
-			config.type,
-		);
-
 		const canvas = document.createElement("canvas");
-		canvas.width = resultBitmap.width;
-		canvas.height = resultBitmap.height;
-		const ctx = canvas.getContext("2d");
-		if (ctx) {
-			ctx.drawImage(resultBitmap, 0, 0);
-			resultImageUrl.value = canvas.toDataURL(config.format, 0.9);
-		}
-		resultBitmap.close();
+		canvas.width = imageBitmap.width * 2;
+		canvas.height = imageBitmap.height * 2;
+
+		const websr = new WebSR({
+			// biome-ignore lint/suspicious/noExplicitAny: WebSR network type is not exported
+			network_name: networkNameMap[config.size] as any,
+			weights: weightsMap[`${config.size}-${config.type}`],
+			gpu,
+			canvas: canvas as OffscreenCanvas,
+		});
+
+		await websr.render(imageBitmap);
+		imageBitmap.close();
+		resultImageUrl.value = canvas.toDataURL(config.format, 0.9);
 	} catch (e: unknown) {
 		console.error(e);
 		errorMessage.value =

@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import WebSR from "@websr/websr";
+import cnn2xLarge3D from "@websr/websr/weights/anime4k/cnn-2x-l-3d.json";
+import cnn2xLargeAnime from "@websr/websr/weights/anime4k/cnn-2x-l-an.json";
+import cnn2xLargeRealLife from "@websr/websr/weights/anime4k/cnn-2x-l-rl.json";
+import cnn2xMedium3D from "@websr/websr/weights/anime4k/cnn-2x-m-3d.json";
+import cnn2xMediumAnime from "@websr/websr/weights/anime4k/cnn-2x-m-an.json";
+import cnn2xMediumRealLife from "@websr/websr/weights/anime4k/cnn-2x-m-rl.json";
+import cnn2xSmall3D from "@websr/websr/weights/anime4k/cnn-2x-s-3d.json";
+import cnn2xSmallAnime from "@websr/websr/weights/anime4k/cnn-2x-s-an.json";
+import cnn2xSmallRealLife from "@websr/websr/weights/anime4k/cnn-2x-s-rl.json";
 import * as Comlink from "comlink";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import DownloadLink from "../components/DownloadLink.vue";
@@ -12,7 +22,7 @@ import OpencvWorkerConstructor from "../workers/opencv-worker?worker";
 import type { TesseractWorker } from "../workers/tesseract-worker";
 import TesseractWorkerConstructor from "../workers/tesseract-worker?worker";
 
-type ProcessType = "resize" | "convert" | "bg-remover" | "ocr";
+type ProcessType = "resize" | "upscale" | "convert" | "bg-remover" | "ocr";
 
 type ResizeConfig = {
 	width: number;
@@ -23,6 +33,11 @@ type ResizeConfig = {
 type ConvertConfig = {
 	format: "image/png" | "image/jpeg" | "image/webp";
 	quality: number;
+};
+
+type UpscaleConfig = {
+	size: "s" | "m" | "l";
+	type: "an" | "rl" | "3d";
 };
 
 type BgRemoverConfig = {
@@ -37,7 +52,12 @@ type OcrConfig = {
 	language: string;
 };
 
-type StepConfig = ResizeConfig | ConvertConfig | BgRemoverConfig | OcrConfig;
+type StepConfig =
+	| ResizeConfig
+	| UpscaleConfig
+	| ConvertConfig
+	| BgRemoverConfig
+	| OcrConfig;
 
 type PipelineStep = {
 	id: number;
@@ -56,6 +76,7 @@ type PipelineResult = {
 
 const processTypeLabels: Record<ProcessType, string> = {
 	resize: "Image Resize",
+	upscale: "Image Upscale",
 	convert: "Image Convert",
 	"bg-remover": "BG Remover",
 	ocr: "OCR",
@@ -63,6 +84,7 @@ const processTypeLabels: Record<ProcessType, string> = {
 
 const processTypeOptions: { value: ProcessType; label: string }[] = [
 	{ value: "resize", label: "Image Resize" },
+	{ value: "upscale", label: "Image Upscale" },
 	{ value: "convert", label: "Image Convert" },
 	{ value: "bg-remover", label: "BG Remover" },
 	{ value: "ocr", label: "OCR" },
@@ -97,6 +119,7 @@ const runMessage = ref("");
 const grabCutCropper = ref<InstanceType<typeof ImageCropper> | null>(null);
 
 const isProcessing = ref(false);
+const isWebGPUAvailable = ref(true);
 const runError = ref("");
 const results = ref<PipelineResult[]>([]);
 const finalImageUrl = ref<string | null>(null);
@@ -110,6 +133,8 @@ let opencvWorker: Worker | null = null;
 let opencvApi: Comlink.Remote<OpencvWorker> | null = null;
 let tesseractWorker: Worker | null = null;
 let tesseractApi: Comlink.Remote<TesseractWorker> | null = null;
+// biome-ignore lint/suspicious/noExplicitAny: GPUDevice is not available in this project type context
+let gpu: any = null;
 let sampleResolver: ((point: { x: number; y: number }) => void) | null = null;
 let grabCutResolver:
 	| ((rect: {
@@ -120,10 +145,40 @@ let grabCutResolver:
 	  }) => void)
 	| null = null;
 
+const weightsMap: Record<string, unknown> = {
+	"s-an": cnn2xSmallAnime,
+	"m-an": cnn2xMediumAnime,
+	"l-an": cnn2xLargeAnime,
+	"s-rl": cnn2xSmallRealLife,
+	"m-rl": cnn2xMediumRealLife,
+	"l-rl": cnn2xLargeRealLife,
+	"s-3d": cnn2xSmall3D,
+	"m-3d": cnn2xMedium3D,
+	"l-3d": cnn2xLarge3D,
+};
+
+const networkNameMap: Record<"s" | "m" | "l", string> = {
+	s: "anime4k/cnn-2x-s",
+	m: "anime4k/cnn-2x-m",
+	l: "anime4k/cnn-2x-l",
+};
+
+const initWebGPU = async () => {
+	try {
+		gpu = await WebSR.initWebGPU();
+		isWebGPUAvailable.value = Boolean(gpu);
+	} catch {
+		isWebGPUAvailable.value = false;
+		gpu = null;
+	}
+};
+
 const createDefaultConfig = (type: ProcessType): StepConfig => {
 	switch (type) {
 		case "resize":
 			return { width: 1200, height: 800, keepAspectRatio: true };
+		case "upscale":
+			return { size: "s", type: "an" };
 		case "convert":
 			return { format: "image/png", quality: 0.9 };
 		case "bg-remover":
@@ -189,6 +244,10 @@ const canRun = computed(() => {
 		!!sourceImageUrl.value &&
 		validationErrors.value.length === 0
 	);
+});
+
+const hasUpscaleStep = computed(() => {
+	return pipelineSteps.value.some((step) => step.type === "upscale");
 });
 
 const outputMode = computed(() => {
@@ -269,6 +328,47 @@ const resizeImageData = async (imageData: ImageData, config: ResizeConfig) => {
 	if (!dstContext) throw new Error("Failed to create destination context.");
 	dstContext.drawImage(srcCanvas, 0, 0, targetWidth, targetHeight);
 	return dstContext.getImageData(0, 0, targetWidth, targetHeight);
+};
+
+const upscaleImageData = async (
+	imageData: ImageData,
+	config: UpscaleConfig,
+) => {
+	if (!gpu) {
+		await initWebGPU();
+		if (!gpu) {
+			throw new Error(
+				"WebGPU is unavailable. Image Upscale step requires WebGPU support.",
+			);
+		}
+	}
+
+	const srcCanvas = document.createElement("canvas");
+	srcCanvas.width = imageData.width;
+	srcCanvas.height = imageData.height;
+	const srcContext = srcCanvas.getContext("2d");
+	if (!srcContext) throw new Error("Failed to create source context.");
+	srcContext.putImageData(imageData, 0, 0);
+
+	const imageBitmap = await createImageBitmap(srcCanvas);
+	const dstCanvas = document.createElement("canvas");
+	dstCanvas.width = imageBitmap.width * 2;
+	dstCanvas.height = imageBitmap.height * 2;
+
+	const websr = new WebSR({
+		// biome-ignore lint/suspicious/noExplicitAny: WebSR network type is not exported
+		network_name: networkNameMap[config.size] as any,
+		weights: weightsMap[`${config.size}-${config.type}`],
+		gpu,
+		canvas: dstCanvas as OffscreenCanvas,
+	});
+
+	await websr.render(imageBitmap);
+	imageBitmap.close();
+
+	const dstContext = dstCanvas.getContext("2d");
+	if (!dstContext) throw new Error("Failed to create destination context.");
+	return dstContext.getImageData(0, 0, dstCanvas.width, dstCanvas.height);
 };
 
 const waitForSamplePoint = (stepId: number) => {
@@ -376,6 +476,15 @@ const runPipeline = async () => {
 	resetRunState();
 
 	try {
+		if (pipelineSteps.value.some((step) => step.type === "upscale")) {
+			await initWebGPU();
+			if (!gpu) {
+				throw new Error(
+					"WebGPU is unavailable. Remove Image Upscale steps or use a browser/device with WebGPU support.",
+				);
+			}
+		}
+
 		let currentImageData = await imageDataFromUrl(sourceImageUrl.value);
 		let lastImageOutputUrl = "";
 		let lastMimeType: "image/png" | "image/jpeg" | "image/webp" = "image/png";
@@ -403,6 +512,26 @@ const runPipeline = async () => {
 					outputType: "image",
 					previewUrl,
 					meta: `${currentImageData.width} x ${currentImageData.height} px`,
+				});
+				lastImageOutputUrl = previewUrl;
+				lastMimeType = "image/png";
+				previewImageUrl.value = previewUrl;
+				continue;
+			}
+
+			if (step.type === "upscale") {
+				const config = step.config as UpscaleConfig;
+				currentImageData = await upscaleImageData(currentImageData, config);
+				const previewUrl = await imageDataToDataUrl(
+					currentImageData,
+					"image/png",
+				);
+				results.value.push({
+					stepId: step.id,
+					stepTitle: getStepTitle(step, index),
+					outputType: "image",
+					previewUrl,
+					meta: `2x | Model: ${config.size.toUpperCase()}-${config.type.toUpperCase()} | ${currentImageData.width} x ${currentImageData.height} px`,
 				});
 				lastImageOutputUrl = previewUrl;
 				lastMimeType = "image/png";
@@ -513,6 +642,7 @@ const runPipeline = async () => {
 };
 
 onMounted(() => {
+	void initWebGPU();
 	opencvWorker = new OpencvWorkerConstructor();
 	opencvApi = Comlink.wrap<OpencvWorker>(opencvWorker);
 	tesseractWorker = new TesseractWorkerConstructor();
@@ -527,6 +657,7 @@ onUnmounted(() => {
 	}
 	sampleResolver = null;
 	grabCutResolver = null;
+	gpu = null;
 	opencvWorker?.terminate();
 	tesseractWorker?.terminate();
 });
@@ -536,8 +667,13 @@ onUnmounted(() => {
   <div>
     <ToolHeader
       title="Image Process Pipeline"
-      description="Build a sequential image pipeline with resize, convert, background removal, and OCR. Use + Add Process to extend the chain."
+      description="Build a sequential image pipeline with resize, AI upscale (2x), convert, background removal, and OCR. Use + Add Process to extend the chain."
     />
+
+    <div v-if="hasUpscaleStep && !isWebGPUAvailable" class="alert alert-warning mb-4">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      WebGPU is not available. Remove Image Upscale steps or use a WebGPU-supported browser/device.
+    </div>
 
     <div class="row g-4">
       <div class="col-lg-6">
@@ -635,6 +771,25 @@ onUnmounted(() => {
                       />
                       <label class="form-check-label small" :for="`keep-ratio-${step.id}`">Lock</label>
                     </div>
+                  </div>
+                </template>
+
+                <template v-if="step.type === 'upscale'">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold small">Model Size</label>
+                    <select v-model="(step.config as UpscaleConfig).size" class="form-select form-select-sm">
+                      <option value="s">Small (Fastest)</option>
+                      <option value="m">Medium</option>
+                      <option value="l">Large (Best Quality)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold small">Content Type</label>
+                    <select v-model="(step.config as UpscaleConfig).type" class="form-select form-select-sm">
+                      <option value="an">Anime / Illustration</option>
+                      <option value="rl">Real Life (Photo)</option>
+                      <option value="3d">3D / CGI / Gaming</option>
+                    </select>
                   </div>
                 </template>
 

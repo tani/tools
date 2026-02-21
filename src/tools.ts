@@ -237,6 +237,14 @@ export const tools: Tool[] = [
 		component: () => import("./views/bg-remover.vue"),
 		category: "Graphics & Images",
 	},
+	{
+		path: "/image-upscale",
+		name: "Image Upscale",
+		icon: "🔍",
+		description: "Upscale images using AI directly in the browser.",
+		component: () => import("./views/image-upscale.vue"),
+		category: "Graphics & Images",
+	},
 	// PDF Tools
 	{
 		path: "/pdf-viewer",

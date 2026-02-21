@@ -245,6 +245,15 @@ export const tools: Tool[] = [
 		component: () => import("./views/image-upscale.vue"),
 		category: "Graphics & Images",
 	},
+	{
+		path: "/image-process-pipeline",
+		name: "Image Process Pipeline",
+		icon: "🧪",
+		description:
+			"Build and run sequential image pipelines with resize, convert, background removal, and OCR.",
+		component: () => import("./views/image-process-pipeline.vue"),
+		category: "Graphics & Images",
+	},
 	// PDF Tools
 	{
 		path: "/pdf-viewer",
@@ -309,6 +318,15 @@ export const tools: Tool[] = [
 		icon: "🍅",
 		description: "Track focus sessions with the Pomodoro timer.",
 		component: () => import("./views/pomodoro.vue"),
+		category: "Utilities",
+	},
+	{
+		path: "/world-time-map",
+		name: "World Time Map",
+		icon: "🌍",
+		description:
+			"Hover or tap countries on the world map to see local time by ISO code.",
+		component: () => import("./views/world-time-map.vue"),
 		category: "Utilities",
 	},
 ];

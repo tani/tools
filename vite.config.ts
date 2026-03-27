@@ -1,4 +1,4 @@
-import vue from "unplugin-vue/vite";
+import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 import polyfillPlugin from "./unplugin/polyfill";
 import pwaPlugin from "./unplugin/pwa";

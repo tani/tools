@@ -15,6 +15,19 @@ export type FormatOption = {
 	mimeType: string;
 };
 
+type ConversionResult = {
+	option: FormatOption;
+	blobUrl: string;
+	bytes: Uint8Array;
+	size: number;
+	width?: number;
+	height?: number;
+	pageCount?: number;
+	isArchive?: boolean;
+	downloadExtension?: string;
+	previewLabel?: string;
+};
+
 const availableFormats: FormatOption[] = [
 	{ label: "PNG", extension: "png", mimeType: "image/png" },
 	{ label: "JPEG", extension: "jpg", mimeType: "image/jpeg" },
@@ -37,14 +50,7 @@ const sourceDetails = ref<{
 const sourceError = ref("");
 
 const converting = ref(false);
-const result = ref<{
-	option: FormatOption;
-	blobUrl: string;
-	bytes: Uint8Array;
-	width: number;
-	height: number;
-	size: number;
-} | null>(null);
+const result = ref<ConversionResult | null>(null);
 const conversionError = ref("");
 
 let muWorker: Worker | null = null;
@@ -56,6 +62,139 @@ onMounted(async () => {
 	muWorker = new PdfWorkerConstructor();
 	muApi = Comlink.wrap<PdfWorker>(muWorker);
 });
+
+const createImageBlob = async (
+	width: number,
+	height: number,
+	pixels: Uint8ClampedArray,
+	mimeType: string,
+	qualityValue: number,
+) => {
+	const canvas = document.createElement("canvas");
+	canvas.width = width;
+	canvas.height = height;
+	const ctx = canvas.getContext("2d");
+	if (!ctx) throw new Error("Failed to get canvas context");
+
+	const imageData = new ImageData(pixels, width, height);
+	ctx.putImageData(imageData, 0, 0);
+
+	const blob = await new Promise<Blob | null>((resolve) => {
+		ctx.canvas.toBlob((value) => resolve(value), mimeType, qualityValue);
+	});
+	if (!blob) throw new Error("Failed to create blob");
+	return blob;
+};
+
+const makeCrc32Table = () => {
+	const table = new Uint32Array(256);
+	for (let i = 0; i < 256; i++) {
+		let c = i;
+		for (let j = 0; j < 8; j++) {
+			c = (c & 1) !== 0 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+		}
+		table[i] = c >>> 0;
+	}
+	return table;
+};
+
+const crc32Table = makeCrc32Table();
+
+const computeCrc32 = (bytes: Uint8Array) => {
+	let crc = 0xffffffff;
+	for (const byte of bytes) {
+		crc = crc32Table[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+	}
+	return (crc ^ 0xffffffff) >>> 0;
+};
+
+const createStoredZip = (
+	entries: Array<{ name: string; bytes: Uint8Array }>,
+) => {
+	const encoder = new TextEncoder();
+	const localParts: Uint8Array[] = [];
+	const centralParts: Uint8Array[] = [];
+	let offset = 0;
+
+	for (const entry of entries) {
+		const nameBytes = encoder.encode(entry.name);
+		const crc = computeCrc32(entry.bytes);
+
+		const localHeader = new Uint8Array(30 + nameBytes.length);
+		const localView = new DataView(localHeader.buffer);
+		localView.setUint32(0, 0x04034b50, true);
+		localView.setUint16(4, 20, true);
+		localView.setUint16(6, 0, true);
+		localView.setUint16(8, 0, true);
+		localView.setUint16(10, 0, true);
+		localView.setUint16(12, 0, true);
+		localView.setUint32(14, crc, true);
+		localView.setUint32(18, entry.bytes.length, true);
+		localView.setUint32(22, entry.bytes.length, true);
+		localView.setUint16(26, nameBytes.length, true);
+		localView.setUint16(28, 0, true);
+		localHeader.set(nameBytes, 30);
+		localParts.push(localHeader, entry.bytes);
+
+		const centralHeader = new Uint8Array(46 + nameBytes.length);
+		const centralView = new DataView(centralHeader.buffer);
+		centralView.setUint32(0, 0x02014b50, true);
+		centralView.setUint16(4, 20, true);
+		centralView.setUint16(6, 20, true);
+		centralView.setUint16(8, 0, true);
+		centralView.setUint16(10, 0, true);
+		centralView.setUint16(12, 0, true);
+		centralView.setUint16(14, 0, true);
+		centralView.setUint32(16, crc, true);
+		centralView.setUint32(20, entry.bytes.length, true);
+		centralView.setUint32(24, entry.bytes.length, true);
+		centralView.setUint16(28, nameBytes.length, true);
+		centralView.setUint16(30, 0, true);
+		centralView.setUint16(32, 0, true);
+		centralView.setUint16(34, 0, true);
+		centralView.setUint16(36, 0, true);
+		centralView.setUint32(38, 0, true);
+		centralView.setUint32(42, offset, true);
+		centralHeader.set(nameBytes, 46);
+		centralParts.push(centralHeader);
+
+		offset += localHeader.length + entry.bytes.length;
+	}
+
+	const centralDirectorySize = centralParts.reduce(
+		(total, part) => total + part.length,
+		0,
+	);
+	const endRecord = new Uint8Array(22);
+	const endView = new DataView(endRecord.buffer);
+	endView.setUint32(0, 0x06054b50, true);
+	endView.setUint16(4, 0, true);
+	endView.setUint16(6, 0, true);
+	endView.setUint16(8, entries.length, true);
+	endView.setUint16(10, entries.length, true);
+	endView.setUint32(12, centralDirectorySize, true);
+	endView.setUint32(16, offset, true);
+	endView.setUint16(20, 0, true);
+
+	const totalSize = offset + centralDirectorySize + endRecord.length;
+	const zipBytes = new Uint8Array(totalSize);
+	let writeOffset = 0;
+
+	for (const part of [...localParts, ...centralParts, endRecord]) {
+		zipBytes.set(part, writeOffset);
+		writeOffset += part.length;
+	}
+
+	return zipBytes;
+};
+
+const getDownloadFileName = () => {
+	if (!result.value) return "";
+	const originalName = sourceName.value.replace(/\.[^.]+$/, "") || "converted";
+	const extension =
+		result.value.downloadExtension || result.value.option.extension;
+	return `${originalName}.${extension}`;
+};
 
 const readFile = async (event: Event) => {
 	const target = event.target as HTMLInputElement;
@@ -123,6 +262,46 @@ const convert = async () => {
 	}
 
 	try {
+		if (sourcePdfBytes.value && option.mimeType.startsWith("image/")) {
+			if (!muApi) return;
+
+			const pageCount = await muApi.getPageCount(sourcePdfBytes.value);
+			const zipEntries: Array<{ name: string; bytes: Uint8Array }> = [];
+
+			for (let i = 0; i < pageCount; i++) {
+				const pageImage = await muApi.getPageAsImage(sourcePdfBytes.value, i);
+				const blob = await createImageBlob(
+					pageImage.width,
+					pageImage.height,
+					pageImage.pixels,
+					option.mimeType,
+					quality.value,
+				);
+				const bytes = new Uint8Array(await blob.arrayBuffer());
+				zipEntries.push({
+					name: `page-${String(i + 1).padStart(3, "0")}.${option.extension}`,
+					bytes,
+				});
+			}
+
+			const zipBytes = createStoredZip(zipEntries);
+			if (result.value?.blobUrl) URL.revokeObjectURL(result.value.blobUrl);
+
+			result.value = {
+				option,
+				blobUrl: URL.createObjectURL(
+					new Blob([zipBytes as BlobPart], { type: "application/zip" }),
+				),
+				bytes: zipBytes,
+				size: zipBytes.length,
+				pageCount,
+				isArchive: true,
+				downloadExtension: "zip",
+				previewLabel: `${pageCount} pages exported as ${option.label} images`,
+			};
+			return;
+		}
+
 		if (targetFormat.value === "application/pdf") {
 			if (!muApi || !sourceBytes.value) return;
 			const pdfBytes = await muApi.imageToPdf(
@@ -221,13 +400,13 @@ const formatSize = (bytes: number) => {
   <div class="container py-4">
     <ToolHeader
       title="Image Convert"
-      description="Convert images between popular formats like PNG, JPEG, and WebP using the browser's Canvas API."
+      description="Convert images between popular formats and export PDF pages as a ZIP of images directly in the browser."
     />
 
     <ToolCard title="Configuration" class="mb-4">
       <div class="row g-3 align-items-end">
         <div class="col-md-6">
-          <FilePicker label="Input Image" accept="image/*,application/pdf" @change="readFile" />
+          <FilePicker label="Input Image or PDF" accept="image/*,application/pdf" @change="readFile" />
         </div>
         <div class="col-md-3">
           <label class="form-label fw-bold small">Target Format</label>
@@ -276,7 +455,7 @@ const formatSize = (bytes: number) => {
                 {{ formatSize(sourceBytes?.length || 0) }}
               </div>
             </div>
-            <div v-else class="text-muted small">Upload an image to see preview</div>
+            <div v-else class="text-muted small">Upload an image or PDF to see preview</div>
           </div>
           <p v-if="sourceError" class="text-danger small mt-2 mb-0">{{ sourceError }}</p>
         </ToolCard>
@@ -286,7 +465,7 @@ const formatSize = (bytes: number) => {
           <template #header-actions v-if="result">
             <DownloadLink
               :href="result.blobUrl"
-              :filename="`converted.${result.option.extension}`"
+              :filename="getDownloadFileName()"
             />
           </template>
           <div
@@ -294,8 +473,18 @@ const formatSize = (bytes: number) => {
             style="min-height: 300px"
           >
             <div v-if="result" class="w-100">
+              <div
+                v-if="result.isArchive"
+                class="d-flex h-100 flex-column align-items-center justify-content-center py-5"
+              >
+                <div class="fw-semibold mb-2">ZIP archive ready</div>
+                <div class="text-muted small">{{ result.previewLabel }}</div>
+                <div class="text-muted small font-monospace mt-2">
+                  {{ formatSize(result.size) }}
+                </div>
+              </div>
               <PdfViewer
-                v-if="result.option.mimeType === 'application/pdf'"
+                v-else-if="result.option.mimeType === 'application/pdf'"
                 :data="result.bytes"
               />
               <img
@@ -304,12 +493,12 @@ const formatSize = (bytes: number) => {
                 class="img-fluid mb-2 rounded shadow-sm"
                 style="max-height: 400px"
               />
-              <div class="text-muted small font-monospace mt-2">
+              <div v-if="!result.isArchive" class="text-muted small font-monospace mt-2">
                 {{ result.width }} × {{ result.height }} px | {{ formatSize(result.size) }}
               </div>
             </div>
             <LoadingOverlay v-else-if="converting" :loading="converting" message="Converting..." />
-            <div v-else class="text-muted small">Converted image will appear here</div>
+            <div v-else class="text-muted small">Converted file will appear here</div>
           </div>
           <p v-if="conversionError" class="text-danger small mt-2 mb-0">{{ conversionError }}</p>
         </ToolCard>

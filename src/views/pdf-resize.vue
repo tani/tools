@@ -7,7 +7,6 @@ import PdfViewer from "../components/PdfViewer.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { PdfWorker } from "../workers/pdf-worker";
-
 import PdfWorkerConstructor from "../workers/pdf-worker?worker";
 
 const fileData = ref<Uint8Array | null>(null);
@@ -87,64 +86,76 @@ const resizePdf = async () => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="PDF Resize"
-      description="Resize all pages of a PDF document to a standard format like A4 or Letter."
-    />
+	<div>
+		<ToolHeader
+			title="PDF Resize"
+			description="Resize all pages of a PDF document to a standard format like A4 or Letter."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-4">
-          <FilePicker label="Upload PDF" accept="application/pdf" @change="handleFileChange" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-bold small">Target Format</label>
-          <select v-model="targetFormat" class="form-select">
-            <option v-for="(_, name) in formats" :key="name" :value="name">{{ name }}</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-bold small">Orientation</label>
-          <select v-model="orientation" class="form-select">
-            <option value="portrait">Portrait</option>
-            <option value="landscape">Landscape</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <button
-            class="btn btn-primary w-100"
-            @click="resizePdf"
-            :disabled="!fileData || isProcessing"
-          >
-            <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-            Resize
-          </button>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-end">
+				<div class="col-md-4">
+					<FilePicker
+						label="Upload PDF"
+						accept="application/pdf"
+						@change="handleFileChange"
+					/>
+				</div>
+				<div class="col-md-3">
+					<label class="form-label fw-bold small">Target Format</label>
+					<select v-model="targetFormat" class="form-select">
+						<option v-for="(_, name) in formats" :key="name" :value="name">
+							{{ name }}
+						</option>
+					</select>
+				</div>
+				<div class="col-md-3">
+					<label class="form-label fw-bold small">Orientation</label>
+					<select v-model="orientation" class="form-select">
+						<option value="portrait">Portrait</option>
+						<option value="landscape">Landscape</option>
+					</select>
+				</div>
+				<div class="col-md-2">
+					<button
+						class="btn btn-primary w-100"
+						@click="resizePdf"
+						:disabled="!fileData || isProcessing"
+					>
+						<span
+							v-if="isProcessing"
+							class="spinner-border spinner-border-sm me-2"
+						></span>
+						Resize
+					</button>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div
-      v-if="downloadUrl"
-      class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
-    >
-      <span><strong>Success!</strong> All pages have been resized to {{ targetFormat }}.</span>
-      <DownloadLink
-        :href="downloadUrl"
-        :filename="'resized_' + fileName"
-        label="Download Resized PDF"
-        class="btn btn-success btn-sm"
-      />
-    </div>
+		<div
+			v-if="downloadUrl"
+			class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
+		>
+			<span
+				><strong>Success!</strong> All pages have been resized to
+				{{ targetFormat }}.</span
+			>
+			<DownloadLink
+				:href="downloadUrl"
+				:filename="'resized_' + fileName"
+				label="Download Resized PDF"
+				class="btn btn-success btn-sm"
+			/>
+		</div>
 
-    <div class="row">
-      <div class="col-12 mb-4">
-        <ToolCard title="Document Preview" no-padding>
-          <PdfViewer :data="fileData" />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-12 mb-4">
+				<ToolCard title="Document Preview" no-padding>
+					<PdfViewer :data="fileData" />
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped></style>

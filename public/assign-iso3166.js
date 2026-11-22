@@ -59,7 +59,7 @@ function levenshtein(a, b) {
 	const rows = a.length + 1;
 	const cols = b.length + 1;
 	const dp = Array.from({ length: rows }, (_, i) => {
-		const row = new Array(cols).fill(0);
+		const row = Array.from({ length: cols }, () => 0);
 		row[0] = i;
 		return row;
 	});

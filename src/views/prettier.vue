@@ -1,118 +1,147 @@
 <template>
-  <div>
-      <ToolHeader
-      title="Prettier"
-      description="Format JSON, YAML, and code snippets instantly."
-    />
-    <p class="text-muted">
-      Format code from any supported language using Prettier's built-in plugins.
-    </p>
+	<div>
+		<ToolHeader
+			title="Prettier"
+			description="Format JSON, YAML, and code snippets instantly."
+		/>
+		<p class="text-muted">
+			Format code from any supported language using Prettier's built-in plugins.
+		</p>
 
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-lg-4">
-            <label class="form-label small fw-bold text-muted">Parser</label>
-            <select v-model="selectedParser" class="form-select">
-              <option v-for="option in parserOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-            <div class="form-text">
-              Choose a parser that matches the language you want to format.
-            </div>
-          </div>
-          <div class="col-lg-2">
-            <label class="form-label small fw-bold text-muted">Print Width</label>
-            <input
-              v-model.number="printWidth"
-              type="number"
-              min="40"
-              max="200"
-              class="form-control"
-            />
-            <div class="form-text">Maximum line width.</div>
-          </div>
-          <div class="col-lg-2">
-            <label class="form-label small fw-bold text-muted">Tab Width</label>
-            <input v-model.number="tabWidth" type="number" min="1" max="8" class="form-control" />
-            <div class="form-text">Spaces per indentation level.</div>
-          </div>
-          <div
-            v-if="visibility.supportsSemicolons"
-            class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4"
-          >
-            <div class="form-check">
-              <input v-model="useSemi" class="form-check-input" type="checkbox" id="useSemi" />
-              <label class="form-check-label" for="useSemi">Semicolons</label>
-            </div>
-          </div>
-          <div
-            v-if="visibility.supportsSingleQuote"
-            class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4"
-          >
-            <div class="form-check">
-              <input
-                v-model="singleQuote"
-                class="form-check-input"
-                type="checkbox"
-                id="singleQuote"
-              />
-              <label class="form-check-label" for="singleQuote">Single quotes</label>
-            </div>
-          </div>
-          <div v-if="visibility.supportsTrailingComma" class="col-lg-3">
-            <label class="form-label small fw-bold text-muted">Trailing Commas</label>
-            <select v-model="trailingComma" class="form-select">
-              <option value="es5">ES5</option>
-              <option value="all">All</option>
-              <option value="none">None</option>
-            </select>
-            <div class="form-text">Control where trailing commas are added.</div>
-          </div>
-          <div class="col-lg-12 text-end">
-            <small class="text-muted">Formatting runs automatically as you edit.</small>
-          </div>
-        </div>
-      </div>
-    </div>
+		<div class="card mb-4 shadow-sm">
+			<div class="card-header fw-bold small text-uppercase text-muted">
+				Configuration
+			</div>
+			<div class="card-body">
+				<div class="row g-3">
+					<div class="col-lg-4">
+						<label class="form-label small fw-bold text-muted">Parser</label>
+						<select v-model="selectedParser" class="form-select">
+							<option
+								v-for="option in parserOptions"
+								:key="option.value"
+								:value="option.value"
+							>
+								{{ option.label }}
+							</option>
+						</select>
+						<div class="form-text">
+							Choose a parser that matches the language you want to format.
+						</div>
+					</div>
+					<div class="col-lg-2">
+						<label class="form-label small fw-bold text-muted"
+							>Print Width</label
+						>
+						<input
+							v-model.number="printWidth"
+							type="number"
+							min="40"
+							max="200"
+							class="form-control"
+						/>
+						<div class="form-text">Maximum line width.</div>
+					</div>
+					<div class="col-lg-2">
+						<label class="form-label small fw-bold text-muted">Tab Width</label>
+						<input
+							v-model.number="tabWidth"
+							type="number"
+							min="1"
+							max="8"
+							class="form-control"
+						/>
+						<div class="form-text">Spaces per indentation level.</div>
+					</div>
+					<div
+						v-if="visibility.supportsSemicolons"
+						class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4"
+					>
+						<div class="form-check">
+							<input
+								v-model="useSemi"
+								class="form-check-input"
+								type="checkbox"
+								id="useSemi"
+							/>
+							<label class="form-check-label" for="useSemi">Semicolons</label>
+						</div>
+					</div>
+					<div
+						v-if="visibility.supportsSingleQuote"
+						class="col-lg-2 d-flex align-items-center gap-2 pt-lg-4"
+					>
+						<div class="form-check">
+							<input
+								v-model="singleQuote"
+								class="form-check-input"
+								type="checkbox"
+								id="singleQuote"
+							/>
+							<label class="form-check-label" for="singleQuote"
+								>Single quotes</label
+							>
+						</div>
+					</div>
+					<div v-if="visibility.supportsTrailingComma" class="col-lg-3">
+						<label class="form-label small fw-bold text-muted"
+							>Trailing Commas</label
+						>
+						<select v-model="trailingComma" class="form-select">
+							<option value="es5">ES5</option>
+							<option value="all">All</option>
+							<option value="none">None</option>
+						</select>
+						<div class="form-text">
+							Control where trailing commas are added.
+						</div>
+					</div>
+					<div class="col-lg-12 text-end">
+						<small class="text-muted"
+							>Formatting runs automatically as you edit.</small
+						>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <ToolCard title="Source Code" class="h-100" no-padding>
-          <template #header-actions>
-            <small class="text-muted">Paste any supported language</small>
-          </template>
-          <MonospaceEditor
-            v-model="input"
-            :language="currentLanguage"
-            :rows="18"
-            placeholder="Paste your code here..."
-          />
-        </ToolCard>
-      </div>
+		<div class="row g-4">
+			<div class="col-lg-6">
+				<ToolCard title="Source Code" class="h-100" no-padding>
+					<template #header-actions>
+						<small class="text-muted">Paste any supported language</small>
+					</template>
+					<MonospaceEditor
+						v-model="input"
+						:language="currentLanguage"
+						:rows="18"
+						placeholder="Paste your code here..."
+					/>
+				</ToolCard>
+			</div>
 
-      <div class="col-lg-6">
-        <ToolCard title="Formatted Result" class="h-100" no-padding>
-          <template #header-actions>
-            <CopyButton :content="formatted" />
-          </template>
-          <div class="position-relative h-100">
-            <LoadingOverlay :loading="isProcessing" message="Formatting..." />
-            <MonospaceEditor
-              :model-value="formatted"
-              :language="currentLanguage"
-              :rows="18"
-              readonly
-              bg-light
-            />
-          </div>
-        </ToolCard>
-        <div v-if="error" class="alert alert-warning mt-3 mb-0">{{ error }}</div>
-      </div>
-    </div>
-  </div>
+			<div class="col-lg-6">
+				<ToolCard title="Formatted Result" class="h-100" no-padding>
+					<template #header-actions>
+						<CopyButton :content="formatted" />
+					</template>
+					<div class="position-relative h-100">
+						<LoadingOverlay :loading="isProcessing" message="Formatting..." />
+						<MonospaceEditor
+							:model-value="formatted"
+							:language="currentLanguage"
+							:rows="18"
+							readonly
+							bg-light
+						/>
+					</div>
+				</ToolCard>
+				<div v-if="error" class="alert alert-warning mt-3 mb-0">
+					{{ error }}
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -124,7 +153,6 @@ import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { PrettierWorker } from "../workers/prettier-worker";
-
 import PrettierWorkerConstructor from "../workers/prettier-worker?worker";
 
 const parserOptions = [

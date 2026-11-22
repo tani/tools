@@ -23,31 +23,31 @@ const output = computed(() => replace(input.value));
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Unicode → LaTeX"
-      description="Convert Unicode mathematical characters to their corresponding LaTeX commands."
-    />
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Unicode Input" no-padding>
-          <MonospaceEditor v-model="input" />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="LaTeX Output" no-padding>
-          <template #header-actions>
-            <CopyButton :content="output" />
-          </template>
-          <MonospaceEditor :model-value="output" readonly bg-light />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+	<div>
+		<ToolHeader
+			title="Unicode → LaTeX"
+			description="Convert Unicode mathematical characters to their corresponding LaTeX commands."
+		/>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Unicode Input" no-padding>
+					<MonospaceEditor v-model="input" />
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="LaTeX Output" no-padding>
+					<template #header-actions>
+						<CopyButton :content="output" />
+					</template>
+					<MonospaceEditor :model-value="output" readonly bg-light />
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .font-monospace {
-  font-family: var(--bs-font-monospace);
+	font-family: var(--bs-font-monospace);
 }
 </style>

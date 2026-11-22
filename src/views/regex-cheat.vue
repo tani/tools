@@ -165,95 +165,108 @@ const caveats = [
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Regex Cheat"
-      description="Quick reference for Oniguruma regular expression syntax and common patterns."
-    />
+	<div>
+		<ToolHeader
+			title="Regex Cheat"
+			description="Quick reference for Oniguruma regular expression syntax and common patterns."
+		/>
 
-    <ToolCard title="Quick Start" class="mb-4">
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <div class="p-3 bg-light rounded">
-            <div class="fw-bold small text-uppercase text-muted mb-2">Pattern + Flags</div>
-            <div class="font-monospace">\b\h+\b</div>
-            <div class="font-monospace">flags: i</div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="p-3 bg-light rounded">
-            <div class="fw-bold small text-uppercase text-muted mb-2">Inline Modifiers</div>
-            <div class="font-monospace">(?x) # ignore whitespace</div>
-            <div class="font-monospace">(?i:...)</div>
-          </div>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Quick Start" class="mb-4">
+			<div class="row g-3">
+				<div class="col-lg-6">
+					<div class="p-3 bg-light rounded">
+						<div class="fw-bold small text-uppercase text-muted mb-2">
+							Pattern + Flags
+						</div>
+						<div class="font-monospace">\b\h+\b</div>
+						<div class="font-monospace">flags: i</div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="p-3 bg-light rounded">
+						<div class="fw-bold small text-uppercase text-muted mb-2">
+							Inline Modifiers
+						</div>
+						<div class="font-monospace">(?x) # ignore whitespace</div>
+						<div class="font-monospace">(?i:...)</div>
+					</div>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div class="row">
-      <div v-for="section in sections" :key="section.title" class="col-12 mb-4">
-        <ToolCard :title="section.title" no-padding>
-          <div class="table-responsive">
-            <table class="table mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th class="text-uppercase small text-muted" style="width: 35%">Syntax</th>
-                  <th class="text-uppercase small text-muted">Meaning</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="row in section.rows" :key="row.syntax">
-                  <td class="font-monospace">{{ row.syntax }}</td>
-                  <td>{{ row.meaning }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </ToolCard>
-      </div>
-    </div>
+		<div class="row">
+			<div v-for="section in sections" :key="section.title" class="col-12 mb-4">
+				<ToolCard :title="section.title" no-padding>
+					<div class="table-responsive">
+						<table class="table mb-0">
+							<thead class="table-light">
+								<tr>
+									<th
+										class="text-uppercase small text-muted"
+										style="width: 35%"
+									>
+										Syntax
+									</th>
+									<th class="text-uppercase small text-muted">Meaning</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="row in section.rows" :key="row.syntax">
+									<td class="font-monospace">{{ row.syntax }}</td>
+									<td>{{ row.meaning }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Common Examples" class="h-100">
-          <div v-for="example in examples" :key="example.title" class="mb-3">
-            <div class="fw-bold">{{ example.title }}</div>
-            <div class="font-monospace bg-light p-2 rounded mb-1">
-              {{ example.pattern }}
-            </div>
-            <div class="text-muted small">{{ example.desc }}</div>
-          </div>
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Notes & Caveats" class="h-100">
-          <ul class="mb-0">
-            <li v-for="note in caveats" :key="note">{{ note }}</li>
-          </ul>
-        </ToolCard>
-      </div>
-    </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Common Examples" class="h-100">
+					<div v-for="example in examples" :key="example.title" class="mb-3">
+						<div class="fw-bold">{{ example.title }}</div>
+						<div class="font-monospace bg-light p-2 rounded mb-1">
+							{{ example.pattern }}
+						</div>
+						<div class="text-muted small">{{ example.desc }}</div>
+					</div>
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Notes & Caveats" class="h-100">
+					<ul class="mb-0">
+						<li v-for="note in caveats" :key="note">{{ note }}</li>
+					</ul>
+				</ToolCard>
+			</div>
+		</div>
 
-    <ToolCard title="Useful Links" class="mb-4">
-      <div class="d-flex flex-column gap-2">
-        <a
-          href="https://github.com/kkos/oniguruma/blob/master/doc/RE"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Official Oniguruma Syntax Reference
-        </a>
-        <a href="https://github.com/microsoft/vscode-oniguruma" target="_blank" rel="noreferrer">
-          vscode-oniguruma documentation
-        </a>
-      </div>
-    </ToolCard>
-  </div>
+		<ToolCard title="Useful Links" class="mb-4">
+			<div class="d-flex flex-column gap-2">
+				<a
+					href="https://github.com/kkos/oniguruma/blob/master/doc/RE"
+					target="_blank"
+					rel="noreferrer"
+				>
+					Official Oniguruma Syntax Reference
+				</a>
+				<a
+					href="https://github.com/microsoft/vscode-oniguruma"
+					target="_blank"
+					rel="noreferrer"
+				>
+					vscode-oniguruma documentation
+				</a>
+			</div>
+		</ToolCard>
+	</div>
 </template>
 
 <style scoped>
 .table td,
 .table th {
-  vertical-align: middle;
+	vertical-align: middle;
 }
 </style>

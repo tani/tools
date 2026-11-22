@@ -122,43 +122,45 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    ref="editorRef"
-    :class="[
-      'form-control font-monospace editor-container prism-editor',
-      bgLight ? 'bg-light' : '',
-      singleLine ? 'single-line py-2' : 'p-3 border-0'
-    ]"
-    :style="{ minHeight: singleLine ? 'auto' : (rows ? `calc(${rows} * 1.5em)` : '480px') }"
-    :data-placeholder="placeholder"
-  />
+	<div
+		ref="editorRef"
+		:class="[
+			'form-control font-monospace editor-container prism-editor',
+			bgLight ? 'bg-light' : '',
+			singleLine ? 'single-line py-2' : 'p-3 border-0',
+		]"
+		:style="{
+			minHeight: singleLine ? 'auto' : rows ? `calc(${rows} * 1.5em)` : '480px',
+		}"
+		:data-placeholder="placeholder"
+	/>
 </template>
 
 <style scoped>
 .editor-container {
-  overflow: auto;
-  white-space: pre;
-  word-wrap: normal;
-  outline: none;
-  position: relative;
-  font-family: var(--bs-font-monospace);
+	overflow: auto;
+	white-space: pre;
+	word-wrap: normal;
+	outline: none;
+	position: relative;
+	font-family: var(--bs-font-monospace);
 }
 
 .editor-container.single-line {
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
+	white-space: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 
 .editor-container:empty::before {
-  content: attr(data-placeholder);
-  color: #6c757d;
-  pointer-events: none;
+	content: attr(data-placeholder);
+	color: #6c757d;
+	pointer-events: none;
 }
 
 /* Prism overrides for CodeJar */
 .prism-editor {
-  line-height: 1.5;
-  tab-size: 2;
+	line-height: 1.5;
+	tab-size: 2;
 }
 </style>

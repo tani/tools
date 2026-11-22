@@ -367,102 +367,112 @@ const getTrackDescription = (track: unknown) => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Video Clipper"
-      description="Trim and shorten video files using WebCodecs."
-    />
+	<div>
+		<ToolHeader
+			title="Video Clipper"
+			description="Trim and shorten video files using WebCodecs."
+		/>
 
-    <div class="row g-4">
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <FilePicker
-              label="Select Video (MP4)"
-              accept="video/mp4,video/*"
-              @change="handleFileChange"
-              :disabled="processing"
-            />
+		<div class="row g-4">
+			<div class="col-12">
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<FilePicker
+							label="Select Video (MP4)"
+							accept="video/mp4,video/*"
+							@change="handleFileChange"
+							:disabled="processing"
+						/>
 
-            <div v-if="videoUrl" class="mt-4">
-              <div class="ratio ratio-16x9 bg-black rounded mb-3">
-                <video
-                  ref="videoElement"
-                  :src="videoUrl"
-                  controls
-                  @loadedmetadata="onMetadataLoaded"
-                  class="w-100 h-100"
-                ></video>
-              </div>
+						<div v-if="videoUrl" class="mt-4">
+							<div class="ratio ratio-16x9 bg-black rounded mb-3">
+								<video
+									ref="videoElement"
+									:src="videoUrl"
+									controls
+									@loadedmetadata="onMetadataLoaded"
+									class="w-100 h-100"
+								></video>
+							</div>
 
-              <div class="row g-3 align-items-end">
-                <div class="col-md-5">
-                  <label class="form-label">Start Time</label>
-                  <div class="input-group">
-                    <input
-                      type="number"
-                      class="form-control"
-                      v-model.number="startTime"
-                      :max="endTime"
-                      min="0"
-                      step="0.1"
-                      :disabled="processing"
-                    />
-                    <button class="btn btn-outline-secondary" type="button" @click="setStartToCurrent" :disabled="processing">
-                      Use Current
-                    </button>
-                  </div>
-                  <div class="form-text">{{ formatTime(startTime) }}</div>
-                </div>
+							<div class="row g-3 align-items-end">
+								<div class="col-md-5">
+									<label class="form-label">Start Time</label>
+									<div class="input-group">
+										<input
+											type="number"
+											class="form-control"
+											v-model.number="startTime"
+											:max="endTime"
+											min="0"
+											step="0.1"
+											:disabled="processing"
+										/>
+										<button
+											class="btn btn-outline-secondary"
+											type="button"
+											@click="setStartToCurrent"
+											:disabled="processing"
+										>
+											Use Current
+										</button>
+									</div>
+									<div class="form-text">{{ formatTime(startTime) }}</div>
+								</div>
 
-                <div class="col-md-5">
-                  <label class="form-label">End Time</label>
-                  <div class="input-group">
-                    <input
-                      type="number"
-                      class="form-control"
-                      v-model.number="endTime"
-                      :min="startTime"
-                      :max="duration"
-                      step="0.1"
-                      :disabled="processing"
-                    />
-                    <button class="btn btn-outline-secondary" type="button" @click="setEndToCurrent" :disabled="processing">
-                      Use Current
-                    </button>
-                  </div>
-                  <div class="form-text">{{ formatTime(endTime) }}</div>
-                </div>
+								<div class="col-md-5">
+									<label class="form-label">End Time</label>
+									<div class="input-group">
+										<input
+											type="number"
+											class="form-control"
+											v-model.number="endTime"
+											:min="startTime"
+											:max="duration"
+											step="0.1"
+											:disabled="processing"
+										/>
+										<button
+											class="btn btn-outline-secondary"
+											type="button"
+											@click="setEndToCurrent"
+											:disabled="processing"
+										>
+											Use Current
+										</button>
+									</div>
+									<div class="form-text">{{ formatTime(endTime) }}</div>
+								</div>
 
-                <div class="col-md-2">
-                  <button
-                    class="btn btn-primary w-100"
-                    @click="processVideo"
-                    :disabled="processing || !videoUrl"
-                  >
-                    Clip Video
-                  </button>
-                </div>
-              </div>
+								<div class="col-md-2">
+									<button
+										class="btn btn-primary w-100"
+										@click="processVideo"
+										:disabled="processing || !videoUrl"
+									>
+										Clip Video
+									</button>
+								</div>
+							</div>
 
-              <div v-if="processing" class="mt-4">
-                <div class="progress mb-2">
-                  <div
-                    class="progress-bar progress-bar-striped progress-bar-animated"
-                    role="progressbar"
-                    :style="{ width: progress + '%' }"
-                  ></div>
-                </div>
-                <p class="text-center text-muted small">{{ status }}</p>
-              </div>
+							<div v-if="processing" class="mt-4">
+								<div class="progress mb-2">
+									<div
+										class="progress-bar progress-bar-striped progress-bar-animated"
+										role="progressbar"
+										:style="{ width: progress + '%' }"
+									></div>
+								</div>
+								<p class="text-center text-muted small">{{ status }}</p>
+							</div>
 
-              <div v-if="error" class="alert alert-danger mt-3">
-                {{ error }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+							<div v-if="error" class="alert alert-danger mt-3">
+								{{ error }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>

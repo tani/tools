@@ -6,7 +6,6 @@ import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { OnigurumaWorker } from "../workers/oniguruma-worker";
-
 import OnigurumaWorkerConstructor from "../workers/oniguruma-worker?worker";
 
 const worker = ref<Comlink.Remote<OnigurumaWorker> | null>(null);
@@ -130,98 +129,116 @@ const compiledPreview = computed(() => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Regex"
-      description="Highlight Oniguruma-style regex matches with an instant preview, powered by vscode-oniguruma."
-    />
+	<div>
+		<ToolHeader
+			title="Regex"
+			description="Highlight Oniguruma-style regex matches with an instant preview, powered by vscode-oniguruma."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3">
-        <div class="col-12">
-          <label for="pattern" class="form-label fw-bold small">Oniguruma Pattern</label>
-          <MonospaceEditor
-            id="pattern"
-            v-model="pattern"
-            placeholder="e.g., \\b\\h+\\b"
-            language="regex"
-            single-line
-          />
-          <div class="form-text mt-0">
-            Supports Oniguruma syntax like <span class="font-monospace">\\h</span>,
-            <span class="font-monospace">\\R</span>, and inline modifiers.
-          </div>
-        </div>
-        <div class="col-md-6">
-          <label for="flags" class="form-label fw-bold small">Flags</label>
-          <input
-            id="flags"
-            v-model="flags"
-            class="form-control font-monospace"
-            placeholder="i, m, x, D, S, W"
-          />
-          <div class="form-text">Oniguruma flags (passed as <span class="font-monospace">(?flags)pattern</span>).</div>
-        </div>
-        <div class="col-md-6">
-          <label for="limit" class="form-label fw-bold small">Max Matches</label>
-          <input
-            id="limit"
-            v-model.number="maxMatches"
-            type="number"
-            class="form-control"
-            min="1"
-            max="5000"
-          />
-          <div class="form-text">Stops scanning after the limit to stay fast.</div>
-        </div>
-        <div class="col-12">
-          <div v-if="!isWorkerReady" class="alert alert-info mb-0">
-            Loading Oniguruma (WASM)...
-          </div>
-          <div v-else-if="error" class="alert alert-danger mb-0">
-            {{ error }}
-          </div>
-          <div v-else class="alert alert-secondary mb-0">
-            <strong>Preview:</strong>
-            <span class="font-monospace">{{ compiledPreview || "—" }}</span>
-          </div>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3">
+				<div class="col-12">
+					<label for="pattern" class="form-label fw-bold small"
+						>Oniguruma Pattern</label
+					>
+					<MonospaceEditor
+						id="pattern"
+						v-model="pattern"
+						placeholder="e.g., \\b\\h+\\b"
+						language="regex"
+						single-line
+					/>
+					<div class="form-text mt-0">
+						Supports Oniguruma syntax like
+						<span class="font-monospace">\\h</span>,
+						<span class="font-monospace">\\R</span>, and inline modifiers.
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="flags" class="form-label fw-bold small">Flags</label>
+					<input
+						id="flags"
+						v-model="flags"
+						class="form-control font-monospace"
+						placeholder="i, m, x, D, S, W"
+					/>
+					<div class="form-text">
+						Oniguruma flags (passed as
+						<span class="font-monospace">(?flags)pattern</span>).
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="limit" class="form-label fw-bold small"
+						>Max Matches</label
+					>
+					<input
+						id="limit"
+						v-model.number="maxMatches"
+						type="number"
+						class="form-control"
+						min="1"
+						max="5000"
+					/>
+					<div class="form-text">
+						Stops scanning after the limit to stay fast.
+					</div>
+				</div>
+				<div class="col-12">
+					<div v-if="!isWorkerReady" class="alert alert-info mb-0">
+						Loading Oniguruma (WASM)...
+					</div>
+					<div v-else-if="error" class="alert alert-danger mb-0">
+						{{ error }}
+					</div>
+					<div v-else class="alert alert-secondary mb-0">
+						<strong>Preview:</strong>
+						<span class="font-monospace">{{ compiledPreview || "—" }}</span>
+					</div>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Input Text" class="h-100" no-padding>
-          <MonospaceEditor v-model="text" language="regex" :rows="18" />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Matches Preview" class="h-100">
-          <template #header-actions>
-            <span class="small text-muted">{{ matchSummary }}</span>
-          </template>
-          <div class="font-monospace text-finder-output" v-html="highlightedHtml"></div>
-        </ToolCard>
-      </div>
-    </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Input Text" class="h-100" no-padding>
+					<MonospaceEditor v-model="text" language="regex" :rows="18" />
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Matches Preview" class="h-100">
+					<template #header-actions>
+						<span class="small text-muted">{{ matchSummary }}</span>
+					</template>
+					<div
+						class="font-monospace text-finder-output"
+						v-html="highlightedHtml"
+					></div>
+				</ToolCard>
+			</div>
+		</div>
 
-    <div class="row">
-      <div class="col-12 mb-4">
-        <ToolCard title="Matched Text" no-padding>
-          <template #header-actions>
-            <CopyButton :content="matchList" />
-          </template>
-          <MonospaceEditor :model-value="matchList" bg-light readonly :rows="8" />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-12 mb-4">
+				<ToolCard title="Matched Text" no-padding>
+					<template #header-actions>
+						<CopyButton :content="matchList" />
+					</template>
+					<MonospaceEditor
+						:model-value="matchList"
+						bg-light
+						readonly
+						:rows="8"
+					/>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .text-finder-output {
-  white-space: pre-wrap;
-  word-break: break-word;
-  min-height: 100%;
+	white-space: pre-wrap;
+	word-break: break-word;
+	min-height: 100%;
 }
 </style>

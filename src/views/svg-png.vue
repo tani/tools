@@ -67,67 +67,85 @@ const handleChange = async (event: Event) => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="SVG → PNG"
-      description="Convert SVG images to PNG format with custom dimensions."
-    />
+	<div>
+		<ToolHeader
+			title="SVG → PNG"
+			description="Convert SVG images to PNG format with custom dimensions."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label fw-bold small">Width (px)</label>
-          <input v-model.number="x" class="form-control" type="number" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-bold small">Height (px)</label>
-          <input v-model.number="y" class="form-control" type="number" />
-        </div>
-        <div class="col-md-4">
-          <FilePicker label="Upload SVG" accept="image/svg+xml" @change="handleChange" />
-        </div>
-        <div class="col-md-2">
-          <button class="btn btn-primary w-100" type="button" @click="handleClick">Convert</button>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-end">
+				<div class="col-md-3">
+					<label class="form-label fw-bold small">Width (px)</label>
+					<input v-model.number="x" class="form-control" type="number" />
+				</div>
+				<div class="col-md-3">
+					<label class="form-label fw-bold small">Height (px)</label>
+					<input v-model.number="y" class="form-control" type="number" />
+				</div>
+				<div class="col-md-4">
+					<FilePicker
+						label="Upload SVG"
+						accept="image/svg+xml"
+						@change="handleChange"
+					/>
+				</div>
+				<div class="col-md-2">
+					<button
+						class="btn btn-primary w-100"
+						type="button"
+						@click="handleClick"
+					>
+						Convert
+					</button>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div class="row">
-      <div class="col-12 mb-4">
-        <ToolCard title="SVG Code" no-padding>
-          <MonospaceEditor v-model="raw" :rows="10" placeholder="Paste or edit SVG code here..." />
-        </ToolCard>
-      </div>
-    </div>
+		<div class="row">
+			<div class="col-12 mb-4">
+				<ToolCard title="SVG Code" no-padding>
+					<MonospaceEditor
+						v-model="raw"
+						:rows="10"
+						placeholder="Paste or edit SVG code here..."
+					/>
+				</ToolCard>
+			</div>
+		</div>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="SVG Preview" class="h-100">
-          <div
-            class="bg-light overflow-auto p-3 d-flex align-items-center justify-content-center"
-            style="min-height: 400px"
-          >
-            <img v-if="svg" :src="svg" class="img-fluid" alt="SVG preview" />
-            <div v-else class="text-muted small">SVG preview will appear here</div>
-          </div>
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="PNG Preview" class="h-100">
-          <template #header-actions>
-            <DownloadLink :href="png" filename="converted.png" />
-          </template>
-          <div
-            class="bg-light text-center p-3 d-flex align-items-center justify-content-center"
-            style="min-height: 400px"
-          >
-            <img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
-            <div v-else class="text-muted small">PNG preview will appear here</div>
-          </div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="SVG Preview" class="h-100">
+					<div
+						class="bg-light overflow-auto p-3 d-flex align-items-center justify-content-center"
+						style="min-height: 400px"
+					>
+						<img v-if="svg" :src="svg" class="img-fluid" alt="SVG preview" />
+						<div v-else class="text-muted small">
+							SVG preview will appear here
+						</div>
+					</div>
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="PNG Preview" class="h-100">
+					<template #header-actions>
+						<DownloadLink :href="png" filename="converted.png" />
+					</template>
+					<div
+						class="bg-light text-center p-3 d-flex align-items-center justify-content-center"
+						style="min-height: 400px"
+					>
+						<img v-if="png" :src="png" class="img-fluid" alt="PNG preview" />
+						<div v-else class="text-muted small">
+							PNG preview will appear here
+						</div>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped></style>

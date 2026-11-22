@@ -210,185 +210,217 @@ const convertToGif = async () => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="GIF Converter"
-      description="Convert video files to animated GIFs using WebCodecs and gifenc."
-    />
+	<div>
+		<ToolHeader
+			title="GIF Converter"
+			description="Convert video files to animated GIFs using WebCodecs and gifenc."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-end">
-        <div class="col-lg-4">
-          <label class="form-label fw-bold small text-uppercase text-muted">Upload video</label>
-          <FilePicker
-            label="Select Video"
-            accept="video/mp4,video/quicktime,video/webm,video/x-matroska,video/*"
-            @change="handleFileChange"
-            :disabled="processing"
-          />
-          <div class="form-text">Pick a video to convert into an animated GIF.</div>
-        </div>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-end">
+				<div class="col-lg-4">
+					<label class="form-label fw-bold small text-uppercase text-muted"
+						>Upload video</label
+					>
+					<FilePicker
+						label="Select Video"
+						accept="video/mp4,video/quicktime,video/webm,video/x-matroska,video/*"
+						@change="handleFileChange"
+						:disabled="processing"
+					/>
+					<div class="form-text">
+						Pick a video to convert into an animated GIF.
+					</div>
+				</div>
 
-        <div class="col-lg-4">
-          <label class="form-label small text-muted fw-bold text-uppercase">Start time</label>
-          <div class="input-group">
-            <input
-              type="number"
-              class="form-control"
-              v-model.number="startTime"
-              :max="endTime"
-              min="0"
-              step="0.1"
-              :disabled="processing"
-            />
-            <button class="btn btn-outline-secondary" type="button" @click="setStartToCurrent" :disabled="processing">
-              Use Current
-            </button>
-          </div>
-          <div class="form-text">{{ formatTime(startTime) }}</div>
-        </div>
+				<div class="col-lg-4">
+					<label class="form-label small text-muted fw-bold text-uppercase"
+						>Start time</label
+					>
+					<div class="input-group">
+						<input
+							type="number"
+							class="form-control"
+							v-model.number="startTime"
+							:max="endTime"
+							min="0"
+							step="0.1"
+							:disabled="processing"
+						/>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							@click="setStartToCurrent"
+							:disabled="processing"
+						>
+							Use Current
+						</button>
+					</div>
+					<div class="form-text">{{ formatTime(startTime) }}</div>
+				</div>
 
-        <div class="col-lg-4">
-          <label class="form-label small text-muted fw-bold text-uppercase">End time</label>
-          <div class="input-group">
-            <input
-              type="number"
-              class="form-control"
-              v-model.number="endTime"
-              :min="startTime"
-              :max="duration"
-              step="0.1"
-              :disabled="processing"
-            />
-            <button class="btn btn-outline-secondary" type="button" @click="setEndToCurrent" :disabled="processing">
-              Use Current
-            </button>
-          </div>
-          <div class="form-text">{{ formatTime(endTime) }}</div>
-        </div>
-      </div>
+				<div class="col-lg-4">
+					<label class="form-label small text-muted fw-bold text-uppercase"
+						>End time</label
+					>
+					<div class="input-group">
+						<input
+							type="number"
+							class="form-control"
+							v-model.number="endTime"
+							:min="startTime"
+							:max="duration"
+							step="0.1"
+							:disabled="processing"
+						/>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							@click="setEndToCurrent"
+							:disabled="processing"
+						>
+							Use Current
+						</button>
+					</div>
+					<div class="form-text">{{ formatTime(endTime) }}</div>
+				</div>
+			</div>
 
-      <div class="row g-3 mt-1 align-items-end">
-        <div class="col-lg-4">
-          <label class="form-label fw-bold small text-uppercase text-muted">Max width (px)</label>
-          <input
-            type="number"
-            class="form-control"
-            v-model.number="maxWidth"
-            min="16"
-            max="4096"
-            step="1"
-            :disabled="processing"
-          />
-          <div class="form-text">Maintains aspect ratio.</div>
-        </div>
+			<div class="row g-3 mt-1 align-items-end">
+				<div class="col-lg-4">
+					<label class="form-label fw-bold small text-uppercase text-muted"
+						>Max width (px)</label
+					>
+					<input
+						type="number"
+						class="form-control"
+						v-model.number="maxWidth"
+						min="16"
+						max="4096"
+						step="1"
+						:disabled="processing"
+					/>
+					<div class="form-text">Maintains aspect ratio.</div>
+				</div>
 
-        <div class="col-lg-4">
-          <label class="form-label fw-bold small text-uppercase text-muted">Frame rate (fps)</label>
-          <input
-            type="number"
-            class="form-control"
-            v-model.number="frameRate"
-            min="1"
-            max="60"
-            step="1"
-            :disabled="processing"
-          />
-          <div class="form-text">Higher values increase size.</div>
-        </div>
+				<div class="col-lg-4">
+					<label class="form-label fw-bold small text-uppercase text-muted"
+						>Frame rate (fps)</label
+					>
+					<input
+						type="number"
+						class="form-control"
+						v-model.number="frameRate"
+						min="1"
+						max="60"
+						step="1"
+						:disabled="processing"
+					/>
+					<div class="form-text">Higher values increase size.</div>
+				</div>
 
-        <div class="col-lg-4">
-          <button
-            class="btn btn-primary w-100"
-            @click="convertToGif"
-            :disabled="processing || !videoUrl"
-          >
-            Convert to GIF
-          </button>
-          <div class="form-text">&nbsp;</div>
-        </div>
-      </div>
+				<div class="col-lg-4">
+					<button
+						class="btn btn-primary w-100"
+						@click="convertToGif"
+						:disabled="processing || !videoUrl"
+					>
+						Convert to GIF
+					</button>
+					<div class="form-text">&nbsp;</div>
+				</div>
+			</div>
 
-      <div v-if="processing" class="mt-3">
-        <div class="progress" style="height: 1.5rem;">
-          <div
-            class="progress-bar progress-bar-striped progress-bar-animated"
-            role="progressbar"
-            :style="{ width: progress + '%' }"
-            :aria-valuenow="progress"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            {{ progress }}%
-          </div>
-        </div>
-      </div>
+			<div v-if="processing" class="mt-3">
+				<div class="progress" style="height: 1.5rem">
+					<div
+						class="progress-bar progress-bar-striped progress-bar-animated"
+						role="progressbar"
+						:style="{ width: progress + '%' }"
+						:aria-valuenow="progress"
+						aria-valuemin="0"
+						aria-valuemax="100"
+					>
+						{{ progress }}%
+					</div>
+				</div>
+			</div>
 
-      <div class="d-flex flex-wrap gap-3 mt-3 align-items-center">
-        <span class="badge bg-light text-dark border">{{ selectedFileLabel }}</span>
-        <span v-if="resultUrl" class="badge bg-light text-dark border">
-          GIF size: {{ formatBytes(resultSize) }}
-        </span>
-        <span v-if="processing" class="badge bg-warning text-dark">Processing…</span>
-        <span v-if="status" class="badge bg-secondary opacity-75">{{ status }}</span>
-      </div>
-    </ToolCard>
+			<div class="d-flex flex-wrap gap-3 mt-3 align-items-center">
+				<span class="badge bg-light text-dark border">{{
+					selectedFileLabel
+				}}</span>
+				<span v-if="resultUrl" class="badge bg-light text-dark border">
+					GIF size: {{ formatBytes(resultSize) }}
+				</span>
+				<span v-if="processing" class="badge bg-warning text-dark"
+					>Processing…</span
+				>
+				<span v-if="status" class="badge bg-secondary opacity-75">{{
+					status
+				}}</span>
+			</div>
+		</ToolCard>
 
-    <div v-if="error" class="alert alert-danger" role="alert">
-      {{ error }}
-    </div>
+		<div v-if="error" class="alert alert-danger" role="alert">
+			{{ error }}
+		</div>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Source preview" class="h-100">
-          <template #header-actions>
-            <span class="badge bg-secondary opacity-75" v-if="videoUrl">
-              {{ formatTime(duration) }}
-            </span>
-          </template>
-          <div v-if="videoUrl" class="ratio ratio-16x9 bg-black rounded">
-            <video
-              ref="videoElement"
-              :src="videoUrl"
-              controls
-              @loadedmetadata="onMetadataLoaded"
-              class="w-100 h-100"
-            ></video>
-          </div>
-          <div v-else class="text-muted small text-center py-5">
-            Upload a video to preview the source clip.
-          </div>
-        </ToolCard>
-      </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Source preview" class="h-100">
+					<template #header-actions>
+						<span class="badge bg-secondary opacity-75" v-if="videoUrl">
+							{{ formatTime(duration) }}
+						</span>
+					</template>
+					<div v-if="videoUrl" class="ratio ratio-16x9 bg-black rounded">
+						<video
+							ref="videoElement"
+							:src="videoUrl"
+							controls
+							@loadedmetadata="onMetadataLoaded"
+							class="w-100 h-100"
+						></video>
+					</div>
+					<div v-else class="text-muted small text-center py-5">
+						Upload a video to preview the source clip.
+					</div>
+				</ToolCard>
+			</div>
 
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="GIF preview" class="h-100">
-          <template #header-actions>
-            <div class="d-flex align-items-center gap-3" v-if="resultUrl">
-              <a
-                class="btn btn-sm btn-link p-0 text-decoration-none"
-                :href="resultUrl"
-                :download="downloadName"
-              >
-                Download
-              </a>
-              <span class="badge bg-secondary opacity-75">
-                {{ formatBytes(resultSize) }}
-              </span>
-            </div>
-          </template>
-          <div v-if="resultUrl" class="text-center">
-            <img :src="resultUrl" alt="GIF preview" class="img-fluid rounded border" />
-          </div>
-          <div v-else class="text-muted small text-center py-5">
-            Convert a clip to see the GIF preview here.
-          </div>
-        </ToolCard>
-      </div>
-    </div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="GIF preview" class="h-100">
+					<template #header-actions>
+						<div class="d-flex align-items-center gap-3" v-if="resultUrl">
+							<a
+								class="btn btn-sm btn-link p-0 text-decoration-none"
+								:href="resultUrl"
+								:download="downloadName"
+							>
+								Download
+							</a>
+							<span class="badge bg-secondary opacity-75">
+								{{ formatBytes(resultSize) }}
+							</span>
+						</div>
+					</template>
+					<div v-if="resultUrl" class="text-center">
+						<img
+							:src="resultUrl"
+							alt="GIF preview"
+							class="img-fluid rounded border"
+						/>
+					</div>
+					<div v-else class="text-muted small text-center py-5">
+						Convert a clip to see the GIF preview here.
+					</div>
+				</ToolCard>
+			</div>
+		</div>
 
-    <div v-if="!hasPreview" class="text-center text-muted py-4">
-      Upload a video to start converting it into a GIF.
-    </div>
-  </div>
+		<div v-if="!hasPreview" class="text-center text-muted py-4">
+			Upload a video to start converting it into a GIF.
+		</div>
+	</div>
 </template>

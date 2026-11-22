@@ -19,11 +19,11 @@ const copyToClipboard = () => {
 </script>
 
 <template>
-  <button
-    class="btn btn-sm btn-link p-0 text-decoration-none small"
-    :disabled="!content"
-    @click="copyToClipboard"
-  >
-    {{ copyBtnText }}
-  </button>
+	<button
+		class="btn btn-sm btn-link p-0 text-decoration-none small"
+		:disabled="!content"
+		@click="copyToClipboard"
+	>
+		{{ copyBtnText }}
+	</button>
 </template>

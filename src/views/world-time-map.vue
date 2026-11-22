@@ -238,8 +238,7 @@ function resolveTimezone(code: string) {
 	let timezone: string | null = null;
 	try {
 		const locale = new Intl.Locale(`en-${canonicalCode}`);
-		const zones =
-			typeof locale.getTimeZones === "function" ? locale.getTimeZones() : null;
+		const zones = locale.getTimeZones?.();
 		if (Array.isArray(zones) && zones.length > 0) {
 			timezone = zones[0];
 		}
@@ -388,50 +387,56 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
-	    <ToolHeader
-	      title="World Time Map"
-	      description="Hover or tap any country to see its country code and current local time."
-	    />
+	<div>
+		<ToolHeader
+			title="World Time Map"
+			description="Hover or tap any country to see its country code and current local time."
+		/>
 
-	    <div class="map-time-panels-outside d-flex flex-wrap gap-2 mb-3">
-	      <div class="card border-0 shadow-sm panel-card">
-	        <div class="card-body p-2">
-	          <div class="text-muted small">AoE</div>
-	          <div class="font-monospace small fw-semibold">{{ aoeTimeText }}</div>
-	        </div>
-	      </div>
-	      <div class="card border-0 shadow-sm panel-card">
-	        <div class="card-body p-2">
-	          <div class="text-muted small">Local</div>
-	          <div class="font-monospace small fw-semibold">{{ localTimeText }}</div>
-	        </div>
-	      </div>
-	    </div>
+		<div class="map-time-panels-outside d-flex flex-wrap gap-2 mb-3">
+			<div class="card border-0 shadow-sm panel-card">
+				<div class="card-body p-2">
+					<div class="text-muted small">AoE</div>
+					<div class="font-monospace small fw-semibold">{{ aoeTimeText }}</div>
+				</div>
+			</div>
+			<div class="card border-0 shadow-sm panel-card">
+				<div class="card-body p-2">
+					<div class="text-muted small">Local</div>
+					<div class="font-monospace small fw-semibold">
+						{{ localTimeText }}
+					</div>
+				</div>
+			</div>
+		</div>
 
-	    <ToolCard title="Interactive Map">
-	      <div
-	        ref="mapContainer"
-	        class="map-stage position-relative bg-light border rounded overflow-auto"
-	      >
-	        <div v-if="mapLoadError" class="text-danger small p-3">{{ mapLoadError }}</div>
-	        <div v-else-if="!mapMarkup" class="text-muted small p-3">Loading world map...</div>
-	        <div v-else class="map-svg" v-html="mapMarkup" />
+		<ToolCard title="Interactive Map">
+			<div
+				ref="mapContainer"
+				class="map-stage position-relative bg-light border rounded overflow-auto"
+			>
+				<div v-if="mapLoadError" class="text-danger small p-3">
+					{{ mapLoadError }}
+				</div>
+				<div v-else-if="!mapMarkup" class="text-muted small p-3">
+					Loading world map...
+				</div>
+				<div v-else class="map-svg" v-html="mapMarkup" />
 
-        <div
-          v-if="popup.visible"
-          class="country-popup card shadow-sm border-0"
-          :style="popupStyle"
-        >
-          <div class="card-body p-2">
-            <div class="fw-bold small">{{ popup.name }}</div>
-            <div class="text-muted small mb-1">{{ popup.code }}</div>
-            <div class="font-monospace small">{{ popupTimeText }}</div>
-          </div>
-        </div>
-      </div>
-    </ToolCard>
-  </div>
+				<div
+					v-if="popup.visible"
+					class="country-popup card shadow-sm border-0"
+					:style="popupStyle"
+				>
+					<div class="card-body p-2">
+						<div class="fw-bold small">{{ popup.name }}</div>
+						<div class="text-muted small mb-1">{{ popup.code }}</div>
+						<div class="font-monospace small">{{ popupTimeText }}</div>
+					</div>
+				</div>
+			</div>
+		</ToolCard>
+	</div>
 </template>
 
 <style scoped>

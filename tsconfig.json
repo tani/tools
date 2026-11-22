@@ -5,8 +5,6 @@
 		"lib": ["DOM", "DOM.Iterable", "ESNext"],
 		"allowJs": false,
 		"skipLibCheck": true,
-		"esModuleInterop": false,
-		"allowSyntheticDefaultImports": true,
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
 		"module": "ESNext",
@@ -15,7 +13,7 @@
 		"isolatedModules": true,
 		"noEmit": true,
 		"allowImportingTsExtensions": true,
-		"types": ["node", "bun"]
+		"types": ["node"]
 	},
 	"include": ["**/*.ts", "**/*.vue", "**/*.json"],
 	"exclude": ["dist"]

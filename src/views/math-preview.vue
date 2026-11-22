@@ -116,59 +116,72 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Math Preview"
-      description="Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a PNG."
-    />
+	<div>
+		<ToolHeader
+			title="Math Preview"
+			description="Preview TeX, LaTeX, or Xy-pic code as a rendered mathematical expression and export it as a PNG."
+		/>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="TeX Input" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="input"
-            language="latex"
-            :rows="15"
-            placeholder="Enter TeX/LaTeX or Xy-pic code here..."
-          />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Preview" class="h-100" no-padding>
-          <template #header-actions>
-            <DownloadLink :href="imageUrl" filename="math-expression.png" label="Download PNG" />
-          </template>
-          <div class="bg-light">
-            <div v-if="error" class="alert alert-danger m-3 small">
-              <strong>Error:</strong> {{ error }}
-            </div>
-            <div
-              class="preview-container border-0 rounded-0 p-4 text-center d-flex align-items-center justify-content-center"
-              style="min-height: 382px"
-            >
-              <div v-if="!input.trim()" class="text-muted small">
-                Enter some TeX to see the preview
-              </div>
-              <LoadingOverlay v-else-if="isRendering" :loading="true" message="Rendering..." />
-              <img v-else-if="imageUrl" :src="imageUrl" class="img-fluid" alt="Math Preview" />
-            </div>
-          </div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="TeX Input" class="h-100" no-padding>
+					<MonospaceEditor
+						v-model="input"
+						language="latex"
+						:rows="15"
+						placeholder="Enter TeX/LaTeX or Xy-pic code here..."
+					/>
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Preview" class="h-100" no-padding>
+					<template #header-actions>
+						<DownloadLink
+							:href="imageUrl"
+							filename="math-expression.png"
+							label="Download PNG"
+						/>
+					</template>
+					<div class="bg-light">
+						<div v-if="error" class="alert alert-danger m-3 small">
+							<strong>Error:</strong> {{ error }}
+						</div>
+						<div
+							class="preview-container border-0 rounded-0 p-4 text-center d-flex align-items-center justify-content-center"
+							style="min-height: 382px"
+						>
+							<div v-if="!input.trim()" class="text-muted small">
+								Enter some TeX to see the preview
+							</div>
+							<LoadingOverlay
+								v-else-if="isRendering"
+								:loading="true"
+								message="Rendering..."
+							/>
+							<img
+								v-else-if="imageUrl"
+								:src="imageUrl"
+								class="img-fluid"
+								alt="Math Preview"
+							/>
+						</div>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .preview-container {
-  min-height: 200px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: auto;
+	min-height: 200px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: auto;
 }
 :deep(svg) {
-  max-width: 100%;
-  height: auto;
+	max-width: 100%;
+	height: auto;
 }
 </style>

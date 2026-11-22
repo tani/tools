@@ -8,32 +8,36 @@ This project, "Taniguchi's Tools," is a comprehensive, web-based suite of develo
 
 - **Framework:** Vue 3 (Composition API with `<script setup>`)
 - **Language:** TypeScript
-- **Build Tool:** Bun (`bun build`) with `@eckidevs/bun-plugin-vue`
+- **Runtime and Package Manager:** Node.js 24 and npm
+- **Build Tool:** Vite+ with `@vitejs/plugin-vue`
 - **Styling:** Bootstrap 5 with Bootswatch "Lumen" theme
 - **Routing:** Vue Router
-- **Linting/Formatting:** Biome
+- **Linting/Formatting:** Oxlint and Oxfmt via Vite+
 
 ### Architecture
 
 - **`src/tools.ts`**: **[CRITICAL]** The single source of truth for tool definitions. Contains path, component import, metadata, and category for every tool.
 - **`src/views/`**: Contains the individual tool components (e.g., `pattern.vue`, `regex.vue`). New tools must be registered in `src/tools.ts`.
-- **`src/worker/`**: Houses shared logic and pure functions with Web Worker support.
-- **`scripts/`**: Build pipeline scripts (Bun build, PWA, Prism assets, Tesseract assets).
+- **`src/workers/`** contains Web Worker code.
+- **`unplugin/`** contains build plugins for the PWA, Tesseract assets, and browser polyfills.
 
 ## Building and Running
 
 ### Build
 
 ```bash
-bun run build
+npm ci
+npm run dev
+npm run build
 ```
 
-Compiles the application for production into the `dist/` directory (HTML entry point).
+The production build writes the application to `dist/`.
 
 ### Code Quality
 
-- **Check Everything:** `bun run check` (Runs TypeScript check + Vue check + Biome check)
-- **Fix Formatting:** `bun run check!` (Runs checks + Biome formatting/fixing)
+- Run `npm run check` to check formatting, lint rules, and Vue and TypeScript types.
+- Run `npm run check!` to apply formatting and safe lint fixes.
+- Run `npm test` to run the PDFium suite.
 
 ## Development Conventions
 
@@ -58,4 +62,4 @@ All tools must adhere to the established consistent design language:
 
 - **Language:** The user interface and all documentation/comments must be in **English**.
 - **Reactivity:** Leverage Vue's `computed` properties for real-time data processing to ensure a responsive "instant-feedback" feel.
-- **Safety:** You MUST run `bun run check` and `bun run build` before finishing any task to ensure code quality and prevent regressions.
+- **Verification** requires running `npm run check` and `npm run build` before finishing a task.

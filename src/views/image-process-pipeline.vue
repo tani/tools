@@ -1,13 +1,4 @@
 <script setup lang="ts">
-import cnn2xLarge3D from "@websr/websr/weights/anime4k/cnn-2x-l-3d.json";
-import cnn2xLargeAnime from "@websr/websr/weights/anime4k/cnn-2x-l-an.json";
-import cnn2xLargeRealLife from "@websr/websr/weights/anime4k/cnn-2x-l-rl.json";
-import cnn2xMedium3D from "@websr/websr/weights/anime4k/cnn-2x-m-3d.json";
-import cnn2xMediumAnime from "@websr/websr/weights/anime4k/cnn-2x-m-an.json";
-import cnn2xMediumRealLife from "@websr/websr/weights/anime4k/cnn-2x-m-rl.json";
-import cnn2xSmall3D from "@websr/websr/weights/anime4k/cnn-2x-s-3d.json";
-import cnn2xSmallAnime from "@websr/websr/weights/anime4k/cnn-2x-s-an.json";
-import cnn2xSmallRealLife from "@websr/websr/weights/anime4k/cnn-2x-s-rl.json";
 import * as Comlink from "comlink";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import DownloadLink from "../components/DownloadLink.vue";
@@ -16,7 +7,7 @@ import ImageCropper from "../components/ImageCropper.vue";
 import MonospaceEditor from "../components/MonospaceEditor.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
-import { loadWebSR } from "../websr";
+import { getWebSRModel, loadWebSR } from "../websr";
 import type { OpencvWorker } from "../workers/opencv-worker";
 import OpencvWorkerConstructor from "../workers/opencv-worker?worker";
 import type { TesseractWorker } from "../workers/tesseract-worker";
@@ -133,8 +124,7 @@ let opencvWorker: Worker | null = null;
 let opencvApi: Comlink.Remote<OpencvWorker> | null = null;
 let tesseractWorker: Worker | null = null;
 let tesseractApi: Comlink.Remote<TesseractWorker> | null = null;
-// biome-ignore lint/suspicious/noExplicitAny: GPUDevice is not available in this project type context
-let gpu: any = null;
+let gpu: unknown = null;
 let sampleResolver: ((point: { x: number; y: number }) => void) | null = null;
 let grabCutResolver:
 	| ((rect: {
@@ -144,24 +134,6 @@ let grabCutResolver:
 			height: number;
 	  }) => void)
 	| null = null;
-
-const weightsMap: Record<string, unknown> = {
-	"s-an": cnn2xSmallAnime,
-	"m-an": cnn2xMediumAnime,
-	"l-an": cnn2xLargeAnime,
-	"s-rl": cnn2xSmallRealLife,
-	"m-rl": cnn2xMediumRealLife,
-	"l-rl": cnn2xLargeRealLife,
-	"s-3d": cnn2xSmall3D,
-	"m-3d": cnn2xMedium3D,
-	"l-3d": cnn2xLarge3D,
-};
-
-const networkNameMap: Record<"s" | "m" | "l", string> = {
-	s: "anime4k/cnn-2x-s",
-	m: "anime4k/cnn-2x-m",
-	l: "anime4k/cnn-2x-l",
-};
 
 const initWebGPU = async () => {
 	try {
@@ -358,19 +330,19 @@ const upscaleImageData = async (
 	const WebSR = await loadWebSR();
 
 	const websr = new WebSR({
-		// biome-ignore lint/suspicious/noExplicitAny: WebSR network type is not exported
-		network_name: networkNameMap[config.size] as any,
-		weights: weightsMap[`${config.size}-${config.type}`],
+		...getWebSRModel(config.size, config.type),
 		gpu,
-		canvas: dstCanvas as OffscreenCanvas,
+		canvas: dstCanvas,
 	});
 
 	await websr.render(imageBitmap);
 	imageBitmap.close();
 
-	const dstContext = dstCanvas.getContext("2d");
-	if (!dstContext) throw new Error("Failed to create destination context.");
-	return dstContext.getImageData(0, 0, dstCanvas.width, dstCanvas.height);
+	// Read the WebGPU output through the existing 2D canvas.
+	srcCanvas.width = dstCanvas.width;
+	srcCanvas.height = dstCanvas.height;
+	srcContext.drawImage(dstCanvas, 0, 0);
+	return srcContext.getImageData(0, 0, srcCanvas.width, srcCanvas.height);
 };
 
 const waitForSamplePoint = (stepId: number) => {
@@ -666,301 +638,442 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Image Process Pipeline"
-      description="Build a sequential image pipeline with resize, AI upscale (2x), convert, background removal, and OCR. Use + Add Process to extend the chain."
-    />
+	<div>
+		<ToolHeader
+			title="Image Process Pipeline"
+			description="Build a sequential image pipeline with resize, AI upscale (2x), convert, background removal, and OCR. Use + Add Process to extend the chain."
+		/>
 
-    <div v-if="hasUpscaleStep && !isWebGPUAvailable" class="alert alert-warning mb-4">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i>
-      WebGPU is not available. Remove Image Upscale steps or use a WebGPU-supported browser/device.
-    </div>
+		<div
+			v-if="hasUpscaleStep && !isWebGPUAvailable"
+			class="alert alert-warning mb-4"
+		>
+			<i class="bi bi-exclamation-triangle-fill me-2"></i>
+			WebGPU is not available. Remove Image Upscale steps or use a
+			WebGPU-supported browser/device.
+		</div>
 
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <ToolCard title="Pipeline Builder" class="h-100">
-          <div class="row g-2 mb-3 align-items-end">
-            <div class="col-md-6">
-              <label class="form-label fw-bold small">Next Process</label>
-              <select v-model="nextProcessType" class="form-select form-select-sm">
-                <option v-for="option in processTypeOptions" :key="option.value" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
-            <div class="col-md-3 d-grid">
-              <button class="btn btn-outline-primary btn-sm" type="button" @click="addStep()">
-                + Add Process
-              </button>
-            </div>
-            <div class="col-md-3 d-grid">
-              <button class="btn btn-primary btn-sm" type="button" :disabled="!canRun" @click="runPipeline">
-                <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-                {{ isProcessing ? "Running" : "Run" }}
-              </button>
-            </div>
-          </div>
+		<div class="row g-4">
+			<div class="col-lg-6">
+				<ToolCard title="Pipeline Builder" class="h-100">
+					<div class="row g-2 mb-3 align-items-end">
+						<div class="col-md-6">
+							<label class="form-label fw-bold small">Next Process</label>
+							<select
+								v-model="nextProcessType"
+								class="form-select form-select-sm"
+							>
+								<option
+									v-for="option in processTypeOptions"
+									:key="option.value"
+									:value="option.value"
+								>
+									{{ option.label }}
+								</option>
+							</select>
+						</div>
+						<div class="col-md-3 d-grid">
+							<button
+								class="btn btn-outline-primary btn-sm"
+								type="button"
+								@click="addStep()"
+							>
+								+ Add Process
+							</button>
+						</div>
+						<div class="col-md-3 d-grid">
+							<button
+								class="btn btn-primary btn-sm"
+								type="button"
+								:disabled="!canRun"
+								@click="runPipeline"
+							>
+								<span
+									v-if="isProcessing"
+									class="spinner-border spinner-border-sm me-2"
+								></span>
+								{{ isProcessing ? "Running" : "Run" }}
+							</button>
+						</div>
+					</div>
 
-          <div v-if="validationErrors.length > 0" class="alert alert-warning mb-3 py-2">
-            <div class="fw-bold small text-uppercase">Pipeline Validation</div>
-            <ul class="mb-0 small">
-              <li v-for="error in validationErrors" :key="error">{{ error }}</li>
-            </ul>
-          </div>
-          <div v-else class="small text-success mb-3">Pipeline is valid.</div>
+					<div
+						v-if="validationErrors.length > 0"
+						class="alert alert-warning mb-3 py-2"
+					>
+						<div class="fw-bold small text-uppercase">Pipeline Validation</div>
+						<ul class="mb-0 small">
+							<li v-for="error in validationErrors" :key="error">
+								{{ error }}
+							</li>
+						</ul>
+					</div>
+					<div v-else class="small text-success mb-3">Pipeline is valid.</div>
 
-          <div class="card mb-3 border-0 edge-step-card">
-            <div class="card-body">
-              <div class="fw-bold small text-uppercase text-muted mb-3">Step 0 - Input Image</div>
-              <FilePicker label="Upload Source Image" accept="image/*" @change="handleFileChange" />
-              <div v-if="sourceDetails" class="small text-muted font-monospace mt-2">
-                {{ sourceDetails.width }} x {{ sourceDetails.height }} px
-              </div>
-            </div>
-          </div>
+					<div class="card mb-3 border-0 edge-step-card">
+						<div class="card-body">
+							<div class="fw-bold small text-uppercase text-muted mb-3">
+								Step 0 - Input Image
+							</div>
+							<FilePicker
+								label="Upload Source Image"
+								accept="image/*"
+								@change="handleFileChange"
+							/>
+							<div
+								v-if="sourceDetails"
+								class="small text-muted font-monospace mt-2"
+							>
+								{{ sourceDetails.width }} x {{ sourceDetails.height }} px
+							</div>
+						</div>
+					</div>
 
-          <div v-if="pipelineSteps.length === 0" class="text-muted small">Add process steps to build a pipeline.</div>
+					<div v-if="pipelineSteps.length === 0" class="text-muted small">
+						Add process steps to build a pipeline.
+					</div>
 
-          <div v-for="(step, index) in pipelineSteps" :key="step.id" class="card mb-3 border-0 bg-light">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="fw-bold small text-uppercase text-muted">{{ getStepTitle(step, index) }}</span>
-                <div class="btn-group btn-group-sm">
-                  <button
-                    class="btn btn-outline-secondary"
-                    :disabled="index === 0"
-                    type="button"
-                    @click="moveStep(index, -1)"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    class="btn btn-outline-secondary"
-                    :disabled="index === pipelineSteps.length - 1"
-                    type="button"
-                    @click="moveStep(index, 1)"
-                  >
-                    ↓
-                  </button>
-                  <button class="btn btn-outline-danger" type="button" @click="removeStep(index)">Remove</button>
-                </div>
-              </div>
+					<div
+						v-for="(step, index) in pipelineSteps"
+						:key="step.id"
+						class="card mb-3 border-0 bg-light"
+					>
+						<div class="card-body">
+							<div
+								class="d-flex justify-content-between align-items-center mb-3"
+							>
+								<span class="fw-bold small text-uppercase text-muted">{{
+									getStepTitle(step, index)
+								}}</span>
+								<div class="btn-group btn-group-sm">
+									<button
+										class="btn btn-outline-secondary"
+										:disabled="index === 0"
+										type="button"
+										@click="moveStep(index, -1)"
+									>
+										↑
+									</button>
+									<button
+										class="btn btn-outline-secondary"
+										:disabled="index === pipelineSteps.length - 1"
+										type="button"
+										@click="moveStep(index, 1)"
+									>
+										↓
+									</button>
+									<button
+										class="btn btn-outline-danger"
+										type="button"
+										@click="removeStep(index)"
+									>
+										Remove
+									</button>
+								</div>
+							</div>
 
-              <div class="row g-3 align-items-end">
-                <template v-if="step.type === 'resize'">
-                  <div class="col-md-4">
-                    <label class="form-label fw-bold small">Width</label>
-                    <input v-model.number="(step.config as ResizeConfig).width" type="number" min="1" class="form-control form-control-sm" />
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-bold small">Height</label>
-                    <input
-                      v-model.number="(step.config as ResizeConfig).height"
-                      :disabled="(step.config as ResizeConfig).keepAspectRatio"
-                      type="number"
-                      min="1"
-                      class="form-control form-control-sm"
-                    />
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-check mt-4">
-                      <input
-                        :id="`keep-ratio-${step.id}`"
-                        v-model="(step.config as ResizeConfig).keepAspectRatio"
-                        class="form-check-input"
-                        type="checkbox"
-                      />
-                      <label class="form-check-label small" :for="`keep-ratio-${step.id}`">Lock</label>
-                    </div>
-                  </div>
-                </template>
+							<div class="row g-3 align-items-end">
+								<template v-if="step.type === 'resize'">
+									<div class="col-md-4">
+										<label class="form-label fw-bold small">Width</label>
+										<input
+											v-model.number="(step.config as ResizeConfig).width"
+											type="number"
+											min="1"
+											class="form-control form-control-sm"
+										/>
+									</div>
+									<div class="col-md-4">
+										<label class="form-label fw-bold small">Height</label>
+										<input
+											v-model.number="(step.config as ResizeConfig).height"
+											:disabled="(step.config as ResizeConfig).keepAspectRatio"
+											type="number"
+											min="1"
+											class="form-control form-control-sm"
+										/>
+									</div>
+									<div class="col-md-4">
+										<div class="form-check mt-4">
+											<input
+												:id="`keep-ratio-${step.id}`"
+												v-model="(step.config as ResizeConfig).keepAspectRatio"
+												class="form-check-input"
+												type="checkbox"
+											/>
+											<label
+												class="form-check-label small"
+												:for="`keep-ratio-${step.id}`"
+												>Lock</label
+											>
+										</div>
+									</div>
+								</template>
 
-                <template v-if="step.type === 'upscale'">
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold small">Model Size</label>
-                    <select v-model="(step.config as UpscaleConfig).size" class="form-select form-select-sm">
-                      <option value="s">Small (Fastest)</option>
-                      <option value="m">Medium</option>
-                      <option value="l">Large (Best Quality)</option>
-                    </select>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold small">Content Type</label>
-                    <select v-model="(step.config as UpscaleConfig).type" class="form-select form-select-sm">
-                      <option value="an">Anime / Illustration</option>
-                      <option value="rl">Real Life (Photo)</option>
-                      <option value="3d">3D / CGI / Gaming</option>
-                    </select>
-                  </div>
-                </template>
+								<template v-if="step.type === 'upscale'">
+									<div class="col-md-6">
+										<label class="form-label fw-bold small">Model Size</label>
+										<select
+											v-model="(step.config as UpscaleConfig).size"
+											class="form-select form-select-sm"
+										>
+											<option value="s">Small (Fastest)</option>
+											<option value="m">Medium</option>
+											<option value="l">Large (Best Quality)</option>
+										</select>
+									</div>
+									<div class="col-md-6">
+										<label class="form-label fw-bold small">Content Type</label>
+										<select
+											v-model="(step.config as UpscaleConfig).type"
+											class="form-select form-select-sm"
+										>
+											<option value="an">Anime / Illustration</option>
+											<option value="rl">Real Life (Photo)</option>
+											<option value="3d">3D / CGI / Gaming</option>
+										</select>
+									</div>
+								</template>
 
-                <template v-if="step.type === 'convert'">
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold small">Format</label>
-                    <select v-model="(step.config as ConvertConfig).format" class="form-select form-select-sm">
-                      <option value="image/png">PNG</option>
-                      <option value="image/jpeg">JPEG</option>
-                      <option value="image/webp">WebP</option>
-                    </select>
-                  </div>
-                  <div class="col-md-6" v-if="isLossyFormat((step.config as ConvertConfig).format)">
-                    <label class="form-label fw-bold small">
-                      Quality ({{ Math.round((step.config as ConvertConfig).quality * 100) }}%)
-                    </label>
-                    <input
-                      v-model.number="(step.config as ConvertConfig).quality"
-                      type="range"
-                      min="0.1"
-                      max="1"
-                      step="0.01"
-                      class="form-range"
-                    />
-                  </div>
-                </template>
+								<template v-if="step.type === 'convert'">
+									<div class="col-md-6">
+										<label class="form-label fw-bold small">Format</label>
+										<select
+											v-model="(step.config as ConvertConfig).format"
+											class="form-select form-select-sm"
+										>
+											<option value="image/png">PNG</option>
+											<option value="image/jpeg">JPEG</option>
+											<option value="image/webp">WebP</option>
+										</select>
+									</div>
+									<div
+										class="col-md-6"
+										v-if="isLossyFormat((step.config as ConvertConfig).format)"
+									>
+										<label class="form-label fw-bold small">
+											Quality ({{
+												Math.round(
+													(step.config as ConvertConfig).quality * 100,
+												)
+											}}%)
+										</label>
+										<input
+											v-model.number="(step.config as ConvertConfig).quality"
+											type="range"
+											min="0.1"
+											max="1"
+											step="0.01"
+											class="form-range"
+										/>
+									</div>
+								</template>
 
-                <template v-if="step.type === 'bg-remover'">
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold small">Mode</label>
-                    <select v-model="(step.config as BgRemoverConfig).mode" class="form-select form-select-sm">
-                      <option value="magic">Magic Wand</option>
-                      <option value="global">Global Color</option>
-                      <option value="grabcut">GrabCut</option>
-                    </select>
-                  </div>
+								<template v-if="step.type === 'bg-remover'">
+									<div class="col-md-6">
+										<label class="form-label fw-bold small">Mode</label>
+										<select
+											v-model="(step.config as BgRemoverConfig).mode"
+											class="form-select form-select-sm"
+										>
+											<option value="magic">Magic Wand</option>
+											<option value="global">Global Color</option>
+											<option value="grabcut">GrabCut</option>
+										</select>
+									</div>
 
-                  <div class="col-md-6" v-if="(step.config as BgRemoverConfig).mode !== 'grabcut'">
-                    <label class="form-label fw-bold small">Tolerance</label>
-                    <input
-                      v-model.number="(step.config as BgRemoverConfig).tolerance"
-                      type="range"
-                      min="1"
-                      max="150"
-                      class="form-range"
-                    />
-                  </div>
+									<div
+										class="col-md-6"
+										v-if="(step.config as BgRemoverConfig).mode !== 'grabcut'"
+									>
+										<label class="form-label fw-bold small">Tolerance</label>
+										<input
+											v-model.number="
+												(step.config as BgRemoverConfig).tolerance
+											"
+											type="range"
+											min="1"
+											max="150"
+											class="form-range"
+										/>
+									</div>
 
-                  <div v-else class="col-md-6 small text-muted">
-                    GrabCut will pause during run and use a graphical rectangle selector on the current preview.
-                  </div>
-                </template>
+									<div v-else class="col-md-6 small text-muted">
+										GrabCut will pause during run and use a graphical rectangle
+										selector on the current preview.
+									</div>
+								</template>
 
-                <template v-if="step.type === 'ocr'">
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold small">Language</label>
-                    <select v-model="(step.config as OcrConfig).language" class="form-select form-select-sm">
-                      <option v-for="lang in supportedLanguages" :key="lang.code" :value="lang.code">
-                        {{ lang.name }}
-                      </option>
-                    </select>
-                  </div>
-                  <div class="col-md-6 small text-muted">
-                    OCR converts the image into text output. No image process can follow this step.
-                  </div>
-                </template>
-              </div>
-            </div>
-          </div>
+								<template v-if="step.type === 'ocr'">
+									<div class="col-md-6">
+										<label class="form-label fw-bold small">Language</label>
+										<select
+											v-model="(step.config as OcrConfig).language"
+											class="form-select form-select-sm"
+										>
+											<option
+												v-for="lang in supportedLanguages"
+												:key="lang.code"
+												:value="lang.code"
+											>
+												{{ lang.name }}
+											</option>
+										</select>
+									</div>
+									<div class="col-md-6 small text-muted">
+										OCR converts the image into text output. No image process
+										can follow this step.
+									</div>
+								</template>
+							</div>
+						</div>
+					</div>
 
-          <div class="card border-0 edge-step-card">
-            <div class="card-body">
-              <div class="fw-bold small text-uppercase text-muted mb-3">Final Step - Output</div>
-              <label class="form-label fw-bold small">Download As</label>
-              <input
-                v-model.trim="downloadAs"
-                type="text"
-                class="form-control form-control-sm font-monospace"
-                placeholder="pipeline-output"
-              />
-              <div class="small text-muted mt-2 font-monospace">
-                Final file: {{ finalFileName }}
-              </div>
-            </div>
-          </div>
-        </ToolCard>
-      </div>
+					<div class="card border-0 edge-step-card">
+						<div class="card-body">
+							<div class="fw-bold small text-uppercase text-muted mb-3">
+								Final Step - Output
+							</div>
+							<label class="form-label fw-bold small">Download As</label>
+							<input
+								v-model.trim="downloadAs"
+								type="text"
+								class="form-control form-control-sm font-monospace"
+								placeholder="pipeline-output"
+							/>
+							<div class="small text-muted mt-2 font-monospace">
+								Final file: {{ finalFileName }}
+							</div>
+						</div>
+					</div>
+				</ToolCard>
+			</div>
 
-      <div class="col-lg-6">
-        <ToolCard title="Workspace & Output" class="h-100">
-          <template #header-actions>
-            <DownloadLink
-              v-if="outputMode === 'image' && finalImageUrl"
-              :href="finalImageUrl"
-              :filename="finalFileName"
-              label="Download"
-            />
-          </template>
+			<div class="col-lg-6">
+				<ToolCard title="Workspace & Output" class="h-100">
+					<template #header-actions>
+						<DownloadLink
+							v-if="outputMode === 'image' && finalImageUrl"
+							:href="finalImageUrl"
+							:filename="finalFileName"
+							label="Download"
+						/>
+					</template>
 
-          <div class="mb-3">
-            <div class="fw-bold small text-uppercase text-muted mb-2">Current Preview</div>
-            <div
-              class="border rounded bg-light p-2 d-flex justify-content-center align-items-center overflow-hidden"
-              style="min-height: 240px; max-height: 380px"
-            >
-              <ImageCropper
-                v-if="waitingForGrabCutStepId && (previewImageUrl || sourceImageUrl)"
-                ref="grabCutCropper"
-                :src="(previewImageUrl || sourceImageUrl) as string"
-                class="pipeline-preview-cropper"
-              />
-              <img
-                v-else-if="previewImageUrl || sourceImageUrl"
-                :src="previewImageUrl || sourceImageUrl"
-                class="pipeline-preview-media"
-                :style="{ cursor: waitingForSampleStepId ? 'crosshair' : 'default' }"
-                alt="Source"
-                @click="handlePreviewClick"
-              />
-              <span v-else class="small text-muted">Upload an image to start.</span>
-            </div>
-            <div v-if="waitingForGrabCutStepId" class="d-grid mt-2">
-              <button class="btn btn-primary btn-sm" type="button" @click="applyGrabCutRectangle">
-                Apply Rectangle
-              </button>
-            </div>
-            <div v-if="waitingForSampleStepId" class="small text-primary mt-2">
-              Click the preview image to choose a background sample point and continue.
-            </div>
-            <div v-if="waitingForGrabCutStepId" class="small text-primary mt-2">
-              Adjust the rectangle on preview and click Apply Rectangle.
-            </div>
-          </div>
+					<div class="mb-3">
+						<div class="fw-bold small text-uppercase text-muted mb-2">
+							Current Preview
+						</div>
+						<div
+							class="border rounded bg-light p-2 d-flex justify-content-center align-items-center overflow-hidden"
+							style="min-height: 240px; max-height: 380px"
+						>
+							<ImageCropper
+								v-if="
+									waitingForGrabCutStepId && (previewImageUrl || sourceImageUrl)
+								"
+								ref="grabCutCropper"
+								:src="(previewImageUrl || sourceImageUrl) as string"
+								class="pipeline-preview-cropper"
+							/>
+							<img
+								v-else-if="previewImageUrl || sourceImageUrl"
+								:src="previewImageUrl || sourceImageUrl || undefined"
+								class="pipeline-preview-media"
+								:style="{
+									cursor: waitingForSampleStepId ? 'crosshair' : 'default',
+								}"
+								alt="Source"
+								@click="handlePreviewClick"
+							/>
+							<span v-else class="small text-muted"
+								>Upload an image to start.</span
+							>
+						</div>
+						<div v-if="waitingForGrabCutStepId" class="d-grid mt-2">
+							<button
+								class="btn btn-primary btn-sm"
+								type="button"
+								@click="applyGrabCutRectangle"
+							>
+								Apply Rectangle
+							</button>
+						</div>
+						<div v-if="waitingForSampleStepId" class="small text-primary mt-2">
+							Click the preview image to choose a background sample point and
+							continue.
+						</div>
+						<div v-if="waitingForGrabCutStepId" class="small text-primary mt-2">
+							Adjust the rectangle on preview and click Apply Rectangle.
+						</div>
+					</div>
 
-          <div v-if="runError" class="alert alert-danger py-2 small">{{ runError }}</div>
-          <div v-if="runMessage" class="alert alert-info py-2 small">{{ runMessage }}</div>
+					<div v-if="runError" class="alert alert-danger py-2 small">
+						{{ runError }}
+					</div>
+					<div v-if="runMessage" class="alert alert-info py-2 small">
+						{{ runMessage }}
+					</div>
 
-          <div v-if="results.length > 0" class="fw-bold small text-uppercase text-muted mb-2">Step Results</div>
-          <div v-for="result in results" :key="result.stepId" class="border rounded mb-3 p-2 bg-light">
-            <div class="d-flex justify-content-between mb-2">
-              <div class="small fw-bold text-uppercase">{{ result.stepTitle }}</div>
-              <div class="small text-muted font-monospace">{{ result.meta }}</div>
-            </div>
+					<div
+						v-if="results.length > 0"
+						class="fw-bold small text-uppercase text-muted mb-2"
+					>
+						Step Results
+					</div>
+					<div
+						v-for="result in results"
+						:key="result.stepId"
+						class="border rounded mb-3 p-2 bg-light"
+					>
+						<div class="d-flex justify-content-between mb-2">
+							<div class="small fw-bold text-uppercase">
+								{{ result.stepTitle }}
+							</div>
+							<div class="small text-muted font-monospace">
+								{{ result.meta }}
+							</div>
+						</div>
 
-            <div v-if="result.outputType === 'image'" class="text-center">
-              <img :src="result.previewUrl" class="img-fluid border rounded" style="max-height: 220px" alt="Step output" />
-            </div>
+						<div v-if="result.outputType === 'image'" class="text-center">
+							<img
+								:src="result.previewUrl"
+								class="img-fluid border rounded"
+								style="max-height: 220px"
+								alt="Step output"
+							/>
+						</div>
 
-            <div v-else>
-              <MonospaceEditor
-                :model-value="result.text || ''"
-                bg-light
-                readonly
-                style="min-height: 180px"
-                placeholder="OCR output"
-              />
-            </div>
-          </div>
+						<div v-else>
+							<MonospaceEditor
+								:model-value="result.text || ''"
+								bg-light
+								readonly
+								style="min-height: 180px"
+								placeholder="OCR output"
+							/>
+						</div>
+					</div>
 
-          <div v-if="outputMode === 'text'" class="mt-3">
-            <div class="fw-bold small text-uppercase text-muted mb-2">Final Text Output</div>
-            <MonospaceEditor v-model="finalText" bg-light readonly style="min-height: 220px" />
-          </div>
+					<div v-if="outputMode === 'text'" class="mt-3">
+						<div class="fw-bold small text-uppercase text-muted mb-2">
+							Final Text Output
+						</div>
+						<MonospaceEditor
+							v-model="finalText"
+							bg-light
+							readonly
+							style="min-height: 220px"
+						/>
+					</div>
 
-          <div v-if="outputMode === 'none'" class="small text-muted">Run the pipeline to generate output.</div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+					<div v-if="outputMode === 'none'" class="small text-muted">
+						Run the pipeline to generate output.
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>

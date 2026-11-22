@@ -232,142 +232,224 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="containerRef" class="image-cropper-container">
-    <div class="image-wrapper">
-      <img
-        ref="imageRef"
-        :src="props.src"
-        @load="initCrop"
-        class="cropper-image"
-        draggable="false"
-      />
+	<div ref="containerRef" class="image-cropper-container">
+		<div class="image-wrapper">
+			<img
+				ref="imageRef"
+				:src="props.src"
+				@load="initCrop"
+				class="cropper-image"
+				draggable="false"
+			/>
 
-      <div
-        v-if="state.displayWidth > 0"
-        class="crop-overlay"
-        :style="{
-          left: state.crop.left + 'px',
-          top: state.crop.top + 'px',
-          width: state.crop.width + 'px',
-          height: state.crop.height + 'px'
-        }"
-      >
-        <div class="crop-box-content" @mousedown="onMouseDown($event, 'move')">
-          <div class="crop-grid">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-          </div>
-        </div>
+			<div
+				v-if="state.displayWidth > 0"
+				class="crop-overlay"
+				:style="{
+					left: state.crop.left + 'px',
+					top: state.crop.top + 'px',
+					width: state.crop.width + 'px',
+					height: state.crop.height + 'px',
+				}"
+			>
+				<div class="crop-box-content" @mousedown="onMouseDown($event, 'move')">
+					<div class="crop-grid">
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+				</div>
 
-        <!-- Handles -->
-        <div class="handle handle-tl" @mousedown="onMouseDown($event, 'topleft')"></div>
-        <div class="handle handle-tr" @mousedown="onMouseDown($event, 'topright')"></div>
-        <div class="handle handle-bl" @mousedown="onMouseDown($event, 'bottomleft')"></div>
-        <div class="handle handle-br" @mousedown="onMouseDown($event, 'bottomright')"></div>
-        <div class="handle handle-t" @mousedown="onMouseDown($event, 'top')"></div>
-        <div class="handle handle-b" @mousedown="onMouseDown($event, 'bottom')"></div>
-        <div class="handle handle-l" @mousedown="onMouseDown($event, 'left')"></div>
-        <div class="handle handle-r" @mousedown="onMouseDown($event, 'right')"></div>
-      </div>
+				<!-- Handles -->
+				<div
+					class="handle handle-tl"
+					@mousedown="onMouseDown($event, 'topleft')"
+				></div>
+				<div
+					class="handle handle-tr"
+					@mousedown="onMouseDown($event, 'topright')"
+				></div>
+				<div
+					class="handle handle-bl"
+					@mousedown="onMouseDown($event, 'bottomleft')"
+				></div>
+				<div
+					class="handle handle-br"
+					@mousedown="onMouseDown($event, 'bottomright')"
+				></div>
+				<div
+					class="handle handle-t"
+					@mousedown="onMouseDown($event, 'top')"
+				></div>
+				<div
+					class="handle handle-b"
+					@mousedown="onMouseDown($event, 'bottom')"
+				></div>
+				<div
+					class="handle handle-l"
+					@mousedown="onMouseDown($event, 'left')"
+				></div>
+				<div
+					class="handle handle-r"
+					@mousedown="onMouseDown($event, 'right')"
+				></div>
+			</div>
 
-      <!-- Shroud -->
-      <div class="shroud shroud-t" :style="{ height: state.crop.top + 'px' }"></div>
-      <div class="shroud shroud-b" :style="{ top: (state.crop.top + state.crop.height) + 'px' }"></div>
-      <div class="shroud shroud-l" :style="{
-        top: state.crop.top + 'px',
-        height: state.crop.height + 'px',
-        width: state.crop.left + 'px'
-      }"></div>
-      <div class="shroud shroud-r" :style="{
-        top: state.crop.top + 'px',
-        height: state.crop.height + 'px',
-        left: (state.crop.left + state.crop.width) + 'px'
-      }"></div>
-    </div>
-  </div>
+			<!-- Shroud -->
+			<div
+				class="shroud shroud-t"
+				:style="{ height: state.crop.top + 'px' }"
+			></div>
+			<div
+				class="shroud shroud-b"
+				:style="{ top: state.crop.top + state.crop.height + 'px' }"
+			></div>
+			<div
+				class="shroud shroud-l"
+				:style="{
+					top: state.crop.top + 'px',
+					height: state.crop.height + 'px',
+					width: state.crop.left + 'px',
+				}"
+			></div>
+			<div
+				class="shroud shroud-r"
+				:style="{
+					top: state.crop.top + 'px',
+					height: state.crop.height + 'px',
+					left: state.crop.left + state.crop.width + 'px',
+				}"
+			></div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .image-cropper-container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #f0f0f0;
-  user-select: none;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: #f0f0f0;
+	user-select: none;
 }
 
 .image-wrapper {
-  position: relative;
-  display: inline-block;
-  line-height: 0;
+	position: relative;
+	display: inline-block;
+	line-height: 0;
 }
 
 .cropper-image {
-  max-width: 100%;
-  max-height: 500px;
-  display: block;
+	max-width: 100%;
+	max-height: 500px;
+	display: block;
 }
 
 .crop-overlay {
-  position: absolute;
-  border: 1px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-  cursor: move;
-  z-index: 10;
+	position: absolute;
+	border: 1px solid #fff;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+	cursor: move;
+	z-index: 10;
 }
 
 .crop-box-content {
-  width: 100%;
-  height: 100%;
-  position: relative;
+	width: 100%;
+	height: 100%;
+	position: relative;
 }
 
 .crop-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: 1fr 1fr 1fr;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
 }
 
 .crop-grid div {
-  border: 0.5px dashed rgba(255, 255, 255, 0.5);
+	border: 0.5px dashed rgba(255, 255, 255, 0.5);
 }
 
 .handle {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border: 1px solid #000;
-  z-index: 11;
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	background: #fff;
+	border: 1px solid #000;
+	z-index: 11;
 }
 
-.handle-tl { top: -5px; left: -5px; cursor: nwse-resize; }
-.handle-tr { top: -5px; right: -5px; cursor: nesw-resize; }
-.handle-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
-.handle-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
-.handle-t { top: -5px; left: calc(50% - 5px); cursor: ns-resize; }
-.handle-b { bottom: -5px; left: calc(50% - 5px); cursor: ns-resize; }
-.handle-l { top: calc(50% - 5px); left: -5px; cursor: ew-resize; }
-.handle-r { top: calc(50% - 5px); right: -5px; cursor: ew-resize; }
+.handle-tl {
+	top: -5px;
+	left: -5px;
+	cursor: nwse-resize;
+}
+.handle-tr {
+	top: -5px;
+	right: -5px;
+	cursor: nesw-resize;
+}
+.handle-bl {
+	bottom: -5px;
+	left: -5px;
+	cursor: nesw-resize;
+}
+.handle-br {
+	bottom: -5px;
+	right: -5px;
+	cursor: nwse-resize;
+}
+.handle-t {
+	top: -5px;
+	left: calc(50% - 5px);
+	cursor: ns-resize;
+}
+.handle-b {
+	bottom: -5px;
+	left: calc(50% - 5px);
+	cursor: ns-resize;
+}
+.handle-l {
+	top: calc(50% - 5px);
+	left: -5px;
+	cursor: ew-resize;
+}
+.handle-r {
+	top: calc(50% - 5px);
+	right: -5px;
+	cursor: ew-resize;
+}
 
 .shroud {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.5);
-  pointer-events: none;
-  z-index: 5;
-  left: 0;
-  right: 0;
+	position: absolute;
+	background: rgba(0, 0, 0, 0.5);
+	pointer-events: none;
+	z-index: 5;
+	left: 0;
+	right: 0;
 }
-.shroud-t { top: 0; }
-.shroud-b { bottom: 0; }
-.shroud-l { left: 0; }
-.shroud-r { right: 0; }
+.shroud-t {
+	top: 0;
+}
+.shroud-b {
+	bottom: 0;
+}
+.shroud-l {
+	left: 0;
+}
+.shroud-r {
+	right: 0;
+}
 </style>

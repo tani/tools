@@ -51,40 +51,43 @@ watch([oldText, newText], () => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Diff"
-      description="Compare two text blocks and visualize the differences using unified diff."
-    />
+	<div>
+		<ToolHeader
+			title="Diff"
+			description="Compare two text blocks and visualize the differences using unified diff."
+		/>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Old Version" class="h-100" no-padding>
-          <MonospaceEditor v-model="oldText" :rows="10" />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="New Version" class="h-100" no-padding>
-          <MonospaceEditor v-model="newText" :rows="10" />
-        </ToolCard>
-      </div>
-      <div class="col-12 mb-4">
-        <ToolCard title="Unified Diff" no-padding>
-          <template #header-actions>
-            <CopyButton :content="output" />
-          </template>
-          <div v-if="error" class="p-3 bg-danger bg-opacity-10 text-danger font-monospace">
-            {{ error }}
-          </div>
-          <MonospaceEditor
-            v-model="output"
-            language="diff"
-            readonly
-            :rows="15"
-            :bg-light="true"
-          />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Old Version" class="h-100" no-padding>
+					<MonospaceEditor v-model="oldText" :rows="10" />
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="New Version" class="h-100" no-padding>
+					<MonospaceEditor v-model="newText" :rows="10" />
+				</ToolCard>
+			</div>
+			<div class="col-12 mb-4">
+				<ToolCard title="Unified Diff" no-padding>
+					<template #header-actions>
+						<CopyButton :content="output" />
+					</template>
+					<div
+						v-if="error"
+						class="p-3 bg-danger bg-opacity-10 text-danger font-monospace"
+					>
+						{{ error }}
+					</div>
+					<MonospaceEditor
+						v-model="output"
+						language="diff"
+						readonly
+						:rows="15"
+						:bg-light="true"
+					/>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>

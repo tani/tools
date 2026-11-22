@@ -1,5 +1,11 @@
-import { describe, expect, it } from "bun:test";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it, vi } from "vite-plus/test";
 import { pdfWorker } from "../src/workers/pdf-worker";
+
+vi.mock("@embedpdf/pdfium/pdfium.wasm?url", () => ({
+	default: fileURLToPath(import.meta.resolve("@embedpdf/pdfium/pdfium.wasm")),
+}));
+vi.mock("comlink", () => ({ expose: vi.fn() }));
 
 // Create a minimal valid PDF 1.7 file
 function createMinimalPdf(): Uint8Array {
@@ -15,7 +21,7 @@ function createMinimalPdf(): Uint8Array {
 	return encoder.encode(content);
 }
 
-// Mock OffscreenCanvas for Bun environment as it's not available globally
+// Provide the canvas API used by the worker when running under Node.js.
 if (typeof OffscreenCanvas === "undefined") {
 	class MockOffscreenCanvas {
 		width: number;
@@ -87,7 +93,6 @@ describe("PDF Worker with Toy PDF", () => {
 		expect(text).toContain("--- Page 1 --");
 	});
 
-	// PDFiumExt_SaveAsCopy crashes in Bun environment with OOB error, possibly due to WASM memory handling differences
 	it("should merge PDFs", async () => {
 		// Merge specific logic: it imports pages from sources to a new doc
 		const merged = await pdfWorker.mergePdfs([pdfData, pdfData]);

@@ -27,7 +27,7 @@ export interface PDFThumbnail {
 	index: number;
 	width: number;
 	height: number;
-	pixels: Uint8ClampedArray;
+	pixels: Uint8ClampedArray<ArrayBuffer>;
 }
 
 export interface PDFFont {
@@ -333,7 +333,11 @@ export const pdfWorker = {
 	async getPageAsImage(
 		pdfData: Uint8Array,
 		pageIndex: number,
-	): Promise<{ width: number; height: number; pixels: Uint8ClampedArray }> {
+	): Promise<{
+		width: number;
+		height: number;
+		pixels: Uint8ClampedArray<ArrayBuffer>;
+	}> {
 		const mod = await ensurePdfium();
 		const { pdfium } = mod;
 

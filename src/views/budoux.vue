@@ -39,43 +39,53 @@ const output = computed(() => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Japanese Wrap"
-      description="Insert newlines into Japanese text at natural boundaries using BudouX, ensuring each line stays within a specified character limit."
-    />
+	<div>
+		<ToolHeader
+			title="Japanese Wrap"
+			description="Insert newlines into Japanese text at natural boundaries using BudouX, ensuring each line stays within a specified character limit."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-center">
-        <div class="col-md-4">
-          <label for="maxLength" class="form-label fw-bold small text-uppercase text-muted">Max characters per line</label>
-          <input
-            id="maxLength"
-            v-model.number="maxLength"
-            type="number"
-            class="form-control"
-            min="1"
-            max="1000"
-          />
-          <div class="form-text">The text will break at the nearest BudouX chunk before this limit.</div>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-center">
+				<div class="col-md-4">
+					<label
+						for="maxLength"
+						class="form-label fw-bold small text-uppercase text-muted"
+						>Max characters per line</label
+					>
+					<input
+						id="maxLength"
+						v-model.number="maxLength"
+						type="number"
+						class="form-control"
+						min="1"
+						max="1000"
+					/>
+					<div class="form-text">
+						The text will break at the nearest BudouX chunk before this limit.
+					</div>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Original Text" class="h-100" no-padding>
-          <MonospaceEditor v-model="input" :rows="15" placeholder="Enter Japanese text here..." />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Formatted Result" class="h-100" no-padding>
-          <template #header-actions>
-            <CopyButton :content="output" />
-          </template>
-          <MonospaceEditor :model-value="output" readonly bg-light :rows="15" />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Original Text" class="h-100" no-padding>
+					<MonospaceEditor
+						v-model="input"
+						:rows="15"
+						placeholder="Enter Japanese text here..."
+					/>
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Formatted Result" class="h-100" no-padding>
+					<template #header-actions>
+						<CopyButton :content="output" />
+					</template>
+					<MonospaceEditor :model-value="output" readonly bg-light :rows="15" />
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>

@@ -51,52 +51,51 @@ watch([jqFilter, inputJson], () => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="JQ Playground"
-      description="Run JQ filters against JSON data in your browser."
-    />
+	<div>
+		<ToolHeader
+			title="JQ Playground"
+			description="Run JQ filters against JSON data in your browser."
+		/>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="JQ Filter" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="jqFilter"
-            :rows="10"
-            placeholder="."
-          />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Input JSON" class="h-100" no-padding>
-          <MonospaceEditor
-            v-model="inputJson"
-            language="json"
-            :rows="10"
-            placeholder="{}"
-          />
-        </ToolCard>
-      </div>
-    </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="JQ Filter" class="h-100" no-padding>
+					<MonospaceEditor v-model="jqFilter" :rows="10" placeholder="." />
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Input JSON" class="h-100" no-padding>
+					<MonospaceEditor
+						v-model="inputJson"
+						language="json"
+						:rows="10"
+						placeholder="{}"
+					/>
+				</ToolCard>
+			</div>
+		</div>
 
-    <div class="row">
-      <div class="col-12">
-        <ToolCard title="Output" no-padding>
-          <template #header-actions>
-            <CopyButton :content="output" />
-          </template>
-          <div v-if="error" class="p-3 bg-danger bg-opacity-10 text-danger font-monospace">
-            {{ error }}
-          </div>
-          <MonospaceEditor
-            v-model="output"
-            readonly
-            language="json"
-            :rows="10"
-            :bg-light="true"
-          />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-12">
+				<ToolCard title="Output" no-padding>
+					<template #header-actions>
+						<CopyButton :content="output" />
+					</template>
+					<div
+						v-if="error"
+						class="p-3 bg-danger bg-opacity-10 text-danger font-monospace"
+					>
+						{{ error }}
+					</div>
+					<MonospaceEditor
+						v-model="output"
+						readonly
+						language="json"
+						:rows="10"
+						:bg-light="true"
+					/>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>

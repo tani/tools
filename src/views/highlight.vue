@@ -1,92 +1,110 @@
 <template>
-  <div class="container py-4">
-    <ToolHeader
-      title="Highlight"
-      description="Generate syntax-highlighted code snippets using Prism.js and download them as PNG images."
-    />
+	<div class="container py-4">
+		<ToolHeader
+			title="Highlight"
+			description="Generate syntax-highlighted code snippets using Prism.js and download them as PNG images."
+		/>
 
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header fw-bold small text-uppercase text-muted">Configuration</div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label for="language" class="form-label small text-muted">Language</label>
-            <select id="language" v-model="state.language" class="form-select">
-              <option v-for="lang in LANGUAGES" :key="lang.id" :value="lang.id">
-                {{ lang.id }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="theme" class="form-label small text-muted">Theme</label>
-            <select id="theme" v-model="state.themeId" class="form-select">
-              <option v-for="t in THEMES" :key="t.id" :value="t.id">
-                {{ t.id }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="fontSize" class="form-label small text-muted">Font Size</label>
-            <div class="input-group">
-              <input
-                id="fontSize"
-                v-model.number="state.fontSize"
-                type="number"
-                class="form-control"
-                min="10"
-                max="32"
-                step="1"
-              />
-              <span class="input-group-text">px</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+		<div class="card mb-4 shadow-sm">
+			<div class="card-header fw-bold small text-uppercase text-muted">
+				Configuration
+			</div>
+			<div class="card-body">
+				<div class="row g-3">
+					<div class="col-md-4">
+						<label for="language" class="form-label small text-muted"
+							>Language</label
+						>
+						<select id="language" v-model="state.language" class="form-select">
+							<option v-for="lang in LANGUAGES" :key="lang.id" :value="lang.id">
+								{{ lang.id }}
+							</option>
+						</select>
+					</div>
+					<div class="col-md-4">
+						<label for="theme" class="form-label small text-muted">Theme</label>
+						<select id="theme" v-model="state.themeId" class="form-select">
+							<option v-for="t in THEMES" :key="t.id" :value="t.id">
+								{{ t.id }}
+							</option>
+						</select>
+					</div>
+					<div class="col-md-4">
+						<label for="fontSize" class="form-label small text-muted"
+							>Font Size</label
+						>
+						<div class="input-group">
+							<input
+								id="fontSize"
+								v-model.number="state.fontSize"
+								type="number"
+								class="form-control"
+								min="10"
+								max="32"
+								step="1"
+							/>
+							<span class="input-group-text">px</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <ToolCard title="Code" class="h-100" no-padding>
-          <template #header-actions>
-            <span class="text-muted small">Auto-renders with Prism</span>
-          </template>
-          <MonospaceEditor
-            v-model="state.code"
-            :language="state.language"
-            :rows="14"
-            placeholder="Paste your code here..."
-          />
-        </ToolCard>
-      </div>
+		<div class="row g-4">
+			<div class="col-lg-6">
+				<ToolCard title="Code" class="h-100" no-padding>
+					<template #header-actions>
+						<span class="text-muted small">Auto-renders with Prism</span>
+					</template>
+					<MonospaceEditor
+						v-model="state.code"
+						:language="state.language"
+						:rows="14"
+						placeholder="Paste your code here..."
+					/>
+				</ToolCard>
+			</div>
 
-      <div class="col-lg-6">
-        <ToolCard title="Preview" class="h-100" no-padding>
-          <template #header-actions>
-            <button
-              class="btn btn-link p-0 small"
-              :disabled="status.isRendering || status.isDownloading"
-              @click="downloadPng"
-            >
-              {{ status.isDownloading ? "Preparing..." : "Download PNG" }}
-            </button>
-          </template>
-          <div class="card-body bg-light h-100">
-            <div v-if="status.error" class="alert alert-danger" role="alert">{{ status.error }}</div>
-            <div v-else class="code-wrapper font-monospace preview-surface" :style="{ fontSize: `${state.fontSize}px` }">
-              <LoadingOverlay v-if="status.isRendering" :loading="true" message="Rendering..." />
-              <img
-                v-else-if="state.previewImage"
-                :src="state.previewImage"
-                class="img-fluid rounded shadow-sm"
-                alt="Highlighted code preview"
-              />
-              <div v-else class="text-muted small">Preview will appear here.</div>
-            </div>
-          </div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+			<div class="col-lg-6">
+				<ToolCard title="Preview" class="h-100" no-padding>
+					<template #header-actions>
+						<button
+							class="btn btn-link p-0 small"
+							:disabled="status.isRendering || status.isDownloading"
+							@click="downloadPng"
+						>
+							{{ status.isDownloading ? "Preparing..." : "Download PNG" }}
+						</button>
+					</template>
+					<div class="card-body bg-light h-100">
+						<div v-if="status.error" class="alert alert-danger" role="alert">
+							{{ status.error }}
+						</div>
+						<div
+							v-else
+							class="code-wrapper font-monospace preview-surface"
+							:style="{ fontSize: `${state.fontSize}px` }"
+						>
+							<LoadingOverlay
+								v-if="status.isRendering"
+								:loading="true"
+								message="Rendering..."
+							/>
+							<img
+								v-else-if="state.previewImage"
+								:src="state.previewImage"
+								class="img-fluid rounded shadow-sm"
+								alt="Highlighted code preview"
+							/>
+							<div v-else class="text-muted small">
+								Preview will appear here.
+							</div>
+						</div>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -392,19 +410,19 @@ watch(
 
 <style scoped>
 .code-wrapper {
-  min-height: 320px;
-  padding: 1rem;
-  overflow: auto;
+	min-height: 320px;
+	padding: 1rem;
+	overflow: auto;
 }
 
 .preview-surface {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .img-fluid {
-  max-width: 100%;
-  height: auto;
+	max-width: 100%;
+	height: auto;
 }
 </style>

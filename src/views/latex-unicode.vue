@@ -40,32 +40,32 @@ const output = computed(() => replace(input.value));
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="LaTeX → Unicode"
-      description="Convert LaTeX mathematical symbols and expressions to their Unicode equivalents."
-    />
+	<div>
+		<ToolHeader
+			title="LaTeX → Unicode"
+			description="Convert LaTeX mathematical symbols and expressions to their Unicode equivalents."
+		/>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="LaTeX Input" class="h-100" no-padding>
-          <MonospaceEditor v-model="input" :rows="20" />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Unicode Output" class="h-100" no-padding>
-          <template #header-actions>
-            <CopyButton :content="output" />
-          </template>
-          <MonospaceEditor :model-value="output" bg-light readonly :rows="20" />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="LaTeX Input" class="h-100" no-padding>
+					<MonospaceEditor v-model="input" :rows="20" />
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Unicode Output" class="h-100" no-padding>
+					<template #header-actions>
+						<CopyButton :content="output" />
+					</template>
+					<MonospaceEditor :model-value="output" bg-light readonly :rows="20" />
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .font-monospace {
-  font-family: var(--bs-font-monospace);
+	font-family: var(--bs-font-monospace);
 }
 </style>

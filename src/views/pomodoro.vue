@@ -122,100 +122,122 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Pomodoro"
-      description="A simple Pomodoro timer to help you stay focused and productive."
-    />
+	<div>
+		<ToolHeader
+			title="Pomodoro"
+			description="A simple Pomodoro timer to help you stay focused and productive."
+		/>
 
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="nav nav-pills mb-3">
-          <button class="nav-link" :class="{ active: mode === 'work' }" @click="setMode('work')">
-            Work
-          </button>
-          <button
-            class="nav-link"
-            :class="{ active: mode === 'shortBreak' }"
-            @click="setMode('shortBreak')"
-          >
-            Short Break
-          </button>
-          <button
-            class="nav-link"
-            :class="{ active: mode === 'longBreak' }"
-            @click="setMode('longBreak')"
-          >
-            Long Break
-          </button>
-        </div>
-      </div>
-    </div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="nav nav-pills mb-3">
+					<button
+						class="nav-link"
+						:class="{ active: mode === 'work' }"
+						@click="setMode('work')"
+					>
+						Work
+					</button>
+					<button
+						class="nav-link"
+						:class="{ active: mode === 'shortBreak' }"
+						@click="setMode('shortBreak')"
+					>
+						Short Break
+					</button>
+					<button
+						class="nav-link"
+						:class="{ active: mode === 'longBreak' }"
+						@click="setMode('longBreak')"
+					>
+						Long Break
+					</button>
+				</div>
+			</div>
+		</div>
 
-    <div class="row">
-      <div class="col-sm-6 mb-4">
-        <ToolCard title="Timer" class="h-100 text-center">
-          <div class="py-4">
-            <div class="display-1 fw-bold mb-3">{{ displayTime }}</div>
-            <div class="progress mb-4" style="height: 10px">
-              <div
-                class="progress-bar"
-                role="progressbar"
-                :style="{ width: progress + '%' }"
-                :aria-valuenow="progress"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              ></div>
-            </div>
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
-              <button v-if="!isRunning" class="btn btn-primary px-4" @click="startTimer">
-                Start
-              </button>
-              <button v-else class="btn btn-warning px-4" @click="stopTimer">Pause</button>
-              <button class="btn btn-outline-secondary px-4" @click="resetTimer">Reset</button>
-              <button class="btn btn-outline-info px-4" @click="playAlarm(mode === 'work' ? 6 : 3)">
-                Test Alarm
-              </button>
-            </div>
-          </div>
-        </ToolCard>
-      </div>
-      <div class="col-sm-6 mb-4">
-        <ToolCard title="Status & Instructions" class="h-100">
-          <table class="table mb-4">
-            <tbody>
-              <tr>
-                <th>Status</th>
-                <td>{{ isRunning ? "Running" : "Paused" }}</td>
-              </tr>
-              <tr>
-                <th>Current Mode</th>
-                <td class="text-capitalize">{{ mode.replace(/([A-Z])/g, " $1") }}</td>
-              </tr>
-              <tr>
-                <th>Sessions Completed</th>
-                <td>{{ sessionsCompleted }}</td>
-              </tr>
-            </tbody>
-          </table>
+		<div class="row">
+			<div class="col-sm-6 mb-4">
+				<ToolCard title="Timer" class="h-100 text-center">
+					<div class="py-4">
+						<div class="display-1 fw-bold mb-3">{{ displayTime }}</div>
+						<div class="progress mb-4" style="height: 10px">
+							<div
+								class="progress-bar"
+								role="progressbar"
+								:style="{ width: progress + '%' }"
+								:aria-valuenow="progress"
+								aria-valuemin="0"
+								aria-valuemax="100"
+							></div>
+						</div>
+						<div class="d-flex justify-content-center gap-2 flex-wrap">
+							<button
+								v-if="!isRunning"
+								class="btn btn-primary px-4"
+								@click="startTimer"
+							>
+								Start
+							</button>
+							<button v-else class="btn btn-warning px-4" @click="stopTimer">
+								Pause
+							</button>
+							<button
+								class="btn btn-outline-secondary px-4"
+								@click="resetTimer"
+							>
+								Reset
+							</button>
+							<button
+								class="btn btn-outline-info px-4"
+								@click="playAlarm(mode === 'work' ? 6 : 3)"
+							>
+								Test Alarm
+							</button>
+						</div>
+					</div>
+				</ToolCard>
+			</div>
+			<div class="col-sm-6 mb-4">
+				<ToolCard title="Status & Instructions" class="h-100">
+					<table class="table mb-4">
+						<tbody>
+							<tr>
+								<th>Status</th>
+								<td>{{ isRunning ? "Running" : "Paused" }}</td>
+							</tr>
+							<tr>
+								<th>Current Mode</th>
+								<td class="text-capitalize">
+									{{ mode.replace(/([A-Z])/g, " $1") }}
+								</td>
+							</tr>
+							<tr>
+								<th>Sessions Completed</th>
+								<td>{{ sessionsCompleted }}</td>
+							</tr>
+						</tbody>
+					</table>
 
-          <div>
-            <h5 class="small fw-bold text-uppercase text-muted">Instructions</h5>
-            <ul class="text-muted small">
-              <li>Work for 25 minutes.</li>
-              <li>Take a 5-minute short break.</li>
-              <li>Every 4 work sessions, take a 15-minute long break.</li>
-              <li>Alarm will sound when time is up.</li>
-            </ul>
-          </div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+					<div>
+						<h5 class="small fw-bold text-uppercase text-muted">
+							Instructions
+						</h5>
+						<ul class="text-muted small">
+							<li>Work for 25 minutes.</li>
+							<li>Take a 5-minute short break.</li>
+							<li>Every 4 work sessions, take a 15-minute long break.</li>
+							<li>Alarm will sound when time is up.</li>
+						</ul>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .display-1 {
-  font-family: monospace;
+	font-family: monospace;
 }
 </style>

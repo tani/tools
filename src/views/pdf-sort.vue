@@ -8,7 +8,6 @@ import LoadingOverlay from "../components/LoadingOverlay.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { PdfWorker } from "../workers/pdf-worker";
-
 import PdfWorkerConstructor from "../workers/pdf-worker?worker";
 
 interface PageItem {
@@ -121,101 +120,117 @@ const exportPdf = async () => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="PDF Sort"
-      description="Rearrange or remove pages from a PDF document visually."
-    />
+	<div>
+		<ToolHeader
+			title="PDF Sort"
+			description="Rearrange or remove pages from a PDF document visually."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-9">
-          <FilePicker label="Upload PDF" accept="application/pdf" @change="handleFileChange" />
-        </div>
-        <div class="col-md-3">
-          <button
-            class="btn btn-primary w-100"
-            @click="exportPdf"
-            :disabled="pages.length === 0 || isProcessing"
-          >
-            <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-            Export PDF
-          </button>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-end">
+				<div class="col-md-9">
+					<FilePicker
+						label="Upload PDF"
+						accept="application/pdf"
+						@change="handleFileChange"
+					/>
+				</div>
+				<div class="col-md-3">
+					<button
+						class="btn btn-primary w-100"
+						@click="exportPdf"
+						:disabled="pages.length === 0 || isProcessing"
+					>
+						<span
+							v-if="isProcessing"
+							class="spinner-border spinner-border-sm me-2"
+						></span>
+						Export PDF
+					</button>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div
-      v-if="downloadUrl"
-      class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
-    >
-      <span><strong>Success!</strong> Your rearranged PDF is ready.</span>
-      <DownloadLink
-        :href="downloadUrl"
-        :filename="'sorted_' + fileName"
-        label="Download Sorted PDF"
-        class="btn btn-success btn-sm"
-      />
-    </div>
+		<div
+			v-if="downloadUrl"
+			class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
+		>
+			<span><strong>Success!</strong> Your rearranged PDF is ready.</span>
+			<DownloadLink
+				:href="downloadUrl"
+				:filename="'sorted_' + fileName"
+				label="Download Sorted PDF"
+				class="btn btn-success btn-sm"
+			/>
+		</div>
 
-    <ToolCard title="Page Workspace" class="mb-4">
-      <template #header-actions>
-        <span class="badge bg-secondary opacity-75">{{ pages.length }} pages</span>
-      </template>
+		<ToolCard title="Page Workspace" class="mb-4">
+			<template #header-actions>
+				<span class="badge bg-secondary opacity-75"
+					>{{ pages.length }} pages</span
+				>
+			</template>
 
-      <div class="bg-light p-3 rounded">
-        <LoadingOverlay :loading="isProcessing && pages.length === 0" message="Loading Pages..." />
+			<div class="bg-light p-3 rounded">
+				<LoadingOverlay
+					:loading="isProcessing && pages.length === 0"
+					message="Loading Pages..."
+				/>
 
-        <div
-          v-if="pages.length > 0"
-          ref="sortableList"
-          class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 g-3"
-        >
-          <div
-            v-for="(page, index) in pages"
-            :key="page.id"
-            class="col cursor-move"
-            :data-id="page.id"
-          >
-            <div class="card h-100 shadow-sm border-0 overflow-hidden">
-              <div class="position-relative">
-                <img
-                  :src="page.thumbnail"
-                  class="card-img-top border-bottom bg-white"
-                  :alt="'Page ' + (page.originalIndex + 1)"
-                />
-                <div class="badge bg-dark position-absolute top-0 start-0 m-1 opacity-75">
-                  #{{ index + 1 }}
-                </div>
-              </div>
-              <div class="card-footer p-1 bg-white text-center border-0">
-                <span class="x-small text-muted text-uppercase fw-bold" style="font-size: 0.6rem"
-                  >Drag to move</span
-                >
-              </div>
-            </div>
-          </div>
-        </div>
+				<div
+					v-if="pages.length > 0"
+					ref="sortableList"
+					class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 g-3"
+				>
+					<div
+						v-for="(page, index) in pages"
+						:key="page.id"
+						class="col cursor-move"
+						:data-id="page.id"
+					>
+						<div class="card h-100 shadow-sm border-0 overflow-hidden">
+							<div class="position-relative">
+								<img
+									:src="page.thumbnail"
+									class="card-img-top border-bottom bg-white"
+									:alt="'Page ' + (page.originalIndex + 1)"
+								/>
+								<div
+									class="badge bg-dark position-absolute top-0 start-0 m-1 opacity-75"
+								>
+									#{{ index + 1 }}
+								</div>
+							</div>
+							<div class="card-footer p-1 bg-white text-center border-0">
+								<span
+									class="x-small text-muted text-uppercase fw-bold"
+									style="font-size: 0.6rem"
+									>Drag to move</span
+								>
+							</div>
+						</div>
+					</div>
+				</div>
 
-        <div v-else class="text-center py-5 text-muted small uppercase fw-bold">
-          No document loaded
-        </div>
-      </div>
-    </ToolCard>
-  </div>
+				<div v-else class="text-center py-5 text-muted small uppercase fw-bold">
+					No document loaded
+				</div>
+			</div>
+		</ToolCard>
+	</div>
 </template>
 
 <style scoped>
 .cursor-move {
-  cursor: move;
+	cursor: move;
 }
 .btn-xs {
-  padding: 0.1rem 0.25rem;
-  font-size: 0.75rem;
+	padding: 0.1rem 0.25rem;
+	font-size: 0.75rem;
 }
 .card-img-top {
-  object-fit: contain;
-  height: 180px;
-  padding: 10px;
+	object-fit: contain;
+	height: 180px;
+	padding: 10px;
 }
 </style>

@@ -14,15 +14,15 @@ const handleChange = (event: Event) => {
 </script>
 
 <template>
-  <div>
-    <label v-if="label" class="form-label fw-bold small">{{ label }}</label>
-    <input
-      class="form-control"
-      type="file"
-      :accept="accept"
-      :multiple="multiple"
-      :disabled="disabled"
-      @change="handleChange"
-    />
-  </div>
+	<div>
+		<label v-if="label" class="form-label fw-bold small">{{ label }}</label>
+		<input
+			class="form-control"
+			type="file"
+			:accept="accept"
+			:multiple="multiple"
+			:disabled="disabled"
+			@change="handleChange"
+		/>
+	</div>
 </template>

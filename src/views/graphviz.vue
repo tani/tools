@@ -136,73 +136,86 @@ watch(
 </script>
 
 <template>
-  <div class="graphviz-editor">
-    <ToolHeader
-      title="Graphviz"
-      description="Create and preview diagrams using DOT syntax and export them as PNG images."
-    />
+	<div class="graphviz-editor">
+		<ToolHeader
+			title="Graphviz"
+			description="Create and preview diagrams using DOT syntax and export them as PNG images."
+		/>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="DOT Code" class="h-100" no-padding>
-          <template #header-actions>
-            <select
-              v-model="engine"
-              class="form-select form-select-sm"
-              style="width: auto"
-              title="Rendering Engine"
-            >
-              <option v-for="e in engines" :key="e" :value="e">{{ e }}</option>
-            </select>
-          </template>
-          <MonospaceEditor
-            v-model="code"
-            language="dot"
-            :rows="15"
-            placeholder="digraph G { A -> B; }"
-          />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Preview" class="h-100" no-padding>
-          <template #header-actions>
-            <DownloadLink :href="imageUrl" filename="graphviz-diagram.png" label="Download PNG" />
-          </template>
-          <div
-            class="preview-container border-0 rounded-0 bg-light d-flex align-items-center justify-content-center"
-            style="min-height: 382px"
-          >
-            <div v-if="!code" class="text-muted small">Please enter DOT code</div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="DOT Code" class="h-100" no-padding>
+					<template #header-actions>
+						<select
+							v-model="engine"
+							class="form-select form-select-sm"
+							style="width: auto"
+							title="Rendering Engine"
+						>
+							<option v-for="e in engines" :key="e" :value="e">{{ e }}</option>
+						</select>
+					</template>
+					<MonospaceEditor
+						v-model="code"
+						language="dot"
+						:rows="15"
+						placeholder="digraph G { A -> B; }"
+					/>
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Preview" class="h-100" no-padding>
+					<template #header-actions>
+						<DownloadLink
+							:href="imageUrl"
+							filename="graphviz-diagram.png"
+							label="Download PNG"
+						/>
+					</template>
+					<div
+						class="preview-container border-0 rounded-0 bg-light d-flex align-items-center justify-content-center"
+						style="min-height: 382px"
+					>
+						<div v-if="!code" class="text-muted small">
+							Please enter DOT code
+						</div>
 
-            <LoadingOverlay v-else-if="isRendering" :loading="true" message="Rendering..." />
+						<LoadingOverlay
+							v-else-if="isRendering"
+							:loading="true"
+							message="Rendering..."
+						/>
 
-            <div v-else-if="error" class="alert alert-danger m-3 text-start small w-100">
-              <strong>Error:</strong> <span>{{ error }}</span>
-            </div>
+						<div
+							v-else-if="error"
+							class="alert alert-danger m-3 text-start small w-100"
+						>
+							<strong>Error:</strong> <span>{{ error }}</span>
+						</div>
 
-            <img
-              v-else-if="imageUrl"
-              :src="imageUrl"
-              class="img-fluid p-3"
-              alt="Rendered Diagram"
-              title="Right click to save"
-            />
-          </div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+						<img
+							v-else-if="imageUrl"
+							:src="imageUrl"
+							class="img-fluid p-3"
+							alt="Rendered Diagram"
+							title="Right click to save"
+						/>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .preview-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  border: solid 1px #ccc;
-  border-radius: 5px;
-  overflow: auto;
-  background-color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 400px;
+	border: solid 1px #ccc;
+	border-radius: 5px;
+	overflow: auto;
+	background-color: white;
 }
 </style>

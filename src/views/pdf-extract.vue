@@ -7,7 +7,6 @@ import PdfViewer from "../components/PdfViewer.vue";
 import ToolCard from "../components/ToolCard.vue";
 import ToolHeader from "../components/ToolHeader.vue";
 import type { PdfWorker } from "../workers/pdf-worker";
-
 import PdfWorkerConstructor from "../workers/pdf-worker?worker";
 
 const fileData = ref<Uint8Array | null>(null);
@@ -92,61 +91,70 @@ const extractPages = async () => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="PDF Extract"
-      description="Extract specific pages or ranges from a PDF document into a new file."
-    />
+	<div>
+		<ToolHeader
+			title="PDF Extract"
+			description="Extract specific pages or ranges from a PDF document into a new file."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-5">
-          <FilePicker label="Upload PDF" accept="application/pdf" @change="handleFileChange" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label fw-bold small">Page Ranges (e.g. 1, 3, 5-10)</label>
-          <input
-            v-model="pageRange"
-            type="text"
-            class="form-control font-monospace"
-            placeholder="1, 2, 5-8"
-            :disabled="!fileData"
-          />
-        </div>
-        <div class="col-md-3">
-          <button
-            class="btn btn-primary w-100"
-            @click="extractPages"
-            :disabled="!fileData || isProcessing"
-          >
-            <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-            Extract Pages
-          </button>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-end">
+				<div class="col-md-5">
+					<FilePicker
+						label="Upload PDF"
+						accept="application/pdf"
+						@change="handleFileChange"
+					/>
+				</div>
+				<div class="col-md-4">
+					<label class="form-label fw-bold small"
+						>Page Ranges (e.g. 1, 3, 5-10)</label
+					>
+					<input
+						v-model="pageRange"
+						type="text"
+						class="form-control font-monospace"
+						placeholder="1, 2, 5-8"
+						:disabled="!fileData"
+					/>
+				</div>
+				<div class="col-md-3">
+					<button
+						class="btn btn-primary w-100"
+						@click="extractPages"
+						:disabled="!fileData || isProcessing"
+					>
+						<span
+							v-if="isProcessing"
+							class="spinner-border spinner-border-sm me-2"
+						></span>
+						Extract Pages
+					</button>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div
-      v-if="downloadUrl"
-      class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
-    >
-      <span><strong>Success!</strong> Selected pages have been extracted.</span>
-      <DownloadLink
-        :href="downloadUrl"
-        :filename="'extracted_' + fileName"
-        label="Download Extracted PDF"
-        class="btn btn-success btn-sm"
-      />
-    </div>
+		<div
+			v-if="downloadUrl"
+			class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4"
+		>
+			<span><strong>Success!</strong> Selected pages have been extracted.</span>
+			<DownloadLink
+				:href="downloadUrl"
+				:filename="'extracted_' + fileName"
+				label="Download Extracted PDF"
+				class="btn btn-success btn-sm"
+			/>
+		</div>
 
-    <div class="row">
-      <div class="col-12 mb-4">
-        <ToolCard title="Source Document Preview" no-padding>
-          <PdfViewer :data="fileData" />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-12 mb-4">
+				<ToolCard title="Source Document Preview" no-padding>
+					<PdfViewer :data="fileData" />
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped></style>

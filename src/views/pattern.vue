@@ -106,138 +106,163 @@ const processedData = computed(() => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Pattern Fold"
-      :description="`Extract common patterns from multiple lines by replacing variations with '${diffChar}'.`"
-    />
+	<div>
+		<ToolHeader
+			title="Pattern Fold"
+			:description="`Extract common patterns from multiple lines by replacing variations with '${diffChar}'.`"
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row align-items-center g-3">
-        <div class="col-auto">
-          <label for="diffChar" class="form-label mb-0 fw-bold small">Replacement Character</label>
-        </div>
-        <div class="col-auto">
-          <input
-            id="diffChar"
-            type="text"
-            v-model="diffChar"
-            @input="limitDiffChar"
-            class="form-control form-control-sm text-center font-monospace"
-            style="width: 3rem"
-          />
-        </div>
-        <div class="col-auto ms-auto">
-          <div class="form-check mb-0">
-            <input class="form-check-input" type="checkbox" v-model="showSteps" id="showSteps" />
-            <label
-              class="form-check-label small fw-bold text-muted text-uppercase"
-              for="showSteps"
-              style="font-size: 0.75rem"
-            >
-              Show Calculation Steps
-            </label>
-          </div>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row align-items-center g-3">
+				<div class="col-auto">
+					<label for="diffChar" class="form-label mb-0 fw-bold small"
+						>Replacement Character</label
+					>
+				</div>
+				<div class="col-auto">
+					<input
+						id="diffChar"
+						type="text"
+						v-model="diffChar"
+						@input="limitDiffChar"
+						class="form-control form-control-sm text-center font-monospace"
+						style="width: 3rem"
+					/>
+				</div>
+				<div class="col-auto ms-auto">
+					<div class="form-check mb-0">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							v-model="showSteps"
+							id="showSteps"
+						/>
+						<label
+							class="form-check-label small fw-bold text-muted text-uppercase"
+							for="showSteps"
+							style="font-size: 0.75rem"
+						>
+							Show Calculation Steps
+						</label>
+					</div>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div class="row">
-      <!-- Input Area -->
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Unicode Input" class="h-100" no-padding>
-          <template #header-actions>
-            <span class="badge bg-secondary opacity-75">{{ lineCount }} lines</span>
-          </template>
-          <MonospaceEditor
-            v-model="inputText"
-            :rows="15"
-            placeholder="Enter your strings here..."
-          />
-        </ToolCard>
-      </div>
+		<div class="row">
+			<!-- Input Area -->
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Unicode Input" class="h-100" no-padding>
+					<template #header-actions>
+						<span class="badge bg-secondary opacity-75"
+							>{{ lineCount }} lines</span
+						>
+					</template>
+					<MonospaceEditor
+						v-model="inputText"
+						:rows="15"
+						placeholder="Enter your strings here..."
+					/>
+				</ToolCard>
+			</div>
 
-      <!-- Result Area -->
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Processed Results" class="h-100">
-          <div class="overflow-auto" style="min-height: 382px">
-            <div v-if="!inputText.trim()" class="text-center text-muted py-5 small">
-              Results will appear here
-            </div>
+			<!-- Result Area -->
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Processed Results" class="h-100">
+					<div class="overflow-auto" style="min-height: 382px">
+						<div
+							v-if="!inputText.trim()"
+							class="text-center text-muted py-5 small"
+						>
+							Results will appear here
+						</div>
 
-            <div v-else>
-              <!-- Regex Result -->
-              <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                  <label
-                    class="small fw-bold text-uppercase text-muted mb-0"
-                    style="font-size: 0.7rem"
-                    >Regex Pattern</label
-                  >
-                  <CopyButton :content="processedData.regexResult" />
-                </div>
-                <div
-                  class="p-3 border rounded bg-white font-monospace text-break small"
-                  style="color: #d946ef"
-                >
-                  {{ processedData.regexResult || "(No input)" }}
-                </div>
-              </div>
+						<div v-else>
+							<!-- Regex Result -->
+							<div class="mb-4">
+								<div
+									class="d-flex justify-content-between align-items-center mb-1"
+								>
+									<label
+										class="small fw-bold text-uppercase text-muted mb-0"
+										style="font-size: 0.7rem"
+										>Regex Pattern</label
+									>
+									<CopyButton :content="processedData.regexResult" />
+								</div>
+								<div
+									class="p-3 border rounded bg-white font-monospace text-break small"
+									style="color: #d946ef"
+								>
+									{{ processedData.regexResult || "(No input)" }}
+								</div>
+							</div>
 
-              <!-- Final Result -->
-              <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                  <label
-                    class="small fw-bold text-uppercase text-muted mb-0"
-                    style="font-size: 0.7rem"
-                    >Final Folded Result</label
-                  >
-                  <CopyButton :content="processedData.finalResult" />
-                </div>
-                <div class="p-3 border rounded bg-white font-monospace text-break fw-bold fs-6">
-                  {{ processedData.finalResult || "(No input)" }}
-                </div>
-              </div>
+							<!-- Final Result -->
+							<div class="mb-4">
+								<div
+									class="d-flex justify-content-between align-items-center mb-1"
+								>
+									<label
+										class="small fw-bold text-uppercase text-muted mb-0"
+										style="font-size: 0.7rem"
+										>Final Folded Result</label
+									>
+									<CopyButton :content="processedData.finalResult" />
+								</div>
+								<div
+									class="p-3 border rounded bg-white font-monospace text-break fw-bold fs-6"
+								>
+									{{ processedData.finalResult || "(No input)" }}
+								</div>
+							</div>
 
-              <!-- Calculation Steps -->
-              <div v-if="showSteps && processedData.steps.length > 0">
-                <label
-                  class="small fw-bold text-uppercase text-muted mb-2 d-block"
-                  style="font-size: 0.7rem"
-                  >Step-by-Step Evolution</label
-                >
-                <div
-                  v-for="step in processedData.steps"
-                  :key="step.stepIndex"
-                  class="card mb-2 border-0 shadow-none bg-white"
-                >
-                  <div class="card-body p-2 border rounded">
-                    <span class="badge bg-info text-dark mb-2" style="font-size: 0.6rem"
-                      >Step {{ step.stepIndex }}</span
-                    >
-                    <div class="row g-1 font-monospace" style="font-size: 0.75rem">
-                      <div class="col-1 text-muted text-end">A:</div>
-                      <div class="col-11 text-break">{{ step.inputA }}</div>
+							<!-- Calculation Steps -->
+							<div v-if="showSteps && processedData.steps.length > 0">
+								<label
+									class="small fw-bold text-uppercase text-muted mb-2 d-block"
+									style="font-size: 0.7rem"
+									>Step-by-Step Evolution</label
+								>
+								<div
+									v-for="step in processedData.steps"
+									:key="step.stepIndex"
+									class="card mb-2 border-0 shadow-none bg-white"
+								>
+									<div class="card-body p-2 border rounded">
+										<span
+											class="badge bg-info text-dark mb-2"
+											style="font-size: 0.6rem"
+											>Step {{ step.stepIndex }}</span
+										>
+										<div
+											class="row g-1 font-monospace"
+											style="font-size: 0.75rem"
+										>
+											<div class="col-1 text-muted text-end">A:</div>
+											<div class="col-11 text-break">{{ step.inputA }}</div>
 
-                      <div class="col-1 text-muted text-end">B:</div>
-                      <div class="col-11 text-break">{{ step.inputB }}</div>
+											<div class="col-1 text-muted text-end">B:</div>
+											<div class="col-11 text-break">{{ step.inputB }}</div>
 
-                      <div class="col-1 text-warning text-end">↓</div>
-                      <div class="col-11 text-break text-primary fw-bold">{{ step.output }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+											<div class="col-1 text-warning text-end">↓</div>
+											<div class="col-11 text-break text-primary fw-bold">
+												{{ step.output }}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .font-monospace {
-  font-family: var(--bs-font-monospace);
+	font-family: var(--bs-font-monospace);
 }
 </style>

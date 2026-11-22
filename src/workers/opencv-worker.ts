@@ -1,30 +1,8 @@
-import cv from "@techstark/opencv-js";
+import cvModule from "@techstark/opencv-js";
 import * as Comlink from "comlink";
 
-// TODO: 4.13.0, support `using` statement
-
-const ensureOpenCV = async () => {
-	if (cv.Mat) return;
-
-	return new Promise<void>((resolve, reject) => {
-		if (!cv) return reject(new Error("OpenCV module not found"));
-		cv.onRuntimeInitialized = () => {
-			if (cv?.Mat) resolve();
-		};
-
-		let attempts = 0;
-		const checkInterval = setInterval(() => {
-			attempts++;
-			if (cv?.Mat) {
-				clearInterval(checkInterval);
-				resolve();
-			} else if (attempts > 100) {
-				clearInterval(checkInterval);
-				reject(new Error("OpenCV initialization timeout"));
-			}
-		}, 100);
-	});
-};
+// The OpenCV entry point resolves once its WebAssembly runtime is initialized.
+const cvReady = Promise.resolve(cvModule);
 
 const opencvWorker = {
 	async process(
@@ -33,7 +11,7 @@ const opencvWorker = {
 		y: number,
 		tolerance: number,
 	): Promise<ImageData> {
-		await ensureOpenCV();
+		const cv = await cvReady;
 		const { width, height } = imageData;
 
 		try {
@@ -100,7 +78,6 @@ const opencvWorker = {
 		y: number,
 		tolerance: number,
 	): Promise<ImageData> {
-		await ensureOpenCV();
 		const { width, height } = imageData;
 		const idx = (y * width + x) * 4;
 		const sr = imageData.data[idx];
@@ -127,7 +104,7 @@ const opencvWorker = {
 		imageData: ImageData,
 		rect: { left: number; top: number; width: number; height: number },
 	): Promise<ImageData> {
-		await ensureOpenCV();
+		const cv = await cvReady;
 		const { width, height } = imageData;
 
 		try {

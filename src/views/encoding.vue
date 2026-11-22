@@ -165,113 +165,132 @@ watch([sourceEncoding], () => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Encoding"
-      description="Convert uploaded text files to UTF-8 using browser native APIs."
-    />
+	<div>
+		<ToolHeader
+			title="Encoding"
+			description="Convert uploaded text files to UTF-8 using browser native APIs."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-end">
-        <div class="col-lg-6">
-          <label for="fileInput" class="form-label fw-bold small text-uppercase text-muted"
-            >Upload file</label
-          >
-          <input
-            id="fileInput"
-            type="file"
-            class="form-control"
-            accept=".txt,.csv,.tsv,.log,.json,.html,.xml,.md,.yaml,.yml,text/plain"
-            @change="handleFileChange"
-          />
-          <div class="form-text">Pick a text-based file to convert it to UTF-8.</div>
-        </div>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-end">
+				<div class="col-lg-6">
+					<label
+						for="fileInput"
+						class="form-label fw-bold small text-uppercase text-muted"
+						>Upload file</label
+					>
+					<input
+						id="fileInput"
+						type="file"
+						class="form-control"
+						accept=".txt,.csv,.tsv,.log,.json,.html,.xml,.md,.yaml,.yml,text/plain"
+						@change="handleFileChange"
+					/>
+					<div class="form-text">
+						Pick a text-based file to convert it to UTF-8.
+					</div>
+				</div>
 
-        <div class="col-lg-6">
-          <label for="sourceEncoding" class="form-label fw-bold small text-uppercase text-muted"
-            >Source encoding</label
-          >
-          <select
-            id="sourceEncoding"
-            v-model="sourceEncoding"
-            class="form-select"
-            :disabled="isProcessing"
-          >
-            <optgroup v-for="group in encodingGroups" :key="group.label" :label="group.label">
-              <option
-                v-for="encoding in group.options"
-                :key="encoding.value"
-                :value="encoding.value"
-              >
-                {{ encoding.label }}
-              </option>
-            </optgroup>
-          </select>
-          <div class="form-text">The encoding used to decode the uploaded bytes.</div>
-        </div>
-      </div>
+				<div class="col-lg-6">
+					<label
+						for="sourceEncoding"
+						class="form-label fw-bold small text-uppercase text-muted"
+						>Source encoding</label
+					>
+					<select
+						id="sourceEncoding"
+						v-model="sourceEncoding"
+						class="form-select"
+						:disabled="isProcessing"
+					>
+						<optgroup
+							v-for="group in encodingGroups"
+							:key="group.label"
+							:label="group.label"
+						>
+							<option
+								v-for="encoding in group.options"
+								:key="encoding.value"
+								:value="encoding.value"
+							>
+								{{ encoding.label }}
+							</option>
+						</optgroup>
+					</select>
+					<div class="form-text">
+						The encoding used to decode the uploaded bytes.
+					</div>
+				</div>
+			</div>
 
-      <div class="d-flex flex-wrap gap-3 mt-3 align-items-center">
-        <span class="badge bg-light text-dark border">{{ selectedFileLabel }}</span>
-        <span class="badge bg-light text-dark border" v-if="convertedBinary"
-          >Converted size: {{ formatBytes(convertedSize) }} (UTF-8)</span
-        >
-        <span class="badge bg-warning text-dark" v-if="isProcessing">Processing…</span>
-      </div>
-    </ToolCard>
+			<div class="d-flex flex-wrap gap-3 mt-3 align-items-center">
+				<span class="badge bg-light text-dark border">{{
+					selectedFileLabel
+				}}</span>
+				<span class="badge bg-light text-dark border" v-if="convertedBinary"
+					>Converted size: {{ formatBytes(convertedSize) }} (UTF-8)</span
+				>
+				<span class="badge bg-warning text-dark" v-if="isProcessing"
+					>Processing…</span
+				>
+			</div>
+		</ToolCard>
 
-    <div v-if="conversionError" class="alert alert-danger" role="alert">
-      {{ conversionError }}
-    </div>
+		<div v-if="conversionError" class="alert alert-danger" role="alert">
+			{{ conversionError }}
+		</div>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Source Preview" class="h-100" no-padding>
-          <template #header-actions>
-            <span class="badge bg-secondary opacity-75" v-if="selectedFile">{{
-              sourceEncoding.toUpperCase()
-            }}</span>
-          </template>
-          <MonospaceEditor
-            v-model="decodedText"
-            :rows="14"
-            readonly
-            placeholder="The decoded text from your upload will appear here."
-          />
-        </ToolCard>
-      </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Source Preview" class="h-100" no-padding>
+					<template #header-actions>
+						<span class="badge bg-secondary opacity-75" v-if="selectedFile">{{
+							sourceEncoding.toUpperCase()
+						}}</span>
+					</template>
+					<MonospaceEditor
+						v-model="decodedText"
+						:rows="14"
+						readonly
+						placeholder="The decoded text from your upload will appear here."
+					/>
+				</ToolCard>
+			</div>
 
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="UTF-8 Output" class="h-100" no-padding>
-          <template #header-actions>
-            <div class="d-flex align-items-center gap-3">
-              <CopyButton :content="decodedText" />
-              <button
-                class="btn btn-sm btn-link p-0 text-decoration-none"
-                type="button"
-                :disabled="!convertedBinary"
-                @click="downloadConvertedFile"
-              >
-                Download
-              </button>
-              <span class="badge bg-secondary opacity-75" v-if="convertedBinary">
-                UTF-8
-              </span>
-            </div>
-          </template>
-          <MonospaceEditor
-            v-model="decodedText"
-            :rows="14"
-            readonly
-            bgLight
-            placeholder="Your converted UTF-8 text will be ready to copy or download."
-          />
-        </ToolCard>
-      </div>
-    </div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="UTF-8 Output" class="h-100" no-padding>
+					<template #header-actions>
+						<div class="d-flex align-items-center gap-3">
+							<CopyButton :content="decodedText" />
+							<button
+								class="btn btn-sm btn-link p-0 text-decoration-none"
+								type="button"
+								:disabled="!convertedBinary"
+								@click="downloadConvertedFile"
+							>
+								Download
+							</button>
+							<span
+								class="badge bg-secondary opacity-75"
+								v-if="convertedBinary"
+							>
+								UTF-8
+							</span>
+						</div>
+					</template>
+					<MonospaceEditor
+						v-model="decodedText"
+						:rows="14"
+						readonly
+						bgLight
+						placeholder="Your converted UTF-8 text will be ready to copy or download."
+					/>
+				</ToolCard>
+			</div>
+		</div>
 
-    <div v-if="!hasPreview" class="text-center text-muted py-4">
-      Upload a file to start converting to UTF-8.
-    </div>
-  </div>
+		<div v-if="!hasPreview" class="text-center text-muted py-4">
+			Upload a file to start converting to UTF-8.
+		</div>
+	</div>
 </template>

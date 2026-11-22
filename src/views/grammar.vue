@@ -216,7 +216,7 @@ function buildNullableSet(grammar: Grammar): Set<string> {
 		for (const [head, bodies] of grammar.productions) {
 			if (nullable.has(head)) continue;
 			for (const body of bodies) {
-				if (body.length === 0 || body.every((symbol) => nullable.has(symbol))) {
+				if (body.every((symbol) => nullable.has(symbol))) {
 					nullable.add(head);
 					changed = true;
 					break;
@@ -747,116 +747,144 @@ const matchSummary = computed(() => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="Grammar"
-      description="Convert BNF grammars into CNF, GNF, and an Oniguruma regex, then preview matches against sample text."
-    />
+	<div>
+		<ToolHeader
+			title="Grammar"
+			description="Convert BNF grammars into CNF, GNF, and an Oniguruma regex, then preview matches against sample text."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label for="start-symbol" class="form-label fw-bold small">Start Symbol</label>
-          <input
-            id="start-symbol"
-            v-model="startSymbol"
-            class="form-control font-monospace"
-            placeholder="S"
-          />
-        </div>
-        <div class="col-md-4">
-          <label for="flags" class="form-label fw-bold small">Regex Flags</label>
-          <input
-            id="flags"
-            v-model="flags"
-            class="form-control font-monospace"
-            placeholder="i, m, x"
-          />
-          <div class="form-text">Oniguruma flags apply to the generated pattern.</div>
-        </div>
-        <div class="col-md-4">
-          <label for="limit" class="form-label fw-bold small">Max Matches</label>
-          <input
-            id="limit"
-            v-model.number="maxMatches"
-            type="number"
-            class="form-control"
-            min="1"
-            max="5000"
-          />
-          <div class="form-text">Stops scanning after the limit to keep it fast.</div>
-        </div>
-        <div class="col-12">
-          <div v-if="parseErrors.length" class="alert alert-danger mb-0">
-            <div class="fw-bold">BNF parse issues</div>
-            <ul class="mb-0 ps-3">
-              <li v-for="error in parseErrors" :key="error">{{ error }}</li>
-            </ul>
-          </div>
-          <div v-else class="alert alert-secondary mb-0">
-            <strong>Grammar:</strong>
-            <span class="font-monospace">{{ grammarSummary }}</span>
-          </div>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3">
+				<div class="col-md-4">
+					<label for="start-symbol" class="form-label fw-bold small"
+						>Start Symbol</label
+					>
+					<input
+						id="start-symbol"
+						v-model="startSymbol"
+						class="form-control font-monospace"
+						placeholder="S"
+					/>
+				</div>
+				<div class="col-md-4">
+					<label for="flags" class="form-label fw-bold small"
+						>Regex Flags</label
+					>
+					<input
+						id="flags"
+						v-model="flags"
+						class="form-control font-monospace"
+						placeholder="i, m, x"
+					/>
+					<div class="form-text">
+						Oniguruma flags apply to the generated pattern.
+					</div>
+				</div>
+				<div class="col-md-4">
+					<label for="limit" class="form-label fw-bold small"
+						>Max Matches</label
+					>
+					<input
+						id="limit"
+						v-model.number="maxMatches"
+						type="number"
+						class="form-control"
+						min="1"
+						max="5000"
+					/>
+					<div class="form-text">
+						Stops scanning after the limit to keep it fast.
+					</div>
+				</div>
+				<div class="col-12">
+					<div v-if="parseErrors.length" class="alert alert-danger mb-0">
+						<div class="fw-bold">BNF parse issues</div>
+						<ul class="mb-0 ps-3">
+							<li v-for="error in parseErrors" :key="error">{{ error }}</li>
+						</ul>
+					</div>
+					<div v-else class="alert alert-secondary mb-0">
+						<strong>Grammar:</strong>
+						<span class="font-monospace">{{ grammarSummary }}</span>
+					</div>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="BNF Input" class="h-100" no-padding>
-          <MonospaceEditor v-model="bnfInput" language="bnf" :rows="16" />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Example Text" class="h-100">
-          <template #header-actions>
-            <span class="small text-muted">{{ matchSummary }}</span>
-          </template>
-          <MonospaceEditor v-model="exampleText" :rows="8" />
-          <div class="font-monospace text-finder-output bg-light mt-3">
-            <div class="p-3" v-html="highlightedHtml"></div>
-          </div>
-        </ToolCard>
-      </div>
-    </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="BNF Input" class="h-100" no-padding>
+					<MonospaceEditor v-model="bnfInput" language="bnf" :rows="16" />
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Example Text" class="h-100">
+					<template #header-actions>
+						<span class="small text-muted">{{ matchSummary }}</span>
+					</template>
+					<MonospaceEditor v-model="exampleText" :rows="8" />
+					<div class="font-monospace text-finder-output bg-light mt-3">
+						<div class="p-3" v-html="highlightedHtml"></div>
+					</div>
+				</ToolCard>
+			</div>
+		</div>
 
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Chomsky Normal Form" no-padding>
-          <template #header-actions>
-            <CopyButton :content="cnfOutput" />
-          </template>
-          <MonospaceEditor :model-value="cnfOutput" language="bnf" bg-light readonly :rows="14" />
-        </ToolCard>
-      </div>
-      <div class="col-lg-6 mb-4">
-        <ToolCard title="Greibach Normal Form" no-padding>
-          <template #header-actions>
-            <CopyButton :content="gnfOutput" />
-          </template>
-          <MonospaceEditor :model-value="gnfOutput" language="bnf" bg-light readonly :rows="14" />
-        </ToolCard>
-      </div>
-      <div class="col-12 mb-4">
-        <ToolCard title="Oniguruma Regex" no-padding>
-          <template #header-actions>
-            <CopyButton :content="onigurumaPattern" />
-          </template>
-          <MonospaceEditor :model-value="onigurumaPattern" language="regex" bg-light readonly :rows="10" />
-          <div v-if="error" class="alert alert-danger m-3 mb-0">
-            {{ error }}
-          </div>
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Chomsky Normal Form" no-padding>
+					<template #header-actions>
+						<CopyButton :content="cnfOutput" />
+					</template>
+					<MonospaceEditor
+						:model-value="cnfOutput"
+						language="bnf"
+						bg-light
+						readonly
+						:rows="14"
+					/>
+				</ToolCard>
+			</div>
+			<div class="col-lg-6 mb-4">
+				<ToolCard title="Greibach Normal Form" no-padding>
+					<template #header-actions>
+						<CopyButton :content="gnfOutput" />
+					</template>
+					<MonospaceEditor
+						:model-value="gnfOutput"
+						language="bnf"
+						bg-light
+						readonly
+						:rows="14"
+					/>
+				</ToolCard>
+			</div>
+			<div class="col-12 mb-4">
+				<ToolCard title="Oniguruma Regex" no-padding>
+					<template #header-actions>
+						<CopyButton :content="onigurumaPattern" />
+					</template>
+					<MonospaceEditor
+						:model-value="onigurumaPattern"
+						language="regex"
+						bg-light
+						readonly
+						:rows="10"
+					/>
+					<div v-if="error" class="alert alert-danger m-3 mb-0">
+						{{ error }}
+					</div>
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .text-finder-output {
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-y: auto;
-  border-radius: 0 0 0.375rem 0.375rem;
+	white-space: pre-wrap;
+	word-break: break-word;
+	overflow-y: auto;
+	border-radius: 0 0 0.375rem 0.375rem;
 }
 </style>

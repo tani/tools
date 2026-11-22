@@ -68,38 +68,48 @@ watch(() => props.data, renderPdf);
 </script>
 
 <template>
-  <div
-    class="pdf-viewer-container bg-secondary bg-opacity-10 p-3 rounded overflow-auto"
-    style="max-height: 800px"
-  >
-    <LoadingOverlay :loading="isRendering" message="Rendering Document..." />
+	<div
+		class="pdf-viewer-container bg-secondary bg-opacity-10 p-3 rounded overflow-auto"
+		style="max-height: 800px"
+	>
+		<LoadingOverlay :loading="isRendering" message="Rendering Document..." />
 
-    <div v-if="error && !isRendering" class="alert alert-danger m-0">
-      {{ error }}
-    </div>
+		<div v-if="error && !isRendering" class="alert alert-danger m-0">
+			{{ error }}
+		</div>
 
-    <div v-else-if="pages.length > 0" class="d-flex flex-column gap-3 align-items-center">
-      <div
-        v-for="(page, index) in pages"
-        :key="index"
-        class="pdf-page shadow-sm bg-white p-1 position-relative"
-      >
-        <img :src="page" class="img-fluid border" :alt="'Page ' + (index + 1)" />
-        <span class="badge bg-dark position-absolute top-0 start-0 m-2 opacity-50"
-          >Page {{ index + 1 }}</span
-        >
-      </div>
-    </div>
+		<div
+			v-else-if="pages.length > 0"
+			class="d-flex flex-column gap-3 align-items-center"
+		>
+			<div
+				v-for="(page, index) in pages"
+				:key="index"
+				class="pdf-page shadow-sm bg-white p-1 position-relative"
+			>
+				<img
+					:src="page"
+					class="img-fluid border"
+					:alt="'Page ' + (index + 1)"
+				/>
+				<span
+					class="badge bg-dark position-absolute top-0 start-0 m-2 opacity-50"
+					>Page {{ index + 1 }}</span
+				>
+			</div>
+		</div>
 
-    <div v-else class="text-center py-5 text-muted small uppercase fw-bold">No document loaded</div>
-  </div>
+		<div v-else class="text-center py-5 text-muted small uppercase fw-bold">
+			No document loaded
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .pdf-page {
-  max-width: 100%;
+	max-width: 100%;
 }
 .pdf-page img {
-  display: block;
+	display: block;
 }
 </style>

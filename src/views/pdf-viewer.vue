@@ -24,37 +24,37 @@ const handleFileChange = (event: Event) => {
 </script>
 
 <template>
-  <div>
-    <ToolHeader
-      title="PDF Viewer"
-      description="View multi-page PDF documents directly in your browser."
-    />
+	<div>
+		<ToolHeader
+			title="PDF Viewer"
+			description="View multi-page PDF documents directly in your browser."
+		/>
 
-    <ToolCard title="Configuration" class="mb-4">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-9">
-          <FilePicker
-            label="Upload PDF Document"
-            accept="application/pdf"
-            @change="handleFileChange"
-          />
-        </div>
-        <div class="col-md-3">
-          <div v-if="fileName" class="text-muted small mb-2 text-truncate">
-            <strong>File:</strong> {{ fileName }}
-          </div>
-        </div>
-      </div>
-    </ToolCard>
+		<ToolCard title="Configuration" class="mb-4">
+			<div class="row g-3 align-items-end">
+				<div class="col-md-9">
+					<FilePicker
+						label="Upload PDF Document"
+						accept="application/pdf"
+						@change="handleFileChange"
+					/>
+				</div>
+				<div class="col-md-3">
+					<div v-if="fileName" class="text-muted small mb-2 text-truncate">
+						<strong>File:</strong> {{ fileName }}
+					</div>
+				</div>
+			</div>
+		</ToolCard>
 
-    <div class="row">
-      <div class="col-12 mb-4">
-        <ToolCard title="Document View" no-padding>
-          <PdfViewer :data="fileData" />
-        </ToolCard>
-      </div>
-    </div>
-  </div>
+		<div class="row">
+			<div class="col-12 mb-4">
+				<ToolCard title="Document View" no-padding>
+					<PdfViewer :data="fileData" />
+				</ToolCard>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped></style>

@@ -313,6 +313,14 @@ export const tools: Tool[] = [
 	},
 	// Utilities
 	{
+		path: "/mirror",
+		name: "Mirror",
+		icon: "🪞",
+		description: "Use your webcam as a live mirror.",
+		component: () => import("./views/mirror.vue"),
+		category: "Utilities",
+	},
+	{
 		path: "/pomodoro",
 		name: "Pomodoro",
 		icon: "🍅",
